@@ -132,9 +132,9 @@
 <?php endif; ?>
 
 <!-- MODAL GRUPO -->
-<div id="modal_grupo" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
-    <div class="card" style="max-width: 480px; width: 100%; margin: 0; box-shadow: var(--shadow-modal);">
-        <h3 id="grupo_modal_title" style="font-size: 17px; font-weight: 700; margin: 0 0 16px 0; color: var(--color-text-main);">
+<div id="modal_grupo" class="modal-backdrop" style="display: none;">
+    <div class="modal-dialog">
+        <h3 id="grupo_modal_title" class="modal-title">
             Nuevo Grupo de Modificadores
         </h3>
         <form method="POST" action="<?= e(app_url('/admin/modificadores/grupo/guardar')) ?>">

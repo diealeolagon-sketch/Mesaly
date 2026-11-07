@@ -18,7 +18,7 @@
     </div>
 </div>
 
-<!-- RESUMEN DE ESTRUCTURA Y SECCIONES -->
+<!-- RESUMEN DE SECCIONES -->
 <div class="card" style="margin-bottom: 24px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
         <div>
@@ -29,7 +29,7 @@
                 Pestañas de navegación visibles para tus clientes en la carta digital.
             </p>
         </div>
-        <span class="badge badge-neutral" style="font-size: 12px;">
+        <span class="badge badge-neutral">
             <?= $totalCategorias ?> de <?= $maxCategorias ?> secciones permitidas
         </span>
     </div>
@@ -39,22 +39,22 @@
             Aún no tienes secciones creadas. Haz clic en <strong>Nueva Sección</strong> (ej: <em>Platos Fuertes</em> o <em>Bebidas</em>) para clasificar tus productos.
         </p>
     <?php else: ?>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <div class="cat-chips-wrap">
             <?php foreach ($categorias as $cat): ?>
                 <?php $isActiva = !empty($cat['activa']); ?>
-                <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid <?= $isActiva ? 'var(--color-border)' : 'var(--color-border-subtle)' ?>; background: <?= $isActiva ? 'var(--color-surface)' : 'var(--color-bg-subtle)' ?>; font-size: 13px;">
-                    <span style="font-weight: 600; color: <?= $isActiva ? 'var(--color-text-main)' : 'var(--color-text-subtle)' ?>; <?= !$isActiva ? 'text-decoration: line-through;' : '' ?>">
+                <div class="cat-chip <?= !$isActiva ? 'inactive' : '' ?>">
+                    <span class="cat-chip-name">
                         <?= e($cat['nombre']) ?>
                     </span>
-                    <span style="font-size: 11px; color: var(--color-text-subtle); background: var(--color-bg-subtle); padding: 1px 6px; border-radius: 4px; font-variant-numeric: tabular-nums;">
+                    <span class="cat-chip-order">
                         #<?= (int)$cat['orden'] ?>
                     </span>
-                    <button type="button" onclick="editarCat(<?= e(json_encode($cat)) ?>)" style="background: none; border: none; cursor: pointer; color: var(--color-text-muted); padding: 2px; display: inline-flex; align-items: center;" title="Editar sección">
+                    <button type="button" onclick="editarCat(<?= e(json_encode($cat)) ?>)" class="cat-chip-btn" title="Editar sección">
                         <?= icon('edit', 14) ?>
                     </button>
                     <form method="POST" action="<?= e(app_url('/admin/catalogo/categoria/' . $cat['id'] . '/eliminar')) ?>" style="display: inline;" onsubmit="return confirm('¿Seguro que deseas eliminar esta sección?');">
                         <?= csrf_field() ?>
-                        <button type="submit" style="background: none; border: none; cursor: pointer; color: var(--color-text-subtle); padding: 2px; display: inline-flex; align-items: center;" title="Eliminar sección">
+                        <button type="submit" class="cat-chip-btn danger" title="Eliminar sección">
                             <?= icon('x', 14) ?>
                         </button>
                     </form>
@@ -100,7 +100,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th style="width: 72px;">Foto</th>
+                        <th style="width: 64px;">Foto</th>
                         <th>Plato / Bebida</th>
                         <th>Sección</th>
                         <th style="text-align: right;">Precio (COP)</th>
@@ -113,56 +113,56 @@
                         <tr>
                             <td>
                                 <?php if (!empty($prod['imagen_path'])): ?>
-                                    <img src="<?= e(app_url($prod['imagen_path'])) ?>" alt="" style="width: 52px; height: 52px; border-radius: var(--radius-sm); object-fit: cover; border: 1px solid var(--color-border); display: block;">
+                                    <img src="<?= e(app_url($prod['imagen_path'])) ?>" alt="" class="table-thumb">
                                 <?php else: ?>
-                                    <div style="width: 52px; height: 52px; border-radius: var(--radius-sm); background: var(--color-bg-subtle); border: 1px dashed var(--color-border); display: flex; align-items: center; justify-content: center; color: var(--color-text-subtle);">
-                                        <?= icon('image', 20) ?>
+                                    <div class="table-thumb-placeholder">
+                                        <?= icon('image', 18) ?>
                                     </div>
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-weight: 600; font-size: 14px; color: var(--color-text-main);">
+                                <div class="prod-title-wrap">
+                                    <span class="prod-title">
                                         <?= e($prod['nombre']) ?>
                                     </span>
                                     <?php if (!empty($prod['destacado'])): ?>
-                                        <span class="badge badge-warning" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px;">
+                                        <span class="badge badge-warning">
                                             <?= icon('star', 11) ?>
                                             <span>Destacado</span>
                                         </span>
                                     <?php endif; ?>
                                 </div>
                                 <?php if (!empty($prod['descripcion'])): ?>
-                                    <p style="font-size: 12.5px; color: var(--color-text-muted); margin: 3px 0 0 0; max-width: 440px; line-height: 1.4;">
+                                    <p class="prod-desc">
                                         <?= e($prod['descripcion']) ?>
                                     </p>
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <span class="badge badge-neutral" style="font-weight: 500;">
+                                <span class="badge badge-neutral">
                                     <?= e($prod['categoria_nombre'] ?? 'Sin sección') ?>
                                 </span>
                             </td>
-                            <td style="text-align: right; font-weight: 700; color: var(--color-text-main); font-variant-numeric: tabular-nums; font-size: 14px;">
+                            <td class="prod-price">
                                 <?= format_cop($prod['precio']) ?>
                             </td>
                             <td style="text-align: center;">
                                 <form method="POST" action="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/toggle-agotado')) ?>" style="display: inline;">
                                     <?= csrf_field() ?>
-                                    <button type="submit" class="badge <?= !empty($prod['disponible']) ? 'badge-success' : 'badge-danger' ?>" style="cursor: pointer; border: none; font-size: 12px; font-weight: 600; padding: 4px 10px; display: inline-flex; align-items: center; gap: 5px;">
+                                    <button type="submit" class="badge <?= !empty($prod['disponible']) ? 'badge-success' : 'badge-danger' ?>" style="cursor: pointer; border: none; font-size: 12px; font-weight: 600; padding: 4px 10px;">
                                         <?= !empty($prod['disponible']) ? icon('check', 12) . ' Disponible' : icon('x', 12) . ' Agotado' ?>
                                     </button>
                                 </form>
                             </td>
                             <td style="text-align: right;">
-                                <div style="display: inline-flex; gap: 6px; align-items: center;">
-                                    <a href="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/editar')) ?>" class="btn btn-secondary btn-sm" title="Editar plato" style="padding: 6px 10px;">
+                                <div class="action-btns">
+                                    <a href="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/editar')) ?>" class="btn btn-secondary btn-sm" title="Editar plato">
                                         <?= icon('edit', 14) ?>
                                         <span>Editar</span>
                                     </a>
                                     <form method="POST" action="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/eliminar')) ?>" onsubmit="return confirm('¿Seguro que deseas eliminar este producto? Se ocultará del menú pero su historial se mantendrá intacto.');" style="display: inline;">
                                         <?= csrf_field() ?>
-                                        <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-border); padding: 6px 10px;" title="Eliminar plato">
+                                        <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger);" title="Eliminar plato">
                                             <?= icon('trash', 14) ?>
                                         </button>
                                     </form>
@@ -176,10 +176,10 @@
     <?php endif; ?>
 </div>
 
-<!-- MODAL DE SECCIÓN / CATEGORÍA -->
-<div id="modal_categoria" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
-    <div class="card" style="max-width: 440px; width: 100%; margin: 0; box-shadow: var(--shadow-modal);">
-        <h3 id="cat_modal_title" style="font-size: 17px; font-weight: 700; margin: 0 0 16px 0; color: var(--color-text-main);">
+<!-- MODAL DE SECCIÓN -->
+<div id="modal_categoria" class="modal-backdrop" style="display: none;">
+    <div class="modal-dialog">
+        <h3 id="cat_modal_title" class="modal-title">
             Nueva Sección del Menú
         </h3>
         <form method="POST" action="<?= e(app_url('/admin/catalogo/categoria/guardar')) ?>">
@@ -203,7 +203,7 @@
                 </label>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle);">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="cerrarCatModal()">Cancelar</button>
                 <button type="submit" class="btn btn-primary">Guardar Sección</button>
             </div>
