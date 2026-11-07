@@ -25,6 +25,12 @@ try {
     $schema = file_get_contents(__DIR__ . '/../database/schema.sql');
     $pdo->exec($schema);
     echo "Esquema importado exitosamente.\n";
+
+    if (file_exists(__DIR__ . '/../database/seeds.sql')) {
+        $seeds = file_get_contents(__DIR__ . '/../database/seeds.sql');
+        $pdo->exec($seeds);
+        echo "Seeds iniciales importados exitosamente.\n";
+    }
 } catch (PDOException $e) {
     fwrite(STDERR, "Error conectando a la BD: " . $e->getMessage() . "\n");
     exit(1);

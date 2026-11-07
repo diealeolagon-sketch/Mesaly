@@ -14,6 +14,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .admin-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
         }
         .admin-nav-brand {
             display: flex;
@@ -26,6 +33,20 @@
         .admin-nav-brand .badge {
             background-color: var(--brand-primary);
             color: var(--brand-white);
+        }
+        .admin-nav-links {
+            display: flex;
+            gap: 16px;
+        }
+        .admin-nav-links a {
+            font-weight: 600;
+            color: var(--brand-ink);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+        }
+        .admin-nav-links a:hover {
+            background: var(--brand-gray-light);
+            color: var(--brand-primary);
         }
         .admin-nav-user {
             display: flex;
@@ -46,15 +67,36 @@
             box-shadow: var(--shadow-sm);
             margin-bottom: 24px;
         }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        .table th, .table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--brand-gray-border);
+            font-size: 14px;
+        }
+        .table th {
+            background-color: var(--brand-cream);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
     <header class="admin-nav">
-        <div class="admin-nav-brand">
-            <a href="<?= e(app_url('/superadmin')) ?>">
-                <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly">
-            </a>
-            <span class="badge">Super Admin</span>
+        <div class="admin-nav-left">
+            <div class="admin-nav-brand">
+                <a href="<?= e(app_url('/superadmin')) ?>">
+                    <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly">
+                </a>
+                <span class="badge">Super Admin</span>
+            </div>
+            <nav class="admin-nav-links">
+                <a href="<?= e(app_url('/superadmin')) ?>">Vencimientos</a>
+                <a href="<?= e(app_url('/superadmin/negocios')) ?>">Negocios</a>
+            </nav>
         </div>
         <div class="admin-nav-user">
             <span>Hola, <strong><?= e($user['nombre'] ?? 'Administrador') ?></strong></span>

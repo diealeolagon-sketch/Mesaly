@@ -82,7 +82,8 @@ abstract class TenantModel extends Model
         $sql = "UPDATE `{$this->table}` SET {$setString} WHERE `{$this->primaryKey}` = :__id AND `{$this->tenantColumn}` = :__tenant_id{$softDeleteSql}";
 
         $stmt = self::getPdo()->prepare($sql);
-        return $stmt->execute($data);
+        $stmt->execute($data);
+        return $stmt->rowCount() > 0;
     }
 
     public function delete(int $id): bool
@@ -92,18 +93,20 @@ abstract class TenantModel extends Model
         if ($this->usesSoftDeletes) {
             $sql = "UPDATE `{$this->table}` SET `deleted_at` = :now WHERE `{$this->primaryKey}` = :id AND `{$this->tenantColumn}` = :tenant_id AND `deleted_at` IS NULL";
             $stmt = self::getPdo()->prepare($sql);
-            return $stmt->execute([
+            $stmt->execute([
                 'now' => date('Y-m-d H:i:s'),
                 'id' => $id,
                 'tenant_id' => $tenantId,
             ]);
+            return $stmt->rowCount() > 0;
         }
 
         $sql = "DELETE FROM `{$this->table}` WHERE `{$this->primaryKey}` = :id AND `{$this->tenantColumn}` = :tenant_id";
         $stmt = self::getPdo()->prepare($sql);
-        return $stmt->execute([
+        $stmt->execute([
             'id' => $id,
             'tenant_id' => $tenantId,
         ]);
+        return $stmt->rowCount() > 0;
     }
 }
