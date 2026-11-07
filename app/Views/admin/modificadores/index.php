@@ -132,7 +132,7 @@
 <?php endif; ?>
 
 <!-- MODAL GRUPO -->
-<div id="modal_grupo" class="modal-backdrop" style="display: none;">
+<div id="modal_grupo" class="modal-backdrop" style="display: none !important;">
     <div class="modal-dialog">
         <h3 id="grupo_modal_title" class="modal-title">
             Nuevo Grupo de Modificadores
@@ -143,7 +143,7 @@
 
             <div class="form-group">
                 <label for="grupo_nombre" class="form-label">Nombre del Grupo *</label>
-                <input type="text" id="grupo_nombre" name="nombre" class="form-control" placeholder="Ej: Término de la carne, Adiciones, Salsas" required autofocus>
+                <input type="text" id="grupo_nombre" name="nombre" class="form-control" placeholder="Ej: Término de la carne, Adiciones, Salsas" required>
             </div>
 
             <div class="form-group">
@@ -172,7 +172,7 @@
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle);">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="cerrarGrupoModal()">Cancelar</button>
                 <button type="submit" class="btn btn-primary">Guardar Grupo</button>
             </div>
@@ -182,6 +182,7 @@
 
 <script nonce="<?= e($cspNonce) ?>">
 function abrirGrupoModal() {
+    const modal = document.getElementById('modal_grupo');
     document.getElementById('grupo_modal_title').innerText = 'Nuevo Grupo de Modificadores';
     document.getElementById('grupo_id').value = '0';
     document.getElementById('grupo_nombre').value = '';
@@ -190,10 +191,16 @@ function abrirGrupoModal() {
     document.getElementById('grupo_min').value = '0';
     document.getElementById('grupo_max').value = '3';
     toggleTipoGrupo('unica');
-    document.getElementById('modal_grupo').style.display = 'flex';
+    modal.classList.add('is-open');
+    modal.style.setProperty('display', 'flex', 'important');
+    setTimeout(() => {
+        const inp = document.getElementById('grupo_nombre');
+        if (inp) inp.focus();
+    }, 60);
 }
 
 function editarGrupo(g) {
+    const modal = document.getElementById('modal_grupo');
     document.getElementById('grupo_modal_title').innerText = 'Editar Grupo de Modificadores';
     document.getElementById('grupo_id').value = g.id;
     document.getElementById('grupo_nombre').value = g.nombre;
@@ -202,14 +209,33 @@ function editarGrupo(g) {
     document.getElementById('grupo_min').value = g.min_selecciones;
     document.getElementById('grupo_max').value = g.max_selecciones;
     toggleTipoGrupo(g.tipo);
-    document.getElementById('modal_grupo').style.display = 'flex';
+    modal.classList.add('is-open');
+    modal.style.setProperty('display', 'flex', 'important');
+    setTimeout(() => {
+        const inp = document.getElementById('grupo_nombre');
+        if (inp) inp.focus();
+    }, 60);
 }
 
 function cerrarGrupoModal() {
-    document.getElementById('modal_grupo').style.display = 'none';
+    const modal = document.getElementById('modal_grupo');
+    modal.classList.remove('is-open');
+    modal.style.setProperty('display', 'none', 'important');
 }
 
 function toggleTipoGrupo(tipo) {
     document.getElementById('box_multi_limites').style.display = tipo === 'multiple' ? 'grid' : 'none';
 }
+
+document.getElementById('modal_grupo').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarGrupoModal();
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarGrupoModal();
+    }
+});
 </script>

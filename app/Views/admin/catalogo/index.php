@@ -177,7 +177,7 @@
 </div>
 
 <!-- MODAL DE SECCIÓN -->
-<div id="modal_categoria" class="modal-backdrop" style="display: none;">
+<div id="modal_categoria" class="modal-backdrop" style="display: none !important;">
     <div class="modal-dialog">
         <h3 id="cat_modal_title" class="modal-title">
             Nueva Sección del Menú
@@ -188,7 +188,7 @@
 
             <div class="form-group">
                 <label for="cat_nombre" class="form-label">Nombre de la Sección *</label>
-                <input type="text" id="cat_nombre" name="nombre" class="form-control" placeholder="Ej: Platos Fuertes, Bebidas, Postres" required autofocus>
+                <input type="text" id="cat_nombre" name="nombre" class="form-control" placeholder="Ej: Platos Fuertes, Bebidas, Postres" required>
             </div>
 
             <div class="form-group">
@@ -213,24 +213,50 @@
 
 <script nonce="<?= e($cspNonce) ?>">
 function abrirCatModal() {
+    const modal = document.getElementById('modal_categoria');
     document.getElementById('cat_modal_title').innerText = 'Nueva Sección del Menú';
     document.getElementById('cat_id').value = '0';
     document.getElementById('cat_nombre').value = '';
     document.getElementById('cat_orden').value = '0';
     document.getElementById('cat_activa').checked = true;
-    document.getElementById('modal_categoria').style.display = 'flex';
+    modal.classList.add('is-open');
+    modal.style.setProperty('display', 'flex', 'important');
+    setTimeout(() => {
+        const inp = document.getElementById('cat_nombre');
+        if (inp) inp.focus();
+    }, 60);
 }
 
 function editarCat(cat) {
+    const modal = document.getElementById('modal_categoria');
     document.getElementById('cat_modal_title').innerText = 'Editar Sección';
     document.getElementById('cat_id').value = cat.id;
     document.getElementById('cat_nombre').value = cat.nombre;
     document.getElementById('cat_orden').value = cat.orden;
     document.getElementById('cat_activa').checked = cat.activa == 1;
-    document.getElementById('modal_categoria').style.display = 'flex';
+    modal.classList.add('is-open');
+    modal.style.setProperty('display', 'flex', 'important');
+    setTimeout(() => {
+        const inp = document.getElementById('cat_nombre');
+        if (inp) inp.focus();
+    }, 60);
 }
 
 function cerrarCatModal() {
-    document.getElementById('modal_categoria').style.display = 'none';
+    const modal = document.getElementById('modal_categoria');
+    modal.classList.remove('is-open');
+    modal.style.setProperty('display', 'none', 'important');
 }
+
+document.getElementById('modal_categoria').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarCatModal();
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarCatModal();
+    }
+});
 </script>
