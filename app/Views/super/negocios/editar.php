@@ -1,7 +1,11 @@
 <div style="max-width: 720px; margin: 0 auto;">
-    <div style="margin-bottom: 20px;">
-        <a href="<?= e(app_url('/superadmin/negocios')) ?>" style="font-size: 13px;">← Volver al listado</a>
-        <h2 style="margin-top: 8px;">Editar Negocio: <?= e($negocio['nombre']) ?></h2>
+    <div style="margin-bottom: 24px;">
+        <a href="<?= e(app_url('/superadmin/negocios')) ?>" class="btn btn-secondary btn-sm" style="margin-bottom: 16px;">
+            <?= icon('arrow-left', 14) ?>
+            <span>Volver al listado</span>
+        </a>
+        <h1 class="page-title">Editar Negocio: <?= e($negocio['nombre']) ?></h1>
+        <p class="page-subtitle">Modifica los datos del restaurante. El slug afecta el QR si lo cambias.</p>
     </div>
 
     <div class="card">
@@ -14,10 +18,13 @@
             </div>
 
             <div class="form-group">
-                <label for="slug" class="form-label">Slug de la URL * (¡Cuidado! Cambiarlo altera los códigos QR)</label>
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <span style="color: var(--brand-gray-muted); font-size: 13px;">mesaly.com/</span>
-                    <input type="text" id="slug" name="slug" class="form-control" value="<?= e($negocio['slug']) ?>" required pattern="^[a-z0-9]+(-[a-z0-9]+)*$">
+                <label for="slug" class="form-label">
+                    Slug de la URL *
+                    <span style="font-weight: 400; color: var(--color-danger); font-size: 12px;">¡Cuidado! Cambiarlo altera los códigos QR</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 0;">
+                    <span style="padding: 9px 12px; background: var(--color-bg-subtle); border: 1px solid var(--color-border); border-right: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm); font-size: 13px; color: var(--color-text-muted); white-space: nowrap;">mesaly.com/</span>
+                    <input type="text" id="slug" name="slug" class="form-control" value="<?= e($negocio['slug']) ?>" required pattern="^[a-z0-9]+(-[a-z0-9]+)*$" style="border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
                 </div>
             </div>
 
@@ -47,9 +54,12 @@
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--color-border-subtle);">
                 <a href="<?= e(app_url('/superadmin/negocios')) ?>" class="btn btn-secondary">Cancelar</a>
-                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <button type="submit" class="btn btn-primary">
+                    <?= icon('check', 16) ?>
+                    <span>Guardar Cambios</span>
+                </button>
             </div>
         </form>
     </div>

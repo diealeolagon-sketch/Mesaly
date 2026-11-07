@@ -5,118 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Super Admin — Mesaly') ?></title>
     <link rel="icon" type="image/svg+xml" href="<?= e(app_url('/assets/img/logo-icon.svg')) ?>">
-    <link rel="stylesheet" href="<?= e(app_url('/assets/css/brand.css')) ?>" nonce="<?= e($cspNonce) ?>">
-    <link rel="stylesheet" href="<?= e(app_url('/assets/css/admin.css')) ?>" nonce="<?= e($cspNonce) ?>">
-    <style nonce="<?= e($cspNonce) ?>">
-        .admin-nav {
-            background-color: var(--brand-white);
-            border-bottom: 1px solid var(--brand-gray-border);
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .admin-nav-left {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-        .admin-nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .admin-nav-brand img {
-            height: 36px;
-        }
-        .admin-nav-brand .badge {
-            background-color: var(--brand-primary);
-            color: var(--brand-white);
-        }
-        .admin-nav-links {
-            display: flex;
-            gap: 16px;
-        }
-        .admin-nav-links a {
-            font-weight: 600;
-            color: var(--brand-ink);
-            padding: 6px 12px;
-            border-radius: var(--radius-sm);
-        }
-        .admin-nav-links a:hover {
-            background: var(--brand-gray-light);
-            color: var(--brand-primary);
-        }
-        .admin-nav-user {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 14px;
-        }
-        .admin-container {
-            max-width: 1200px;
-            margin: 28px auto;
-            padding: 0 20px;
-        }
-        .card {
-            background-color: var(--brand-white);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--brand-gray-border);
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 24px;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 16px;
-        }
-        .table th, .table td {
-            padding: 12px 14px;
-            text-align: left;
-            border-bottom: 1px solid var(--brand-gray-border);
-            font-size: 14px;
-        }
-        .table th {
-            background-color: var(--brand-cream);
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" href="<?= e(app_url('/assets/css/admin.css')) ?>?v=2">
 </head>
-<body>
-    <header class="admin-nav">
-        <div class="admin-nav-left">
-            <div class="admin-nav-brand">
-                <a href="<?= e(app_url('/superadmin')) ?>">
-                    <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly">
+<body class="admin-body">
+    <?php $currentUri = $_SERVER['REQUEST_URI'] ?? ''; ?>
+    <header class="top-nav">
+        <div class="top-nav-inner">
+            <div class="nav-brand-group">
+                <a href="<?= e(app_url('/superadmin')) ?>" style="display: flex; align-items: center;">
+                    <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="nav-brand-logo">
                 </a>
-                <span class="badge">Super Admin</span>
+                <span class="nav-tenant-badge" style="background: #FEF2F2; color: #DC2626; border-color: #FECACA;">
+                    <?= icon('settings', 14) ?>
+                    <span>Super Admin</span>
+                </span>
             </div>
-            <nav class="admin-nav-links">
-                <a href="<?= e(app_url('/superadmin')) ?>">Vencimientos</a>
-                <a href="<?= e(app_url('/superadmin/negocios')) ?>">Negocios</a>
+
+            <nav class="nav-links-wrap">
+                <a href="<?= e(app_url('/superadmin')) ?>" class="nav-link-item <?= str_ends_with(rtrim($currentUri, '/'), '/superadmin') ? 'active' : '' ?>">
+                    <?= icon('dashboard', 16) ?>
+                    <span>Vencimientos</span>
+                </a>
+                <a href="<?= e(app_url('/superadmin/negocios')) ?>" class="nav-link-item <?= str_contains($currentUri, '/negocios') ? 'active' : '' ?>">
+                    <?= icon('store', 16) ?>
+                    <span>Negocios</span>
+                </a>
             </nav>
-        </div>
-        <div class="admin-nav-user">
-            <span>Hola, <strong><?= e($user['nombre'] ?? 'Administrador') ?></strong></span>
-            <form method="POST" action="<?= e(app_url('/logout')) ?>" style="display: inline;">
-                <?= csrf_field() ?>
-                <button type="submit" class="btn btn-secondary" style="min-height: 36px; padding: 6px 14px; font-size: 13px;">
-                    Cerrar Sesión
-                </button>
-            </form>
+
+            <div class="nav-user-actions">
+                <span style="font-size: 13px; color: var(--color-text-muted);">
+                    <?= e($user['nombre'] ?? 'Super Admin') ?>
+                </span>
+                <form method="POST" action="<?= e(app_url('/logout')) ?>" style="display: inline;">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-secondary btn-sm" title="Cerrar sesión">
+                        <?= icon('logout', 14) ?>
+                        <span>Salir</span>
+                    </button>
+                </form>
+            </div>
         </div>
     </header>
 
-    <main class="admin-container">
+    <main class="admin-shell">
         <?php if (!empty($flash_success)): ?>
-            <div class="alert alert-success"><?= e($flash_success) ?></div>
+            <div class="alert alert-success" style="margin-bottom: 20px;">
+                <?= icon('check', 16) ?>
+                <span><?= e($flash_success) ?></span>
+            </div>
         <?php endif; ?>
 
         <?php if (!empty($flash_error)): ?>
-            <div class="alert alert-error"><?= e($flash_error) ?></div>
+            <div class="alert alert-error" style="margin-bottom: 20px;">
+                <?= icon('x', 16) ?>
+                <span><?= e($flash_error) ?></span>
+            </div>
         <?php endif; ?>
 
         <?= $content ?>

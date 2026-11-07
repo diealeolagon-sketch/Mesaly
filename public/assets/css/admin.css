@@ -730,3 +730,143 @@ body.admin-body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 768px) {
+    .top-nav-inner {
+        height: auto;
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .nav-links-wrap {
+        gap: 2px;
+        flex-wrap: wrap;
+    }
+
+    .nav-link-item span {
+        display: none;
+    }
+
+    .nav-link-item {
+        padding: 8px 10px;
+    }
+
+    .admin-shell {
+        margin: 16px auto 40px auto;
+        padding: 0 16px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .modules-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .content-header, .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .content-actions {
+        width: 100%;
+    }
+
+    .content-actions .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .table th,
+    .table td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .modal-dialog {
+        padding: 20px 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-brand-logo {
+        height: 24px;
+    }
+
+    .page-title {
+        font-size: 18px;
+    }
+
+    .btn-sm {
+        padding: 6px 10px;
+    }
+}
+
+/* ========== UTILITIES ========== */
+
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+.text-muted  { color: var(--color-text-muted); }
+.mt-0 { margin-top: 0; }
+.mb-0 { margin-bottom: 0; }
+.w-full { width: 100%; }
+
+/* Section divider */
+.section-divider {
+    height: 1px;
+    background: var(--color-border-subtle);
+    margin: 24px 0;
+    border: none;
+}
+
+/* Inline URL prefix input */
+.input-prefix-wrap {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-prefix {
+    padding: 9px 12px;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-right: none;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+
+.input-prefix + .form-control {
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* Config 2-col grid */
+.config-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .config-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}

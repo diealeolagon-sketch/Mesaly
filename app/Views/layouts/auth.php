@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Iniciar Sesión — Mesaly') ?></title>
     <link rel="icon" type="image/svg+xml" href="<?= e(app_url('/assets/img/logo-icon.svg')) ?>">
-    <link rel="stylesheet" href="<?= e(app_url('/assets/css/brand.css')) ?>" nonce="<?= e($cspNonce) ?>">
-    <link rel="stylesheet" href="<?= e(app_url('/assets/css/admin.css')) ?>" nonce="<?= e($cspNonce) ?>">
+    <link rel="stylesheet" href="<?= e(app_url('/assets/css/admin.css')) ?>?v=2">
     <style nonce="<?= e($cspNonce) ?>">
         body.auth-body {
             background-color: #F8FAFC;

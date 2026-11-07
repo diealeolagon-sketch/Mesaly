@@ -1,8 +1,11 @@
 <div style="max-width: 720px; margin: 0 auto;">
-    <div style="margin-bottom: 20px;">
-        <a href="<?= e(app_url('/superadmin/negocios')) ?>" style="font-size: 13px;">← Volver al listado</a>
-        <h2 style="margin-top: 8px;">Registrar Nuevo Negocio</h2>
-        <p style="color: var(--brand-gray-muted); font-size: 14px;">
+    <div style="margin-bottom: 24px;">
+        <a href="<?= e(app_url('/superadmin/negocios')) ?>" class="btn btn-secondary btn-sm" style="margin-bottom: 16px;">
+            <?= icon('arrow-left', 14) ?>
+            <span>Volver al listado</span>
+        </a>
+        <h1 class="page-title">Registrar Nuevo Negocio</h1>
+        <p class="page-subtitle">
             Al crear el negocio se generará un usuario administrador con una contraseña temporal de un solo uso.
         </p>
     </div>
@@ -11,7 +14,7 @@
         <form method="POST" action="<?= e(app_url('/superadmin/negocios/crear')) ?>">
             <?= csrf_field() ?>
 
-            <h3 style="font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--brand-gray-border); padding-bottom: 8px;">
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--color-text-main); margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle);">
                 1. Información del Restaurante
             </h3>
 
@@ -21,15 +24,15 @@
             </div>
 
             <div class="form-group">
-                <label for="slug" class="form-label">Slug de la URL * (único, letras minúsculas, números y guiones)</label>
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <span style="color: var(--brand-gray-muted); font-size: 13px;">mesaly.com/</span>
-                    <input type="text" id="slug" name="slug" class="form-control" placeholder="hamburguesas-la-80" required pattern="^[a-z0-9]+(-[a-z0-9]+)*$">
+                <label for="slug" class="form-label">Slug de la URL * <span style="font-weight: 400; color: var(--color-text-muted);">(único, letras minúsculas, números y guiones)</span></label>
+                <div style="display: flex; align-items: center; gap: 0;">
+                    <span style="padding: 9px 12px; background: var(--color-bg-subtle); border: 1px solid var(--color-border); border-right: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm); font-size: 13px; color: var(--color-text-muted); white-space: nowrap;">mesaly.com/</span>
+                    <input type="text" id="slug" name="slug" class="form-control" placeholder="hamburguesas-la-80" required pattern="^[a-z0-9]+(-[a-z0-9]+)*$" style="border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="whatsapp" class="form-label">Número de WhatsApp del Negocio * (incluyendo código país ej: 573001234567)</label>
+                <label for="whatsapp" class="form-label">Número de WhatsApp del Negocio * <span style="font-weight: 400; color: var(--color-text-muted);">(ej: 573001234567)</span></label>
                 <input type="tel" id="whatsapp" name="whatsapp" class="form-control" placeholder="573001234567" required>
             </div>
 
@@ -54,14 +57,14 @@
                 </div>
             </div>
 
-            <div class="form-group" style="margin-top: 8px;">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
-                    <input type="checkbox" name="en_prueba" value="1" style="width: 18px; height: 18px;">
-                    <strong>Activar periodo de prueba inicial (15 días de cortesía)</strong>
+            <div class="form-group" style="margin-top: 4px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 16px; background: var(--color-bg-subtle); border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle);">
+                    <input type="checkbox" name="en_prueba" value="1" style="width: 16px; height: 16px; accent-color: var(--color-brand);">
+                    <span style="font-size: 13.5px; font-weight: 600; color: var(--color-text-main);">Activar periodo de prueba inicial (15 días de cortesía)</span>
                 </label>
             </div>
 
-            <h3 style="font-size: 16px; margin: 28px 0 16px 0; border-bottom: 1px solid var(--brand-gray-border); padding-bottom: 8px;">
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--color-text-main); margin: 28px 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle);">
                 2. Cuenta del Administrador del Negocio
             </h3>
 
@@ -75,9 +78,12 @@
                 <input type="email" id="admin_email" name="admin_email" class="form-control" placeholder="admin@restaurante.com" required>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--color-border-subtle);">
                 <a href="<?= e(app_url('/superadmin/negocios')) ?>" class="btn btn-secondary">Cancelar</a>
-                <button type="submit" class="btn btn-primary">Registrar y Generar Clave</button>
+                <button type="submit" class="btn btn-primary">
+                    <?= icon('check', 16) ?>
+                    <span>Registrar y Generar Clave</span>
+                </button>
             </div>
         </form>
     </div>
