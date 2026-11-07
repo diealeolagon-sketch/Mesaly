@@ -19,6 +19,9 @@
 !/public/uploads/.gitkeep
 !/public/uploads/.htaccess
 
+# Recursos de diseño y skills de referencia
+skills/
+
 # IDEs y SO
 .vscode/
 .idea/

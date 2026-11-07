@@ -6,132 +6,74 @@
     <title><?= e($title ?? 'Panel de Administración — Mesaly') ?></title>
     <link rel="icon" type="image/svg+xml" href="<?= e(app_url('/assets/img/logo-icon.svg')) ?>">
     <link rel="stylesheet" href="<?= e(app_url('/assets/css/brand.css')) ?>">
-    <style nonce="<?= e($cspNonce) ?>">
-        .admin-nav {
-            background-color: var(--brand-white);
-            border-bottom: 1px solid var(--brand-gray-border);
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-        .admin-nav-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .admin-nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .admin-nav-brand img {
-            height: 32px;
-        }
-        .admin-nav-title {
-            font-weight: 700;
-            font-size: 16px;
-            color: var(--brand-ink);
-        }
-        .admin-nav-links {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .admin-nav-links a {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--brand-ink);
-            padding: 8px 12px;
-            border-radius: var(--radius-sm);
-        }
-        .admin-nav-links a:hover {
-            background: var(--brand-gray-light);
-            color: var(--brand-primary);
-        }
-        .admin-nav-user {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 13px;
-        }
-        .admin-container {
-            max-width: 1200px;
-            margin: 28px auto;
-            padding: 0 20px;
-        }
-        .card {
-            background-color: var(--brand-white);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--brand-gray-border);
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 24px;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 16px;
-        }
-        .table th, .table td {
-            padding: 12px 14px;
-            text-align: left;
-            border-bottom: 1px solid var(--brand-gray-border);
-            font-size: 14px;
-        }
-        .table th {
-            background-color: var(--brand-cream);
-            font-weight: 600;
-        }
-        .btn-sm {
-            min-height: 32px;
-            padding: 4px 10px;
-            font-size: 12px;
-        }
-    </style>
+    <link rel="stylesheet" href="<?= e(app_url('/assets/css/admin.css')) ?>">
 </head>
-<body>
-    <header class="admin-nav">
+<body class="admin-body">
+    <?php
+    $currentUri = $_SERVER['REQUEST_URI'] ?? '';
+    ?>
+    <header class="admin-navbar">
         <div class="admin-nav-left">
-            <div class="admin-nav-brand">
-                <a href="<?= e(app_url('/admin')) ?>">
-                    <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly">
+            <a href="<?= e(app_url('/admin')) ?>" class="admin-brand-link">
+                <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="admin-brand-logo">
+            </a>
+
+            <?php if (!empty($tenant['nombre'])): ?>
+                <span class="admin-restaurant-badge" title="Restaurante activo">
+                    🍽️ <?= e($tenant['nombre']) ?>
+                </span>
+            <?php endif; ?>
+
+            <nav class="admin-nav-menu">
+                <a href="<?= e(app_url('/admin')) ?>" class="admin-nav-item <?= $currentUri === '/admin' || str_ends_with($currentUri, '/admin') ? 'active' : '' ?>">
+                    <span>📊</span> Resumen
                 </a>
-            </div>
-            <nav class="admin-nav-links">
-                <a href="<?= e(app_url('/admin')) ?>">Resumen</a>
-                <a href="<?= e(app_url('/admin/catalogo')) ?>">Catálogo</a>
-                <a href="<?= e(app_url('/admin/modificadores')) ?>">Modificadores</a>
-                <a href="<?= e(app_url('/admin/disponibilidad')) ?>" style="color: #DC2626;">⚡ Agotados</a>
-                <a href="<?= e(app_url('/admin/configuracion')) ?>">Configuración</a>
+                <a href="<?= e(app_url('/admin/catalogo')) ?>" class="admin-nav-item <?= str_contains($currentUri, '/catalogo') ? 'active' : '' ?>">
+                    <span>📋</span> Catálogo
+                </a>
+                <a href="<?= e(app_url('/admin/modificadores')) ?>" class="admin-nav-item <?= str_contains($currentUri, '/modificadores') ? 'active' : '' ?>">
+                    <span>⚙️</span> Modificadores
+                </a>
+                <a href="<?= e(app_url('/admin/disponibilidad')) ?>" class="admin-nav-item <?= str_contains($currentUri, '/disponibilidad') ? 'active' : '' ?>" style="color: #DC2626;">
+                    <span>⚡</span> Agotados
+                </a>
+                <a href="<?= e(app_url('/admin/configuracion')) ?>" class="admin-nav-item <?= str_contains($currentUri, '/configuracion') ? 'active' : '' ?>">
+                    <span>🎨</span> Configuración
+                </a>
             </nav>
         </div>
-        <div class="admin-nav-user">
+
+        <div class="admin-nav-right">
             <?php if (!empty($tenant['slug'])): ?>
-                <a href="<?= e(app_url('/' . $tenant['slug'])) ?>" target="_blank" class="btn btn-secondary btn-sm" style="background: #FFF7EA; border-color: var(--brand-primary); color: var(--brand-primary);">
-                    👁 Ver Menú
+                <a href="<?= e(app_url('/' . $tenant['slug'])) ?>" target="_blank" class="btn-modern btn-modern-secondary btn-modern-sm" style="color: var(--brand-primary); font-weight: 700;">
+                    👁️ Ver Menú Público
                 </a>
             <?php endif; ?>
-            <span><strong><?= e($user['nombre'] ?? 'Admin') ?></strong></span>
+
+            <div style="font-size: 13.5px; color: var(--admin-text-muted); display: flex; align-items: center; gap: 8px;">
+                <span>Hola, <strong><?= e($user['nombre'] ?? 'Admin') ?></strong></span>
+            </div>
+
             <form method="POST" action="<?= e(app_url('/logout')) ?>" style="display: inline;">
                 <?= csrf_field() ?>
-                <button type="submit" class="btn btn-secondary btn-sm">
-                    Salir
+                <button type="submit" class="btn-modern btn-modern-secondary btn-modern-sm" title="Cerrar sesión">
+                    Cerrar Sesión
                 </button>
             </form>
         </div>
     </header>
 
-    <main class="admin-container">
+    <main style="max-width: 1240px; margin: 32px auto; padding: 0 24px;">
         <?php if (!empty($flash_success)): ?>
-            <div class="alert alert-success"><?= e($flash_success) ?></div>
+            <div class="alert alert-success" style="border-radius: var(--radius-md); box-shadow: var(--shadow-subtle);">
+                <strong>✓ Éxito:</strong> <?= e($flash_success) ?>
+            </div>
         <?php endif; ?>
 
         <?php if (!empty($flash_error)): ?>
-            <div class="alert alert-error"><?= e($flash_error) ?></div>
+            <div class="alert alert-error" style="border-radius: var(--radius-md); box-shadow: var(--shadow-subtle);">
+                <strong>✕ Error:</strong> <?= e($flash_error) ?>
+            </div>
         <?php endif; ?>
 
         <?= $content ?>
