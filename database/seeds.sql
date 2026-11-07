@@ -55,8 +55,7 @@ INSERT INTO `restaurantes` (
 ON DUPLICATE KEY UPDATE `nombre` = VALUES(`nombre`), `slug` = VALUES(`slug`);
 
 -- 4. Usuario Admin del Restaurante Demo
--- Contraseña: "Password123*" (Bcrypt cost 12 / Argon2id compatible)
--- Hash generado de "Password123*"
+-- Contraseña: "Password123*" (Argon2id)
 INSERT INTO `usuarios` (
     `id`, `restaurante_id`, `nombre`, `email`, `password_hash`, `rol`, `debe_cambiar_password`, `activo`
 ) VALUES (
@@ -64,7 +63,7 @@ INSERT INTO `usuarios` (
     1,
     'Carlos Restrepo',
     'restaurante@mesaly.co',
-    '$2y$12$Kk8wN8w0LzF2s27fWfKzeu4O9h/p0G6fD/C8rQ/31K44N5gA4dEae',
+    '$argon2id$v=19$m=65536,t=4,p=1$dEdIMzlSOUlVLkVxc0R6Vw$w/KBY5IF1vD5W5HGq7mPI30nZXtCxre2UYXF8v7hS9M',
     'admin_negocio',
     0,
     1
