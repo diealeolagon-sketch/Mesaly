@@ -1,155 +1,126 @@
-<!-- GUÍA DE INICIO Y ESTADO DEL RESTAURANTE -->
-<div class="modern-card" style="background: linear-gradient(135deg, #FFF9F2 0%, #FFFFFF 100%); border-left: 6px solid var(--brand-primary);">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-        <div>
-            <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand-primary);">
-                Panel Administrativo
-            </span>
-            <h1 style="font-size: 28px; margin: 4px 0 6px 0; color: var(--admin-text-main);">
-                <?= e($tenant['nombre']) ?>
-            </h1>
-            <p style="color: var(--admin-text-muted); font-size: 14px; margin: 0;">
-                Tu enlace de menú digital para compartir en Instagram y WhatsApp: 
-                <a href="<?= e(app_url('/' . $tenant['slug'])) ?>" target="_blank" style="font-weight: 700; color: var(--brand-primary); text-decoration: underline;">
-                    <?= e(app_url('/' . $tenant['slug'])) ?> ↗
-                </a>
-            </p>
-        </div>
-
-        <div>
-            <?php if (!empty($tenant['recibiendo_pedidos'])): ?>
-                <span class="badge-status active" style="font-size: 14px; padding: 8px 16px;">
-                    <span style="width: 8px; height: 8px; background: #10B981; border-radius: 50%; display: inline-block;"></span>
-                    Menú Abierto (Recibiendo Pedidos)
-                </span>
-            <?php else: ?>
-                <span class="badge-status inactive" style="font-size: 14px; padding: 8px 16px;">
-                    <span style="width: 8px; height: 8px; background: #EF4444; border-radius: 50%; display: inline-block;"></span>
-                    Menú Cerrado Temporalmente
-                </span>
-            <?php endif; ?>
-        </div>
-    </div>
-</div>
-
-<!-- EXPLAINER: CÓMO FUNCIONA EL SISTEMA -->
-<div class="guide-banner">
-    <div class="guide-icon">💡</div>
+<div class="page-header">
     <div>
-        <h3 class="guide-title">¿Cómo funciona tu menú digital en Mesaly?</h3>
-        <p class="guide-desc">
-            <strong>1. Configura:</strong> Sube tu logo, ajusta tus colores y verifica que tu número de WhatsApp esté correcto.<br>
-            <strong>2. Carga tus platos:</strong> Organiza tu carta por categorías y sube fotos de tus platos con precio en pesos colombianos.<br>
-            <strong>3. Recibe pedidos:</strong> Tus clientes escanean tu QR o abren tu enlace, eligen sus platos en el carrito y te envían el pedido estructurado directamente a tu WhatsApp.
+        <h1 class="page-title"><?= e($tenant['nombre']) ?></h1>
+        <p class="page-subtitle">
+            Menú digital para tus clientes: 
+            <a href="<?= e(app_url('/' . $tenant['slug'])) ?>" target="_blank" style="color: var(--brand-primary); font-weight: 600; text-decoration: none;">
+                <?= e(app_url('/' . $tenant['slug'])) ?> ↗
+            </a>
         </p>
     </div>
-</div>
 
-<!-- MÉTRICAS EN TARJETAS LIMPIAS (PC GRID) -->
-<div class="stats-grid-pc">
-    <div class="stat-card-modern">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 13px; font-weight: 600; color: var(--admin-text-muted);">Categorías Activas</span>
-            <span style="font-size: 20px;">📂</span>
-        </div>
-        <div style="font-size: 34px; font-weight: 800; color: var(--admin-text-main); line-height: 1.1;">
-            <?= (int)$stats['categorias'] ?>
-        </div>
-        <div style="font-size: 12.5px; color: var(--admin-text-subtle); margin-top: 6px;">
-            Secciones en tu menú (Máx: <?= (int)($plan['max_categorias'] ?? 0) ?>)
-        </div>
-    </div>
-
-    <div class="stat-card-modern">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 13px; font-weight: 600; color: var(--admin-text-muted);">Platos y Bebidas</span>
-            <span style="font-size: 20px;">🍽️</span>
-        </div>
-        <div style="font-size: 34px; font-weight: 800; color: var(--brand-primary); line-height: 1.1;">
-            <?= (int)$stats['productos'] ?>
-        </div>
-        <div style="font-size: 12.5px; color: var(--admin-text-subtle); margin-top: 6px;">
-            Total en la carta (Máx: <?= (int)($plan['max_productos'] ?? 0) ?>)
-        </div>
-    </div>
-
-    <div class="stat-card-modern">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 13px; font-weight: 600; color: var(--admin-text-muted);">Modificadores y Extras</span>
-            <span style="font-size: 20px;">⚙️</span>
-        </div>
-        <div style="font-size: 34px; font-weight: 800; color: var(--admin-text-main); line-height: 1.1;">
-            <?= (int)$stats['grupos'] ?>
-        </div>
-        <div style="font-size: 12.5px; color: var(--admin-text-subtle); margin-top: 6px;">
-            Grupos de adiciones y términos
-        </div>
-    </div>
-
-    <div class="stat-card-modern">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 13px; font-weight: 600; color: var(--admin-text-muted);">Tu Suscripción</span>
-            <span style="font-size: 20px;">💎</span>
-        </div>
-        <div style="font-size: 20px; font-weight: 800; color: var(--admin-text-main); line-height: 1.2; margin: 4px 0;">
-            <?= e($plan['nombre'] ?? 'Plan Pro') ?>
-        </div>
-        <div style="font-size: 12.5px; color: #047857; font-weight: 600;">
-            ✓ Al día · Vence: <?= e($tenant['fecha_vencimiento'] ?? 'Activo') ?>
-        </div>
+    <div>
+        <?php if (!empty($tenant['recibiendo_pedidos'])): ?>
+            <span class="badge-pill success">
+                <span style="width: 7px; height: 7px; background: #059669; border-radius: 50%; display: inline-block;"></span>
+                <span>Recibiendo pedidos</span>
+            </span>
+        <?php else: ?>
+            <span class="badge-pill danger">
+                <span style="width: 7px; height: 7px; background: #DC2626; border-radius: 50%; display: inline-block;"></span>
+                <span>Recepción pausada</span>
+            </span>
+        <?php endif; ?>
     </div>
 </div>
 
-<!-- SECCIONES EXPLICADAS CON BOTONES CLAROS -->
-<div class="modern-card">
-    <h3 style="font-size: 18px; margin-bottom: 6px;">Gestión del Restaurante</h3>
-    <p style="color: var(--admin-text-muted); font-size: 13.5px; margin-bottom: 24px;">
-        Haz clic en cualquiera de las secciones para administrar tu operación diaria:
-    </p>
+<!-- KPI CARDS (DENSITY & CLARITY) -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">
+            <span>Categorías activas</span>
+            <?= icon('catalog', 16) ?>
+        </div>
+        <div class="kpi-value"><?= (int)$stats['categorias'] ?></div>
+        <div class="kpi-subtext">Límite del plan: <?= (int)($plan['max_categorias'] ?? 0) ?></div>
+    </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
-        <a href="<?= e(app_url('/admin/catalogo')) ?>" style="text-decoration: none; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--admin-border); background: #FAFBFD; display: flex; flex-direction: column; justify-content: space-between; transition: transform 120ms ease, box-shadow 120ms ease;" class="btn-action-card">
+    <div class="kpi-card">
+        <div class="kpi-label">
+            <span>Platos y bebidas</span>
+            <?= icon('store', 16) ?>
+        </div>
+        <div class="kpi-value" style="color: var(--brand-primary);"><?= (int)$stats['productos'] ?></div>
+        <div class="kpi-subtext">Límite del plan: <?= (int)($plan['max_productos'] ?? 0) ?></div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-label">
+            <span>Modificadores</span>
+            <?= icon('modifiers', 16) ?>
+        </div>
+        <div class="kpi-value"><?= (int)$stats['grupos'] ?></div>
+        <div class="kpi-subtext">Grupos de opciones y extras</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-label">
+            <span>Suscripción</span>
+            <span class="badge-pill success" style="font-size: 11px; padding: 2px 8px;">Al día</span>
+        </div>
+        <div class="kpi-value" style="font-size: 18px; margin-top: 4px;"><?= e($plan['nombre'] ?? 'Plan Pro') ?></div>
+        <div class="kpi-subtext">Vence: <?= e($tenant['fecha_vencimiento'] ?? 'Activo') ?></div>
+    </div>
+</div>
+
+<!-- GESTIÓN OPERATIVA EN TARJETAS LIMPIAS (PC GRID) -->
+<div class="ui-panel">
+    <div class="ui-panel-header">
+        <h2 class="ui-panel-title">Módulos de Gestión</h2>
+        <span style="font-size: 13px; color: var(--text-muted);">Acceso directo a las herramientas del restaurante</span>
+    </div>
+
+    <div class="ui-panel-body" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+        <a href="<?= e(app_url('/admin/catalogo')) ?>" style="text-decoration: none; padding: 20px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between; transition: border-color 140ms ease;">
             <div>
-                <span style="font-size: 28px; display: block; margin-bottom: 8px;">📋</span>
-                <strong style="font-size: 16px; color: var(--admin-text-main); display: block;">Catálogo de Menú</strong>
-                <p style="font-size: 13px; color: var(--admin-text-muted); margin-top: 6px; line-height: 1.4;">
-                    Crea tus categorías (ej: Entradas, Carnes, Bebidas) y agrega tus platos con fotos, precios y descripción.
+                <div style="color: var(--brand-primary); margin-bottom: 12px;">
+                    <?= icon('catalog', 24) ?>
+                </div>
+                <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Catálogo de Menú</h3>
+                <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.45; margin: 0;">
+                    Administra tus categorías de platos y sube tus productos con fotografías, descripción y precios en pesos colombianos.
                 </p>
             </div>
-            <span style="color: var(--brand-primary); font-weight: 700; font-size: 13px; margin-top: 14px;">Ir al Catálogo →</span>
+            <span style="color: var(--brand-primary); font-weight: 600; font-size: 13px; margin-top: 16px;">Abrir catálogo →</span>
         </a>
 
-        <a href="<?= e(app_url('/admin/disponibilidad')) ?>" style="text-decoration: none; padding: 20px; border-radius: var(--radius-md); border: 1px solid rgba(239, 68, 68, 0.2); background: #FFFBFB; display: flex; flex-direction: column; justify-content: space-between; transition: transform 120ms ease, box-shadow 120ms ease;" class="btn-action-card">
+        <a href="<?= e(app_url('/admin/disponibilidad')) ?>" style="text-decoration: none; padding: 20px; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-md); background: #FFFBFB; display: flex; flex-direction: column; justify-content: space-between; transition: border-color 140ms ease;">
             <div>
-                <span style="font-size: 28px; display: block; margin-bottom: 8px;">⚡</span>
-                <strong style="font-size: 16px; color: #DC2626; display: block;">Control Rápido de Agotados</strong>
-                <p style="font-size: 13px; color: var(--admin-text-muted); margin-top: 6px; line-height: 1.4;">
-                    ¿Se agotó un ingrediente en la cocina? Apaga el plato en 1 segundo desde tu celular para que nadie lo pida.
+                <div style="color: #DC2626; margin-bottom: 12px;">
+                    <?= icon('zap', 24) ?>
+                </div>
+                <h3 style="font-size: 16px; font-weight: 600; color: #DC2626; margin-bottom: 6px;">Control de Agotados</h3>
+                <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.45; margin: 0;">
+                    Diseñado para la hora pico: apaga un plato en 1 segundo cuando se agote un ingrediente en cocina para que los clientes no puedan pedirlo.
                 </p>
             </div>
-            <span style="color: #DC2626; font-weight: 700; font-size: 13px; margin-top: 14px;">Gestionar Agotados →</span>
+            <span style="color: #DC2626; font-weight: 600; font-size: 13px; margin-top: 16px;">Ver disponibles y agotados →</span>
         </a>
 
-        <a href="<?= e(app_url('/admin/modificadores')) ?>" style="text-decoration: none; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--admin-border); background: #FAFBFD; display: flex; flex-direction: column; justify-content: space-between; transition: transform 120ms ease, box-shadow 120ms ease;" class="btn-action-card">
+        <a href="<?= e(app_url('/admin/modificadores')) ?>" style="text-decoration: none; padding: 20px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between; transition: border-color 140ms ease;">
             <div>
-                <span style="font-size: 28px; display: block; margin-bottom: 8px;">⚙️</span>
-                <strong style="font-size: 16px; color: var(--admin-text-main); display: block;">Modificadores y Adiciones</strong>
-                <p style="font-size: 13px; color: var(--admin-text-muted); margin-top: 6px; line-height: 1.4;">
-                    Configura opciones para que el cliente personalice (términos de carne, salsas, o adiciones con costo extra).
+                <div style="color: var(--text-secondary); margin-bottom: 12px;">
+                    <?= icon('modifiers', 24) ?>
+                </div>
+                <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Modificadores y Adiciones</h3>
+                <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.45; margin: 0;">
+                    Configura preguntas obligatorias (ej: término de carne) o adiciones con costo adicional (ej: tocineta o queso extra).
                 </p>
             </div>
-            <span style="color: var(--brand-primary); font-weight: 700; font-size: 13px; margin-top: 14px;">Configurar Extras →</span>
+            <span style="color: var(--brand-primary); font-weight: 600; font-size: 13px; margin-top: 16px;">Gestionar modificadores →</span>
         </a>
 
-        <a href="<?= e(app_url('/admin/configuracion')) ?>" style="text-decoration: none; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--admin-border); background: #FAFBFD; display: flex; flex-direction: column; justify-content: space-between; transition: transform 120ms ease, box-shadow 120ms ease;" class="btn-action-card">
+        <a href="<?= e(app_url('/admin/configuracion')) ?>" style="text-decoration: none; padding: 20px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between; transition: border-color 140ms ease;">
             <div>
-                <span style="font-size: 28px; display: block; margin-bottom: 8px;">🎨</span>
-                <strong style="font-size: 16px; color: var(--admin-text-main); display: block;">Marca, Colores y WhatsApp</strong>
-                <p style="font-size: 13px; color: var(--admin-text-muted); margin-top: 6px; line-height: 1.4;">
-                    Sube tu logo, banner, elige los colores de tu negocio, horarios y define el WhatsApp receptor de pedidos.
+                <div style="color: var(--text-secondary); margin-bottom: 12px;">
+                    <?= icon('settings', 24) ?>
+                </div>
+                <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Configuración y Marca</h3>
+                <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.45; margin: 0;">
+                    Define tu número de WhatsApp para recibir pedidos, sube tu logo, personaliza tus colores, horarios y modalidades de entrega.
                 </p>
             </div>
-            <span style="color: var(--brand-primary); font-weight: 700; font-size: 13px; margin-top: 14px;">Editar Configuración →</span>
+            <span style="color: var(--brand-primary); font-weight: 600; font-size: 13px; margin-top: 16px;">Editar configuración →</span>
         </a>
     </div>
 </div>

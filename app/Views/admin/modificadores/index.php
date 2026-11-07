@@ -1,116 +1,105 @@
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+<div class="content-header">
     <div>
-        <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand-primary);">
-            Personalización de Platos
-        </span>
-        <h1 style="font-size: 26px; margin: 4px 0 6px 0; color: var(--admin-text-main);">
-            Grupos de Modificadores y Adicionales
-        </h1>
-        <p style="color: var(--admin-text-muted); font-size: 14px; margin: 0;">
-            Configura opciones para que tus clientes personalicen sus platos (términos de cocción, salsas, o extras con precio adicional).
+        <h1 class="page-title">Grupos de Modificadores</h1>
+        <p class="page-subtitle">
+            Personaliza opciones para tus platos: términos de cocción, adiciones con costo extra o ingredientes a excluir.
         </p>
     </div>
-    <button type="button" class="btn-modern btn-modern-primary" onclick="abrirGrupoModal()">
-        ⚙️ + Nuevo Grupo de Modificadores
-    </button>
-</div>
-
-<!-- EXPLAINER: ¿QUÉ ES UN GRUPO DE MODIFICADORES? -->
-<div class="guide-banner">
-    <div class="guide-icon">💡</div>
-    <div>
-        <h3 class="guide-title">¿Cómo funcionan los modificadores en tu menú?</h3>
-        <p class="guide-desc">
-            Son preguntas u opciones que le aparecen al cliente al tocar un plato antes de agregarlo al carrito:<br>
-            • <strong>Selección Única:</strong> El cliente debe elegir exactamente una opción (ej: <em>Término de la carne</em> o <em>Tipo de leche en café</em>).<br>
-            • <strong>Selección Múltiple:</strong> El cliente puede marcar varias adiciones con precio adicional (ej: <em>+ Tocineta $4.000</em>, <em>+ Queso fundido $3.500</em>).
-        </p>
+    <div class="content-actions">
+        <button type="button" class="btn btn-primary" onclick="abrirGrupoModal()">
+            <?= icon('plus', 16) ?>
+            <span>Nuevo Grupo</span>
+        </button>
     </div>
 </div>
 
 <?php if (empty($grupos)): ?>
-    <div class="modern-card" style="text-align: center; padding: 48px 24px;">
-        <span style="font-size: 42px; display: block; margin-bottom: 12px;">⚙️</span>
-        <h3 style="font-size: 18px; margin-bottom: 6px;">Aún no tienes grupos de modificadores creados</h3>
-        <p style="color: var(--admin-text-muted); font-size: 14px; max-width: 480px; margin: 0 auto 20px auto;">
-            Crea grupos como "Término de la carne" o "Adicionales parrilleros" para que tus platos sean personalizables y aumentes el ticket promedio.
+    <div class="card" style="text-align: center; padding: 56px 24px;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-bg-subtle); display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-subtle); margin-bottom: 16px;">
+            <?= icon('modifiers', 22) ?>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 6px 0;">
+            Aún no tienes grupos de modificadores
+        </h3>
+        <p style="color: var(--color-text-muted); font-size: 14px; max-width: 460px; margin: 0 auto 20px auto;">
+            Crea grupos como <em>"Término de la carne"</em> o <em>"Adiciones parrilleras"</em> para que tus clientes personalicen sus pedidos.
         </p>
-        <button type="button" class="btn-modern btn-modern-primary" onclick="abrirGrupoModal()">
-            + Crear Mi Primer Grupo
+        <button type="button" class="btn btn-primary" onclick="abrirGrupoModal()">
+            <?= icon('plus', 16) ?>
+            <span>Crear Primer Grupo</span>
         </button>
     </div>
 <?php else: ?>
-    <div style="display: grid; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 20px;">
         <?php foreach ($grupos as $grupo): ?>
-            <div class="modern-card" style="margin-bottom: 0;">
-                <div class="modern-card-header" style="border-bottom: 1px solid var(--admin-border); padding-bottom: 16px;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 16px; border-bottom: 1px solid var(--color-border-subtle); flex-wrap: wrap; gap: 12px;">
                     <div>
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <h3 style="font-size: 18px; margin: 0; color: var(--admin-text-main);"><?= e($grupo['nombre']) ?></h3>
-                            <span class="badge" style="background: <?= $grupo['tipo'] === 'unica' ? '#EEF2FF' : '#FEF3C7' ?>; color: <?= $grupo['tipo'] === 'unica' ? '#3730A3' : '#92400E' ?>; font-weight: 700; font-size: 12px;">
-                                <?= $grupo['tipo'] === 'unica' ? '🔘 Selección Única' : '☑️ Selección Múltiple (Adiciones)' ?>
+                            <h2 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0;">
+                                <?= e($grupo['nombre']) ?>
+                            </h2>
+                            <span class="badge <?= $grupo['tipo'] === 'unica' ? 'badge-neutral' : 'badge-warning' ?>" style="font-weight: 600;">
+                                <?= $grupo['tipo'] === 'unica' ? 'Selección Única' : 'Selección Múltiple' ?>
                             </span>
                             <?php if (!empty($grupo['obligatorio'])): ?>
-                                <span class="badge" style="background: #FEE2E2; color: #991B1B; font-weight: 700; font-size: 12px;">
-                                    Obligatorio
-                                </span>
+                                <span class="badge badge-danger">Obligatorio</span>
                             <?php else: ?>
-                                <span class="badge" style="background: #F1F5F9; color: var(--admin-text-muted); font-size: 12px;">
-                                    Opcional
-                                </span>
+                                <span class="badge badge-neutral">Opcional</span>
                             <?php endif; ?>
                         </div>
 
                         <?php if ($grupo['tipo'] === 'multiple'): ?>
-                            <p style="color: var(--admin-text-muted); font-size: 13px; margin: 6px 0 0 0;">
+                            <p style="color: var(--color-text-muted); font-size: 12.5px; margin: 6px 0 0 0;">
                                 El cliente puede elegir entre <strong><?= (int)$grupo['min_selecciones'] ?></strong> y <strong><?= (int)$grupo['max_selecciones'] ?></strong> opciones.
                             </p>
                         <?php endif; ?>
                     </div>
 
                     <div style="display: flex; gap: 8px;">
-                        <button type="button" class="btn-modern btn-modern-secondary btn-modern-sm" onclick="editarGrupo(<?= e(json_encode($grupo)) ?>)">
-                            Editar Grupo
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="editarGrupo(<?= e(json_encode($grupo)) ?>)">
+                            <?= icon('edit', 14) ?>
+                            <span>Editar</span>
                         </button>
-                        <form method="POST" action="<?= e(app_url('/admin/modificadores/grupo/' . $grupo['id'] . '/eliminar')) ?>" onsubmit="return confirm('¿Seguro que deseas eliminar este grupo y todas sus opciones?');">
+                        <form method="POST" action="<?= e(app_url('/admin/modificadores/grupo/' . $grupo['id'] . '/eliminar')) ?>" onsubmit="return confirm('¿Seguro que deseas eliminar este grupo y todas sus opciones?');" style="display: inline;">
                             <?= csrf_field() ?>
-                            <button type="submit" class="btn-modern btn-modern-danger btn-modern-sm">
-                                Eliminar
+                            <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-border);" title="Eliminar grupo">
+                                <?= icon('trash', 14) ?>
                             </button>
                         </form>
                     </div>
                 </div>
 
-                <!-- Lista de opciones del grupo -->
-                <div style="margin-bottom: 20px;">
-                    <span style="font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--admin-text-muted); display: block; margin-bottom: 10px;">
-                        Opciones disponibles para el cliente:
+                <!-- Opciones configuradas -->
+                <div style="padding: 16px 0 20px 0;">
+                    <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-muted); display: block; margin-bottom: 10px;">
+                        Opciones para el cliente
                     </span>
 
                     <?php if (empty($grupo['opciones'])): ?>
-                        <div style="background: #FFFDF9; border: 1px dashed rgba(232, 93, 4, 0.3); padding: 14px; border-radius: var(--radius-md); font-size: 13.5px; color: var(--admin-text-muted);">
-                            Este grupo aún no tiene opciones configuradas. Usa el formulario de abajo para agregar las opciones (ej: <em>Tres cuartos</em> o <em>Queso extra +$3.500</em>).
+                        <div style="background: var(--color-bg-subtle); border: 1px dashed var(--color-border); padding: 12px 16px; border-radius: var(--radius-md); font-size: 13px; color: var(--color-text-muted);">
+                            Este grupo aún no tiene opciones. Agrega la primera en el formulario siguiente.
                         </div>
                     <?php else: ?>
-                        <div style="display: grid; gap: 8px;">
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
                             <?php foreach ($grupo['opciones'] as $op): ?>
-                                <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--admin-border);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-subtle); padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--color-border-subtle);">
                                     <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span style="font-size: 14px; font-weight: 600; color: var(--admin-text-main);">
+                                        <span style="font-size: 13.5px; font-weight: 600; color: var(--color-text-main);">
                                             <?= e($op['nombre']) ?>
                                         </span>
                                         <?php if ((int)$op['precio_extra'] > 0): ?>
-                                            <span style="color: var(--brand-primary); font-weight: 800; font-size: 13.5px; background: rgba(232, 93, 4, 0.08); padding: 2px 8px; border-radius: var(--radius-pill);">
+                                            <span style="font-weight: 700; font-size: 12.5px; color: var(--color-brand); font-variant-numeric: tabular-nums;">
                                                 + <?= format_cop($op['precio_extra']) ?>
                                             </span>
                                         <?php else: ?>
-                                            <span style="color: var(--admin-text-subtle); font-size: 12px;">(Sin costo adicional)</span>
+                                            <span style="color: var(--color-text-subtle); font-size: 12px;">(Sin costo)</span>
                                         <?php endif; ?>
                                     </div>
-                                    <form method="POST" action="<?= e(app_url('/admin/modificadores/opcion/' . $op['id'] . '/eliminar')) ?>" onsubmit="return confirm('¿Eliminar esta opción?');">
+                                    <form method="POST" action="<?= e(app_url('/admin/modificadores/opcion/' . $op['id'] . '/eliminar')) ?>" onsubmit="return confirm('¿Eliminar esta opción?');" style="display: inline;">
                                         <?= csrf_field() ?>
-                                        <button type="submit" style="background: none; border: none; color: var(--brand-danger); cursor: pointer; font-size: 13px; font-weight: 600; padding: 4px 8px;" title="Quitar opción">
-                                            ✕ Eliminar
+                                        <button type="submit" style="background: none; border: none; color: var(--color-text-subtle); cursor: pointer; padding: 4px; display: inline-flex; align-items: center;" title="Quitar opción">
+                                            <?= icon('x', 14) ?>
                                         </button>
                                     </form>
                                 </div>
@@ -120,19 +109,21 @@
                 </div>
 
                 <!-- Formulario en línea para agregar opción rápida -->
-                <form method="POST" action="<?= e(app_url('/admin/modificadores/opcion/guardar')) ?>" style="display: flex; gap: 12px; background: #F1F5F9; padding: 12px 18px; border-radius: var(--radius-md); align-items: center; flex-wrap: wrap;">
+                <form method="POST" action="<?= e(app_url('/admin/modificadores/opcion/guardar')) ?>" style="display: flex; gap: 10px; background: var(--color-bg-subtle); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle); align-items: center; flex-wrap: wrap;">
                     <?= csrf_field() ?>
                     <input type="hidden" name="grupo_id" value="<?= e($grupo['id']) ?>">
                     <input type="hidden" name="id" value="0">
 
-                    <span style="font-size: 13px; font-weight: 700; color: var(--admin-text-main);">+ Nueva opción:</span>
-                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Tocineta ahumada crujiente" style="flex: 2; min-width: 200px; min-height: 38px; padding: 6px 12px;" required>
-                    <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 140px;">
-                        <span style="font-size: 13px; font-weight: 700; color: var(--admin-text-muted);">+$</span>
-                        <input type="number" name="precio_extra" class="form-control" placeholder="0" min="0" step="500" value="0" style="min-height: 38px; padding: 6px 10px;" title="Costo adicional (deja en 0 si no tiene costo extra)">
+                    <span style="font-size: 13px; font-weight: 600; color: var(--color-text-main); white-space: nowrap;">
+                        + Opción:
+                    </span>
+                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Tocineta ahumada crujiente" style="flex: 2; min-width: 180px;" required>
+                    <div style="display: flex; align-items: center; position: relative; flex: 1; min-width: 130px;">
+                        <span style="position: absolute; left: 10px; font-size: 12px; font-weight: 600; color: var(--color-text-subtle);">+$</span>
+                        <input type="number" name="precio_extra" class="form-control" placeholder="0" min="0" step="100" value="0" style="padding-left: 28px; font-variant-numeric: tabular-nums;" title="Costo adicional en COP">
                     </div>
-                    <button type="submit" class="btn-modern btn-modern-primary btn-modern-sm">
-                        Guardar Opción
+                    <button type="submit" class="btn btn-secondary btn-sm" style="background: var(--color-surface); font-weight: 600;">
+                        Agregar
                     </button>
                 </form>
             </div>
@@ -141,30 +132,32 @@
 <?php endif; ?>
 
 <!-- MODAL GRUPO -->
-<div id="modal_grupo" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
-    <div class="modern-card" style="max-width: 500px; width: 100%; margin: 0; box-shadow: var(--shadow-elevated);">
-        <h3 id="grupo_modal_title" style="font-size: 18px; margin-bottom: 16px;">Nuevo Grupo de Modificadores</h3>
+<div id="modal_grupo" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
+    <div class="card" style="max-width: 480px; width: 100%; margin: 0; box-shadow: var(--shadow-modal);">
+        <h3 id="grupo_modal_title" style="font-size: 17px; font-weight: 700; margin: 0 0 16px 0; color: var(--color-text-main);">
+            Nuevo Grupo de Modificadores
+        </h3>
         <form method="POST" action="<?= e(app_url('/admin/modificadores/grupo/guardar')) ?>">
             <?= csrf_field() ?>
             <input type="hidden" id="grupo_id" name="id" value="0">
 
             <div class="form-group">
                 <label for="grupo_nombre" class="form-label">Nombre del Grupo *</label>
-                <input type="text" id="grupo_nombre" name="nombre" class="form-control" placeholder="Ej: Término de la carne, Adiciones especiales, Salsas" required autofocus>
+                <input type="text" id="grupo_nombre" name="nombre" class="form-control" placeholder="Ej: Término de la carne, Adiciones, Salsas" required autofocus>
             </div>
 
             <div class="form-group">
                 <label for="grupo_tipo" class="form-label">Tipo de Selección del Cliente *</label>
                 <select id="grupo_tipo" name="tipo" class="form-control" onchange="toggleTipoGrupo(this.value)" required>
-                    <option value="unica">🔘 Selección Única (El cliente escoge exactamente una opción)</option>
-                    <option value="multiple">☑️ Selección Múltiple (El cliente puede marcar varias adiciones o ingredientes)</option>
+                    <option value="unica">Selección Única (El comensal escoge exactamente una opción)</option>
+                    <option value="multiple">Selección Múltiple (El comensal puede marcar varias adiciones)</option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px;">
-                    <input type="checkbox" id="grupo_obligatorio" name="obligatorio" value="1" style="width: 18px; height: 18px;">
-                    <span>Es obligatorio que el cliente elija antes de poder agregar al carrito</span>
+            <div class="form-group" style="margin-top: 14px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; color: var(--color-text-main);">
+                    <input type="checkbox" id="grupo_obligatorio" name="obligatorio" value="1" style="width: 16px; height: 16px; accent-color: var(--color-brand);">
+                    <span>Selección obligatoria para agregar el plato al pedido</span>
                 </label>
             </div>
 
@@ -179,9 +172,9 @@
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
-                <button type="button" class="btn-modern btn-modern-secondary" onclick="cerrarGrupoModal()">Cancelar</button>
-                <button type="submit" class="btn-modern btn-modern-primary">Guardar Grupo</button>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle);">
+                <button type="button" class="btn btn-secondary" onclick="cerrarGrupoModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar Grupo</button>
             </div>
         </form>
     </div>
