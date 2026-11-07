@@ -1,0 +1,26 @@
+# Deshabilitar totalmente la ejecución de scripts PHP en la carpeta de subidas
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# Impedir que cualquier handler interprete archivos como ejecutables
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phar .cgi .pl .py .sh
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phar .cgi .pl .py .sh
+
+# Solo permitir servir tipos de archivo de imagen específicos
+<FilesMatch "(?i)\.(jpg|jpeg|png|webp|svg|gif|ico)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
+
+# Bloquear cualquier otro tipo de archivo
+<FilesMatch "(?i)\.(php|phtml|php3|php4|php5|php7|php8|phar|sh|bash|exe|pl|py|cgi|asp|aspx|jsp|env|config|htaccess|sql)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

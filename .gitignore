@@ -1,0 +1,26 @@
+# Archivos de entorno y secretos
+.env
+.env.backup
+*.pem
+*.key
+
+# Dependencias
+/vendor/
+.phpunit.cache/
+
+# Archivos de almacenamiento y temporales
+/storage/logs/*.log
+/storage/cache/*
+!/storage/logs/.gitkeep
+!/storage/cache/.gitkeep
+
+# Uploads de usuarios
+/public/uploads/*
+!/public/uploads/.gitkeep
+!/public/uploads/.htaccess
+
+# IDEs y SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

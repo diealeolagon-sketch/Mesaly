@@ -1,0 +1,176 @@
+/**
+ * ==============================================================================
+ * MESALY — Identidad de Marca y Variables CSS Globales
+ * ==============================================================================
+ */
+
+:root {
+    /* Paleta Principal de Marca */
+    --brand-primary: #E85D04;     /* Naranja Sazón */
+    --brand-accent: #FFB703;      /* Amarillo Mantequilla */
+    --brand-secondary: #2A9D5C;   /* Verde Albahaca */
+    --brand-ink: #1E1B18;         /* Tinta */
+    --brand-cream: #FFF7EA;       /* Crema */
+    --brand-white: #FFFFFF;       /* Blanco */
+    --brand-gray-light: #F3F4F6;
+    --brand-gray-border: #E5E7EB;
+    --brand-gray-muted: #6B7280;
+
+    /* Semáforo de Suscripción */
+    --status-al-dia: #2A9D5C;
+    --status-por-vencer: #FFB703;
+    --status-en-gracia: #D62828;
+    --status-bloqueado: #7F1D1D;
+    --status-en-prueba: #2563EB;
+    --status-cancelado: #6B7280;
+
+    /* Tipografías del Sistema */
+    --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+    /* Bordes y Sombras */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Reset y Base */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--brand-ink);
+    background-color: var(--brand-cream);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--brand-ink);
+    line-height: 1.25;
+}
+
+a {
+    color: var(--brand-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #c94f03;
+}
+
+/* Componentes Comunes */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    min-height: 44px; /* Accesibilidad táctil */
+}
+
+.btn-primary {
+    background-color: var(--brand-primary);
+    color: var(--brand-white);
+}
+
+.btn-primary:hover {
+    background-color: #c94f03;
+    color: var(--brand-white);
+}
+
+.btn-secondary {
+    background-color: var(--brand-gray-light);
+    color: var(--brand-ink);
+    border: 1px solid var(--brand-gray-border);
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
+.btn-danger {
+    background-color: #DC2626;
+    color: var(--brand-white);
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--brand-ink);
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    border: 1px solid var(--brand-gray-border);
+    border-radius: var(--radius-md);
+    background-color: var(--brand-white);
+    color: var(--brand-ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-height: 44px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.15);
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background-color: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+}
+
+.alert-error {
+    background-color: #FEF2F2;
+    color: #991B1B;
+    border: 1px solid #FECACA;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+}
