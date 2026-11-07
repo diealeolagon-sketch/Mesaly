@@ -34,13 +34,25 @@ if (!function_exists('csrf_field')) {
 
 if (!function_exists('app_url')) {
     /**
-     * Build absolute or relative application URL.
+     * Build application URL (root-relative on web requests for robust CSP/vhost compatibility).
      */
     function app_url(string $path = ''): string
     {
+        $path = '/' . ltrim($path, '/');
+
+        // Si se ejecuta en un servidor web (Apache, Nginx, built-in)
+        if (!empty($_SERVER['HTTP_HOST'])) {
+            $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+            $baseDir = rtrim(dirname($scriptName), '/');
+            if ($baseDir === '.' || $baseDir === '/' || $baseDir === '\\') {
+                $baseDir = '';
+            }
+            return $path === '/' ? ($baseDir !== '' ? $baseDir : '/') : $baseDir . $path;
+        }
+
+        // Entorno CLI o fallback
         $base = rtrim($_ENV['APP_URL'] ?? 'http://localhost/Mesaly/public', '/');
-        $path = ltrim($path, '/');
-        return $path !== '' ? $base . '/' . $path : $base;
+        return $path === '/' ? $base : $base . $path;
     }
 }
 
