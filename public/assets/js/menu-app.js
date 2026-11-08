@@ -22,7 +22,24 @@
 
     const catalogMap = new Map();
     catalog.forEach(p => {
-        catalogMap.set(parseInt(p.id, 10), p);
+        p.id = parseInt(p.id, 10);
+        p.precio = parseInt(p.precio, 10);
+        p.disponible = !!parseInt(p.disponible, 10);
+        if (p.grupos && Array.isArray(p.grupos)) {
+            p.grupos.forEach(g => {
+                g.id = parseInt(g.id, 10);
+                g.obligatorio = parseInt(g.obligatorio, 10);
+                g.min_selecciones = parseInt(g.min_selecciones || 0, 10);
+                g.max_selecciones = parseInt(g.max_selecciones || 0, 10);
+                if (g.opciones && Array.isArray(g.opciones)) {
+                    g.opciones.forEach(o => {
+                        o.id = parseInt(o.id, 10);
+                        o.precio_extra = parseInt(o.precio_extra || 0, 10);
+                    });
+                }
+            });
+        }
+        catalogMap.set(p.id, p);
     });
 
     // Helper: Resuelve URL de imágenes absolutas y relativas
@@ -57,6 +74,8 @@
     const cartBadgeCount = document.getElementById('cartBadgeCount');
     const cartBtnTotal = document.getElementById('cartBtnTotal');
     const btnOpenCart = document.getElementById('btnOpenCart');
+    const btnHeaderCart = document.getElementById('btnHeaderCart');
+    const headerCartBadge = document.getElementById('headerCartBadge');
 
     // Product Modal
     const productModalBackdrop = document.getElementById('productModalBackdrop');
@@ -104,7 +123,7 @@
     function init() {
         bindEvents();
         updateCartUI();
-        initCategoryObserver();
+        initCategoryFiltering();
     }
 
     // 5. Enlace de Eventos
@@ -151,6 +170,7 @@
 
         // Abrir / Cerrar Drawer del Carrito
         btnOpenCart?.addEventListener('click', openCartDrawer);
+        btnHeaderCart?.addEventListener('click', openCartDrawer);
         btnCloseCartDrawer?.addEventListener('click', closeCartDrawer);
         btnContinueShopping?.addEventListener('click', closeCartDrawer);
         cartDrawerBackdrop?.addEventListener('click', function (e) {
@@ -489,6 +509,10 @@
         const totalItems = cart.reduce((sum, it) => sum + it.cantidad, 0);
         const subtotal = cart.reduce((sum, it) => sum + it.total_linea, 0);
 
+        if (headerCartBadge) {
+            headerCartBadge.textContent = totalItems;
+        }
+
         if (totalItems > 0) {
             floatingCartBar.style.display = 'block';
             cartBadgeCount.textContent = totalItems;
@@ -776,8 +800,8 @@
         checkoutErrorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // 10. Sticky Observer de Categorías
-    function initCategoryObserver() {
+    // 10. Filtrado Dinámico de Categorías y Secciones
+    function initCategoryFiltering() {
         const pills = document.querySelectorAll('.category-nav-pill');
         const sections = document.querySelectorAll('.menu-section');
 
@@ -786,39 +810,38 @@
         pills.forEach(pill => {
             pill.addEventListener('click', function (e) {
                 e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetEl = document.querySelector(targetId);
-                if (targetEl) {
-                    const navHeight = document.getElementById('categoryNav')?.offsetHeight || 60;
-                    const elPos = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight - 10;
-                    window.scrollTo({ top: elPos, behavior: 'smooth' });
+                const targetCat = this.getAttribute('data-cat') || 'all';
 
-                    pills.forEach(p => p.classList.remove('active'));
-                    this.classList.add('active');
-                }
-            });
-        });
+                // Marcar la píldora activa
+                pills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const secId = entry.target.id;
-                    pills.forEach(pill => {
-                        if (pill.getAttribute('href') === `#${secId}`) {
-                            pill.classList.add('active');
-                            pill.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+                // Asegurar que la píldora sea visible en el scroll horizontal
+                this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+                // Filtrar las secciones
+                if (targetCat === 'all') {
+                    sections.forEach(sec => {
+                        sec.style.display = '';
+                    });
+                } else {
+                    sections.forEach(sec => {
+                        if (sec.id === targetCat) {
+                            sec.style.display = '';
                         } else {
-                            pill.classList.remove('active');
+                            sec.style.display = 'none';
                         }
                     });
                 }
-            });
-        }, {
-            rootMargin: '-80px 0px -70% 0px',
-            threshold: 0,
-        });
 
-        sections.forEach(sec => observer.observe(sec));
+                // Desplazar suavemente a la carta
+                const nav = document.getElementById('categoryNav');
+                if (nav) {
+                    const navTop = nav.getBoundingClientRect().top + window.pageYOffset;
+                    window.scrollTo({ top: navTop, behavior: 'smooth' });
+                }
+            });
+        });
     }
 
     function escapeHtml(text) {

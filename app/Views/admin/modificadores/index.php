@@ -6,7 +6,7 @@
         </p>
     </div>
     <div class="content-actions">
-        <button type="button" class="btn btn-primary" onclick="abrirGrupoModal()">
+        <button type="button" class="btn btn-primary btn-abrir-grupo" id="btnNuevoGrupo" onclick="abrirGrupoModal()">
             <?= icon('plus', 16) ?>
             <span>Nuevo Grupo de Modificadores</span>
         </button>
@@ -24,7 +24,7 @@
         <p style="color: var(--color-text-muted); font-size: 14px; max-width: 480px; margin: 0 auto 24px auto; line-height: 1.5;">
             Los modificadores permiten que tus clientes personalicen sus platos (ej: <em>"Término de la carne"</em>, <em>"Tipo de salsa"</em> o <em>"Adición de queso / tocineta"</em>).
         </p>
-        <button type="button" class="btn btn-primary" onclick="abrirGrupoModal()">
+        <button type="button" class="btn btn-primary btn-abrir-grupo" onclick="abrirGrupoModal()">
             <?= icon('plus', 16) ?>
             <span>Crear Primer Grupo</span>
         </button>
@@ -63,7 +63,7 @@
                     </div>
 
                     <div class="modifier-group-actions">
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="editarGrupo(<?= e(json_encode($grupo)) ?>)">
+                        <button type="button" class="btn btn-secondary btn-sm btn-editar-grupo" data-grupo="<?= e(json_encode($grupo)) ?>" onclick="editarGrupo(<?= e(json_encode($grupo)) ?>)">
                             <?= icon('edit', 14) ?>
                             <span>Editar Grupo</span>
                         </button>
@@ -144,7 +144,7 @@
 <?php endif; ?>
 
 <!-- MODAL GRUPO -->
-<div id="modal_grupo" class="modal-backdrop" style="display: none !important;">
+<div id="modal_grupo" class="modal-backdrop">
     <div class="modal-dialog" style="max-width: 520px;">
         <h3 id="grupo_modal_title" class="modal-title">
             Nuevo Grupo de Modificadores
@@ -193,7 +193,7 @@
             </div>
 
             <div class="modal-footer" style="margin-top: 28px; padding-top: 20px;">
-                <button type="button" class="btn btn-secondary" onclick="cerrarGrupoModal()">Cancelar</button>
+                <button type="button" class="btn btn-secondary" id="btnCancelarGrupoModal" onclick="cerrarGrupoModal()">Cancelar</button>
                 <button type="submit" class="btn btn-primary" style="padding: 10px 22px;">Guardar Grupo</button>
             </div>
         </form>
@@ -247,7 +247,7 @@ function toggleTipoGrupo(tipo) {
     document.getElementById('box_multi_limites').style.display = tipo === 'multiple' ? 'grid' : 'none';
 }
 
-document.getElementById('modal_grupo').addEventListener('click', function(e) {
+document.getElementById('modal_grupo')?.addEventListener('click', function(e) {
     if (e.target === this) {
         cerrarGrupoModal();
     }
@@ -257,5 +257,19 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         cerrarGrupoModal();
     }
+});
+
+// Enlace directo de eventos (compatible con CSP)
+document.querySelectorAll('.btn-abrir-grupo').forEach(btn => btn.addEventListener('click', abrirGrupoModal));
+document.getElementById('btnCancelarGrupoModal')?.addEventListener('click', cerrarGrupoModal);
+document.querySelectorAll('.btn-editar-grupo').forEach(btn => {
+    btn.addEventListener('click', function() {
+        try {
+            const raw = this.getAttribute('data-grupo');
+            if (raw) editarGrupo(JSON.parse(raw));
+        } catch(e) {
+            console.error('Error parseando grupo:', e);
+        }
+    });
 });
 </script>

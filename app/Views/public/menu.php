@@ -36,7 +36,14 @@ $tieneLogo = !empty($restaurante['logo_path']);
                 <?php endif; ?>
 
                 <div class="menu-brand-info">
-                    <h1 class="menu-brand-title"><?= e($restaurante['nombre']) ?></h1>
+                    <div class="menu-brand-top-row">
+                        <h1 class="menu-brand-title"><?= e($restaurante['nombre']) ?></h1>
+                        <button type="button" class="menu-header-cart-btn" id="btnHeaderCart" title="Ver mi pedido">
+                            <span class="header-cart-icon">🛒</span>
+                            <span class="header-cart-label">Mi Pedido</span>
+                            <span class="header-cart-badge" id="headerCartBadge">0</span>
+                        </button>
+                    </div>
                     
                     <div class="menu-status-row">
                         <?php if (!empty($restaurante['recibiendo_pedidos'])): ?>
@@ -93,19 +100,24 @@ $tieneLogo = !empty($restaurante['logo_path']);
         </div>
     </header>
 
-    <!-- 2. NAVEGACIÓN STICKY DE CATEGORÍAS -->
+    <!-- 2. NAVEGACIÓN STICKY DE CATEGORÍAS (FILTRADO DINÁMICO) -->
     <nav class="menu-category-nav" id="categoryNav">
         <div class="category-nav-scroll">
+            <button type="button" class="category-nav-pill active" data-cat="all">
+                🍽️ Todos los Platos
+            </button>
+
             <?php if (!empty($destacados)): ?>
-                <a href="#cat-destacados" class="category-nav-pill active" data-cat="cat-destacados">
-                    ⭐ Populares
-                </a>
+                <button type="button" class="category-nav-pill" data-cat="cat-destacados">
+                    ⭐ Populares (<?= count($destacados) ?>)
+                </button>
             <?php endif; ?>
 
-            <?php foreach ($categorias as $idx => $cat): ?>
-                <a href="#cat-<?= $cat['id'] ?>" class="category-nav-pill <?= (empty($destacados) && $idx === 0) ? 'active' : '' ?>" data-cat="cat-<?= $cat['id'] ?>">
-                    <?= e($cat['nombre']) ?>
-                </a>
+            <?php foreach ($categorias as $cat): ?>
+                <?php $cant = count($productosPorCategoria[$cat['id']] ?? []); ?>
+                <button type="button" class="category-nav-pill" data-cat="cat-<?= $cat['id'] ?>">
+                    <?= e($cat['nombre']) ?> (<?= $cant ?>)
+                </button>
             <?php endforeach; ?>
         </div>
     </nav>
@@ -224,8 +236,10 @@ $tieneLogo = !empty($restaurante['logo_path']);
                 <!-- Formulario de Checkout -->
                 <form id="checkoutForm" class="checkout-form">
                     <!-- Honeypot anti-bots -->
-                    <input type="text" name="empresa" value="" style="display:none !important;" tabindex="-1" autocomplete="off">
-                    <input type="hidden" name="website" value="" style="display:none !important;">
+                    <div style="display: none !important; position: absolute; left: -9999px;">
+                        <input type="text" name="empresa" value="" tabindex="-1" autocomplete="off">
+                        <input type="hidden" name="website" value="">
+                    </div>
 
                     <h3 class="checkout-section-title">¿Cómo deseas recibir tu pedido?</h3>
 

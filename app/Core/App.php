@@ -80,7 +80,7 @@ class App
     {
         // Cabeceras globales de seguridad obligatorias (Sección 9.8)
         $nonce = View::getCspNonce();
-        header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' 'nonce-{$nonce}'; script-src 'self' 'nonce-{$nonce}'; img-src 'self' data: https:; font-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+        header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' 'nonce-{$nonce}'; script-src 'self' 'unsafe-inline' 'nonce-{$nonce}'; img-src 'self' data: https:; font-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
         header("X-Content-Type-Options: nosniff");
         header("X-Frame-Options: DENY");
         header("Referrer-Policy: strict-origin-when-cross-origin");
