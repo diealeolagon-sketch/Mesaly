@@ -30,37 +30,43 @@
                         </p>
                     </div>
 
-                    <!-- Dropzone accesible como LABEL nativo -->
-                    <label for="imagen_input" class="dropzone" id="dropzone_container">
-                        <input type="file" id="imagen_input" name="imagen" accept="image/jpeg,image/png,image/webp">
+                    <!-- Input de archivo (oculto y desacoplado para evitar conflictos de eventos) -->
+                    <input type="file" id="imagen_input" name="imagen" accept="image/jpeg,image/png,image/webp" style="display: none;">
 
+                    <!-- Dropzone clickeable, arrastrable y accesible -->
+                    <div class="dropzone" id="dropzone_container" data-input="imagen_input" tabindex="0" role="button" aria-label="Seleccionar fotografía del plato">
                         <div id="preview_wrapper" style="width: 100%;">
-                            <?php if (!empty($producto['imagen_path'])): ?>
-                                <img src="<?= e(app_url($producto['imagen_path'])) ?>" id="preview_img" class="dropzone-preview" alt="Foto actual del plato">
-                                <span class="btn btn-secondary btn-sm" style="margin-top: 14px; pointer-events: none;">
+                            <?php $hasImage = !empty($producto['imagen_path']); ?>
+                            <img src="<?= $hasImage ? e(app_url($producto['imagen_path'])) : '' ?>" 
+                                 id="preview_img" 
+                                 class="dropzone-preview" 
+                                 alt="Foto del plato" 
+                                 style="<?= $hasImage ? 'display: block;' : 'display: none;' ?>">
+
+                            <div class="dropzone-placeholder" id="dropzone_placeholder" style="<?= $hasImage ? 'display: none;' : '' ?>">
+                                <div class="dz-icon">
+                                    <?= icon('upload', 22) ?>
+                                </div>
+                                <strong class="dz-label">
+                                    Selecciona o arrastra una foto aquí
+                                </strong>
+                                <span class="dz-hint" style="margin-bottom: 12px;">
+                                    Haz clic en cualquier parte de este recuadro
+                                </span>
+                                <span class="btn btn-secondary btn-sm" style="pointer-events: none;">
+                                    <?= icon('image', 14) ?>
+                                    <span>Buscar en tu equipo</span>
+                                </span>
+                            </div>
+
+                            <div class="dropzone-change-btn" id="dropzone_change_btn" style="margin-top: 14px; <?= $hasImage ? '' : 'display: none;' ?>">
+                                <span class="btn btn-secondary btn-sm" style="pointer-events: none;">
                                     <?= icon('upload', 14) ?>
                                     <span>Cambiar fotografía</span>
                                 </span>
-                            <?php else: ?>
-                                <img src="" id="preview_img" class="dropzone-preview" alt="Vista previa" style="display: none;">
-                                <div id="dropzone_placeholder">
-                                    <div class="dz-icon" style="margin: 0 auto 12px auto;">
-                                        <?= icon('upload', 22) ?>
-                                    </div>
-                                    <strong class="dz-label" style="font-size: 14px; margin-bottom: 4px;">
-                                        Selecciona o arrastra una foto aquí
-                                    </strong>
-                                    <span class="dz-hint" style="margin-bottom: 14px;">
-                                        Haz clic en cualquier parte de este recuadro
-                                    </span>
-                                    <span class="btn btn-secondary btn-sm" style="pointer-events: none;">
-                                        <?= icon('image', 14) ?>
-                                        <span>Buscar en tu equipo</span>
-                                    </span>
-                                </div>
-                            <?php endif; ?>
+                            </div>
                         </div>
-                    </label>
+                    </div>
 
                     <!-- Switches de estado y visibilidad -->
                     <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--color-border-subtle); display: flex; flex-direction: column; gap: 14px;">
@@ -198,57 +204,3 @@
         </div>
     </form>
 </div>
-
-<script nonce="<?= e($cspNonce) ?>">
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        if (file.size > 8388608) {
-            alert('La imagen seleccionada supera el límite máximo de 8 MB. Por favor elige una imagen más liviana.');
-            input.value = '';
-            return;
-        }
-
-        const previewImg = document.getElementById('preview_img');
-        const placeholder = document.getElementById('dropzone_placeholder');
-
-        previewImg.src = URL.createObjectURL(file);
-        previewImg.style.display = 'block';
-        if (placeholder) {
-            placeholder.style.display = 'none';
-        }
-    }
-}
-
-// Drag & Drop nativo y seguro
-const dropzone = document.getElementById('dropzone_container');
-const fileInput = document.getElementById('imagen_input');
-
-if (dropzone && fileInput) {
-    fileInput.addEventListener('change', function() { previewImage(this); });
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            dropzone.classList.add('is-dragover');
-        }, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            dropzone.classList.remove('is-dragover');
-        }, false);
-    });
-
-    dropzone.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        if (files && files.length > 0) {
-            fileInput.files = files;
-            previewImage(fileInput);
-        }
-    }, false);
-}
-</script>

@@ -58,45 +58,63 @@
                 <div class="config-grid-2" style="margin-top: 4px;">
                     <div>
                         <label class="form-label">Logo del Restaurante</label>
-                        <label for="logo_input" class="dropzone" id="dz_logo">
-                            <input type="file" id="logo_input" name="logo" accept="image/jpeg,image/png,image/webp">
-                            <?php if (!empty($tenant['logo_path'])): ?>
-                                <img src="<?= e(app_url($tenant['logo_path'])) ?>" id="preview_logo" class="dropzone-preview" alt="Logo actual" style="max-height: 80px; object-fit: contain;">
-                                <span class="btn btn-secondary btn-sm" style="margin-top: 10px; pointer-events: none;">
-                                    <?= icon('upload', 14) ?>
-                                    <span>Cambiar logo</span>
-                                </span>
-                            <?php else: ?>
-                                <img src="" id="preview_logo" class="dropzone-preview" alt="Logo" style="display: none; max-height: 80px;">
-                                <div class="dz-icon"><?= icon('upload', 20) ?></div>
-                                <strong class="dz-label">Subir Logo</strong>
-                                <span class="dz-hint">JPG, PNG o WebP · máx 8 MB</span>
-                                <span class="btn btn-secondary btn-sm" style="margin-top: 8px; pointer-events: none;">
-                                    Buscar archivo
-                                </span>
-                            <?php endif; ?>
-                        </label>
+                        <input type="file" id="logo_input" name="logo" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                        <div class="dropzone" id="dz_logo" data-input="logo_input" tabindex="0" role="button" aria-label="Subir logo del restaurante">
+                            <div id="preview_wrapper_logo" style="width: 100%;">
+                                <?php $hasLogo = !empty($tenant['logo_path']); ?>
+                                <img src="<?= $hasLogo ? e(app_url($tenant['logo_path'])) : '' ?>" 
+                                     id="preview_logo" 
+                                     class="dropzone-preview" 
+                                     alt="Logo del restaurante" 
+                                     style="max-height: 80px; object-fit: contain; <?= $hasLogo ? 'display: block;' : 'display: none;' ?>">
+                                
+                                <div class="dropzone-placeholder" id="placeholder_logo" style="<?= $hasLogo ? 'display: none;' : '' ?>">
+                                    <div class="dz-icon"><?= icon('upload', 20) ?></div>
+                                    <strong class="dz-label">Subir Logo</strong>
+                                    <span class="dz-hint">JPG, PNG o WebP · máx 8 MB</span>
+                                    <span class="btn btn-secondary btn-sm" style="margin-top: 8px; pointer-events: none;">
+                                        Buscar archivo
+                                    </span>
+                                </div>
+
+                                <div class="dropzone-change-btn" id="change_btn_logo" style="margin-top: 10px; <?= $hasLogo ? '' : 'display: none;' ?>">
+                                    <span class="btn btn-secondary btn-sm" style="pointer-events: none;">
+                                        <?= icon('upload', 14) ?>
+                                        <span>Cambiar logo</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Banner de Portada</label>
-                        <label for="banner_input" class="dropzone" id="dz_banner">
-                            <input type="file" id="banner_input" name="banner" accept="image/jpeg,image/png,image/webp">
-                            <?php if (!empty($tenant['banner_path'])): ?>
-                                <img src="<?= e(app_url($tenant['banner_path'])) ?>" id="preview_banner" class="dropzone-preview" alt="Banner actual" style="max-height: 80px; object-fit: cover;">
-                                <span class="btn btn-secondary btn-sm" style="margin-top: 10px; pointer-events: none;">
-                                    <?= icon('upload', 14) ?>
-                                    <span>Cambiar portada</span>
-                                </span>
-                            <?php else: ?>
-                                <img src="" id="preview_banner" class="dropzone-preview" alt="Banner" style="display: none; max-height: 80px;">
-                                <div class="dz-icon"><?= icon('upload', 20) ?></div>
-                                <strong class="dz-label">Subir Banner</strong>
-                                <span class="dz-hint">JPG, PNG o WebP · máx 8 MB</span>
-                                <span class="btn btn-secondary btn-sm" style="margin-top: 8px; pointer-events: none;">
-                                    Buscar archivo
-                                </span>
-                            <?php endif; ?>
-                        </label>
+                        <input type="file" id="banner_input" name="banner" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                        <div class="dropzone" id="dz_banner" data-input="banner_input" tabindex="0" role="button" aria-label="Subir banner de portada">
+                            <div id="preview_wrapper_banner" style="width: 100%;">
+                                <?php $hasBanner = !empty($tenant['banner_path']); ?>
+                                <img src="<?= $hasBanner ? e(app_url($tenant['banner_path'])) : '' ?>" 
+                                     id="preview_banner" 
+                                     class="dropzone-preview" 
+                                     alt="Banner de portada" 
+                                     style="max-height: 80px; object-fit: cover; <?= $hasBanner ? 'display: block;' : 'display: none;' ?>">
+                                
+                                <div class="dropzone-placeholder" id="placeholder_banner" style="<?= $hasBanner ? 'display: none;' : '' ?>">
+                                    <div class="dz-icon"><?= icon('upload', 20) ?></div>
+                                    <strong class="dz-label">Subir Banner</strong>
+                                    <span class="dz-hint">JPG, PNG o WebP · máx 8 MB</span>
+                                    <span class="btn btn-secondary btn-sm" style="margin-top: 8px; pointer-events: none;">
+                                        Buscar archivo
+                                    </span>
+                                </div>
+
+                                <div class="dropzone-change-btn" id="change_btn_banner" style="margin-top: 10px; <?= $hasBanner ? '' : 'display: none;' ?>">
+                                    <span class="btn btn-secondary btn-sm" style="pointer-events: none;">
+                                        <?= icon('upload', 14) ?>
+                                        <span>Cambiar portada</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -351,70 +369,6 @@
 </form>
 
 <script nonce="<?= e($cspNonce) ?>">
-function previewLogo(input) {
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        if (file.size > 8388608) {
-            alert('El archivo de logo supera el límite máximo de 8 MB.');
-            input.value = '';
-            return;
-        }
-        const p = document.getElementById('preview_logo');
-        p.src = URL.createObjectURL(file);
-        p.style.display = 'block';
-    }
-}
-function previewBanner(input) {
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        if (file.size > 8388608) {
-            alert('El archivo de banner supera el límite máximo de 8 MB.');
-            input.value = '';
-            return;
-        }
-        const p = document.getElementById('preview_banner');
-        p.src = URL.createObjectURL(file);
-        p.style.display = 'block';
-    }
-}
-
-// Drag & drop handlers para logo y banner
-function setupDropzone(dzId, inputId, previewFn) {
-    const dz = document.getElementById(dzId);
-    const inp = document.getElementById(inputId);
-    if (!dz || !inp) return;
-
-    ['dragenter', 'dragover'].forEach(name => {
-        dz.addEventListener(name, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            dz.classList.add('is-dragover');
-        }, false);
-    });
-
-    ['dragleave', 'drop'].forEach(name => {
-        dz.addEventListener(name, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            dz.classList.remove('is-dragover');
-        }, false);
-    });
-
-    dz.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        if (dt.files && dt.files.length > 0) {
-            inp.files = dt.files;
-            previewFn(inp);
-        }
-    }, false);
-}
-
-setupDropzone('dz_logo', 'logo_input', previewLogo);
-setupDropzone('dz_banner', 'banner_input', previewBanner);
-
-document.getElementById('logo_input')?.addEventListener('change', function() { previewLogo(this); });
-document.getElementById('banner_input')?.addEventListener('change', function() { previewBanner(this); });
-
 function syncColor(targetId, val) {
     const el = document.getElementById(targetId);
     if (el) el.value = val;

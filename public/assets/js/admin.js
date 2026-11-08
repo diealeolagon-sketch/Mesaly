@@ -17,9 +17,106 @@
         }
     });
 
-    // 2. Previsualización de imágenes segura
+    // 2. Sistema unificado y accesible de Dropzones de Imágenes (.dropzone[data-input])
+    function setupDropzones() {
+        document.querySelectorAll('.dropzone[data-input]').forEach(function (dropzone) {
+            const inputId = dropzone.getAttribute('data-input');
+            const fileInput = document.getElementById(inputId);
+            if (!fileInput) return;
+
+            const previewImg = dropzone.querySelector('.dropzone-preview');
+            const placeholder = dropzone.querySelector('.dropzone-placeholder');
+            const changeBtn = dropzone.querySelector('.dropzone-change-btn');
+
+            function handleFile(file) {
+                if (!file) return;
+
+                const maxSize = 8 * 1024 * 1024; // 8 MB
+                if (file.size > maxSize) {
+                    alert('La imagen seleccionada supera el límite máximo permitido de 8 MB.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Formato de imagen no soportado. Por favor sube un archivo JPG, PNG o WebP.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                if (previewImg) {
+                    try {
+                        previewImg.src = URL.createObjectURL(file);
+                        previewImg.style.display = 'block';
+                    } catch (e) {
+                        console.error('Error al generar previsualización:', e);
+                    }
+                }
+
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+
+                if (changeBtn) {
+                    changeBtn.style.display = 'block';
+                }
+            }
+
+            // Clic en cualquier área del dropzone activa el selector nativo de archivos
+            dropzone.addEventListener('click', function () {
+                fileInput.click();
+            });
+
+            // Accesibilidad de teclado (Enter o Espacio)
+            dropzone.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInput.click();
+                }
+            });
+
+            // Cambio en el input de archivo
+            fileInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    handleFile(this.files[0]);
+                }
+            });
+
+            // Arrastrar y soltar nativo (Drag & Drop)
+            ['dragenter', 'dragover'].forEach(function (eventName) {
+                dropzone.addEventListener(eventName, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('is-dragover');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(function (eventName) {
+                dropzone.addEventListener(eventName, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('is-dragover');
+                });
+            });
+
+            dropzone.addEventListener('drop', function (e) {
+                const dt = e.dataTransfer;
+                if (dt && dt.files && dt.files.length > 0) {
+                    try {
+                        fileInput.files = dt.files;
+                    } catch (err) {
+                        // Fallback si el navegador no permite asignar DataTransfer a files
+                    }
+                    handleFile(dt.files[0]);
+                }
+            });
+        });
+    }
+
+    // 3. Previsualización de imágenes segura para inputs con data-preview-img
     function setupImagePreviews() {
-        document.querySelectorAll('input[type="file"][data-preview-img]').forEach(input => {
+        document.querySelectorAll('input[type="file"][data-preview-img]').forEach(function (input) {
             input.addEventListener('change', function () {
                 if (!this.files || !this.files[0]) return;
                 const file = this.files[0];
@@ -45,10 +142,15 @@
         });
     }
 
-    // 3. Inicializar al cargar el DOM
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupImagePreviews);
-    } else {
+    // 4. Inicializar al cargar el DOM
+    function init() {
+        setupDropzones();
         setupImagePreviews();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
 })();

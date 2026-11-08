@@ -58,19 +58,27 @@ class Validator
 
             case 'min':
                 $min = (int)($params[0] ?? 0);
-                if (is_string($value) && mb_strlen($value) < $min) {
-                    $this->addError($field, "El campo {$field} debe tener al menos {$min} caracteres.");
-                } elseif (is_numeric($value) && (float)$value < $min) {
-                    $this->addError($field, "El campo {$field} debe ser como mínimo {$min}.");
+                if (is_int($value) || is_float($value)) {
+                    if ($value < $min) {
+                        $this->addError($field, "El campo {$field} debe ser como mínimo {$min}.");
+                    }
+                } elseif (is_string($value)) {
+                    if (mb_strlen($value) < $min) {
+                        $this->addError($field, "El campo {$field} debe tener al menos {$min} caracteres.");
+                    }
                 }
                 break;
 
             case 'max':
                 $max = (int)($params[0] ?? 0);
-                if (is_string($value) && mb_strlen($value) > $max) {
-                    $this->addError($field, "El campo {$field} no puede exceder {$max} caracteres.");
-                } elseif (is_numeric($value) && (float)$value > $max) {
-                    $this->addError($field, "El campo {$field} no puede ser mayor que {$max}.");
+                if (is_int($value) || is_float($value)) {
+                    if ($value > $max) {
+                        $this->addError($field, "El campo {$field} no puede ser mayor que {$max}.");
+                    }
+                } elseif (is_string($value)) {
+                    if (mb_strlen($value) > $max) {
+                        $this->addError($field, "El campo {$field} no puede exceder {$max} caracteres.");
+                    }
                 }
                 break;
 
