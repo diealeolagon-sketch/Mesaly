@@ -16,6 +16,16 @@ class Response
         return $this;
     }
 
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
     public function header(string $name, string $value): self
     {
         $this->headers[$name] = $value;

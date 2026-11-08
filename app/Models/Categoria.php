@@ -26,11 +26,16 @@ class Categoria extends TenantModel
     public function allActiveOrdered(): array
     {
         $tenantId = $this->getTenantId();
+        return $this->allActiveByRestaurantId($tenantId);
+    }
+
+    public function allActiveByRestaurantId(int $restauranteId): array
+    {
         $sql = "SELECT * FROM `{$this->table}` 
                 WHERE `{$this->tenantColumn}` = :tenant_id AND `activa` = 1 AND `deleted_at` IS NULL 
                 ORDER BY `orden` ASC, `nombre` ASC";
         $stmt = self::getPdo()->prepare($sql);
-        $stmt->execute(['tenant_id' => $tenantId]);
+        $stmt->execute(['tenant_id' => $restauranteId]);
         return $stmt->fetchAll();
     }
 }

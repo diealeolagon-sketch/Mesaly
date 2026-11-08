@@ -15,8 +15,13 @@ class MetodoPagoNegocio extends TenantModel
     public function getMetodos(): array
     {
         $tenantId = $this->getTenantId();
+        return $this->getMetodosByRestaurantId($tenantId);
+    }
+
+    public function getMetodosByRestaurantId(int $restauranteId): array
+    {
         $stmt = self::getPdo()->prepare("SELECT metodo FROM `{$this->table}` WHERE `restaurante_id` = :tid");
-        $stmt->execute(['tid' => $tenantId]);
+        $stmt->execute(['tid' => $restauranteId]);
         return $stmt->fetchAll(\PDO::FETCH_COLUMN);
     }
 

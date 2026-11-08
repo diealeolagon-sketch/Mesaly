@@ -12,6 +12,7 @@ use App\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Controllers\Admin\DisponibilidadController;
 use App\Controllers\Admin\ModificadorController;
 use App\Controllers\AuthController;
+use App\Controllers\Public\MenuController;
 use App\Controllers\Super\DashboardController as SuperDashboardController;
 use App\Controllers\Super\NegocioController;
 use App\Core\Auth;
@@ -92,3 +93,12 @@ $router->post('/admin/modificadores/opcion/{id}/eliminar', [ModificadorControlle
 // Disponibilidad rápida
 $router->get('/admin/disponibilidad', [DisponibilidadController::class, 'index'], $adminMiddlewares);
 $router->post('/admin/disponibilidad/toggle', [DisponibilidadController::class, 'toggle'], $adminPostMiddlewares);
+
+// -----------------------------------------------------------------------------
+// Menú Digital Público (Comensales)
+// -----------------------------------------------------------------------------
+$router->get('/{slug}/mesa/{numero}', [MenuController::class, 'mesa']);
+$router->post('/{slug}/mesa/limpiar', [MenuController::class, 'limpiarMesa']);
+$router->post('/{slug}/pedido', [MenuController::class, 'crearPedido']);
+$router->get('/{slug}', [MenuController::class, 'show']);
+

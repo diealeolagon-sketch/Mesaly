@@ -14,9 +14,19 @@ class Request
     private array $files;
     private array $headers;
 
-    public function __construct()
-    {
-        $this->method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+    private ?string $customIp = null;
+
+    public function __construct(
+        ?string $method = null,
+        ?string $uri = null,
+        array $post = [],
+        array $get = [],
+        array $json = [],
+        array $files = [],
+        array $headers = [],
+        ?string $ip = null
+    ) {
+        $this->method = $method !== null ? strtoupper($method) : strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
         
         // Simulación de PUT/PATCH/DELETE vía campo _method
         if ($this->method === 'POST' && isset($_POST['_method'])) {
@@ -26,37 +36,54 @@ class Request
             }
         }
 
-        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+        if ($uri !== null) {
+            $this->uri = '/' . trim($uri, '/');
+        } else {
+            $rawUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 
-        // Normalizar URI eliminando el prefijo si corre en subcarpeta (ej. /Mesaly/public)
-        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-        $baseDir = dirname($scriptName);
-        if ($baseDir !== '/' && $baseDir !== '\\' && str_starts_with($uri, $baseDir)) {
-            $uri = substr($uri, strlen($baseDir));
+            // Normalizar URI eliminando el prefijo si corre en subcarpeta (ej. /Mesaly/public)
+            $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+            $baseDir = dirname($scriptName);
+            if ($baseDir !== '/' && $baseDir !== '\\' && str_starts_with($rawUri, $baseDir)) {
+                $rawUri = substr($rawUri, strlen($baseDir));
+            }
+
+            $this->uri = '/' . trim($rawUri, '/');
         }
 
-        $this->uri = '/' . trim($uri, '/');
-        $this->get = $_GET;
-        $this->post = $_POST;
-        $this->files = $_FILES;
+        $this->get = !empty($get) ? $get : $_GET;
+        $this->post = !empty($post) ? $post : $_POST;
+        $this->files = !empty($files) ? $files : $_FILES;
+        $this->customIp = $ip;
 
         // Headers
         $this->headers = [];
-        foreach ($_SERVER as $key => $value) {
-            if (str_starts_with($key, 'HTTP_')) {
-                $name = str_replace('_', '-', strtolower(substr($key, 5)));
-                $this->headers[$name] = $value;
+        if (!empty($headers)) {
+            foreach ($headers as $k => $v) {
+                $name = str_replace('_', '-', strtolower($k));
+                $this->headers[$name] = (string)$v;
+            }
+        } else {
+            foreach ($_SERVER as $key => $value) {
+                if (str_starts_with($key, 'HTTP_')) {
+                    $name = str_replace('_', '-', strtolower(substr($key, 5)));
+                    $this->headers[$name] = $value;
+                }
             }
         }
 
         // Parse JSON si aplica
-        $this->json = [];
-        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-        if (str_contains(strtolower($contentType), 'application/json')) {
-            $raw = file_get_contents('php://input');
-            $decoded = json_decode($raw, true);
-            if (is_array($decoded)) {
-                $this->json = $decoded;
+        if (!empty($json)) {
+            $this->json = $json;
+        } else {
+            $this->json = [];
+            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+            if (str_contains(strtolower($contentType), 'application/json')) {
+                $raw = file_get_contents('php://input');
+                $decoded = json_decode($raw, true);
+                if (is_array($decoded)) {
+                    $this->json = $decoded;
+                }
             }
         }
     }
@@ -118,6 +145,9 @@ class Request
 
     public function ip(): string
     {
+        if ($this->customIp !== null) {
+            return $this->customIp;
+        }
         if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
             return $_SERVER['HTTP_CF_CONNECTING_IP'];
         }

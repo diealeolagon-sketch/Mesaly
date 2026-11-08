@@ -15,8 +15,13 @@ class Horario extends TenantModel
     public function allByTenant(): array
     {
         $tenantId = $this->getTenantId();
+        return $this->allByRestaurantId($tenantId);
+    }
+
+    public function allByRestaurantId(int $restauranteId): array
+    {
         $stmt = self::getPdo()->prepare("SELECT * FROM `{$this->table}` WHERE `restaurante_id` = :tid ORDER BY `dia_semana` ASC, `tramo` ASC");
-        $stmt->execute(['tid' => $tenantId]);
+        $stmt->execute(['tid' => $restauranteId]);
         return $stmt->fetchAll();
     }
 
