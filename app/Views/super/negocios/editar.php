@@ -25,7 +25,7 @@
             <div class="form-group">
                 <label for="slug" class="form-label">
                     Slug de la URL *
-                    <span style="font-weight: 700; color: var(--color-danger); font-size: 12px; margin-left: 6px;">⚠️ ¡Cuidado! Cambiarlo alterará los códigos QR ya impresos</span>
+                    <span style="font-weight: 700; color: var(--color-danger); font-size: 12px; margin-left: 6px; display: inline-flex; align-items: center; gap: 4px;"><?= icon('alert', 13) ?> ¡Cuidado! Cambiarlo alterará los códigos QR ya impresos</span>
                 </label>
                 <div class="input-prefix-wrap">
                     <span class="input-prefix">mesaly.com/</span>

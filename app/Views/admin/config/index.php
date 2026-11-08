@@ -59,7 +59,7 @@
                     <div>
                         <label class="form-label">Logo del Restaurante</label>
                         <label for="logo_input" class="dropzone" id="dz_logo">
-                            <input type="file" id="logo_input" name="logo" accept="image/jpeg,image/png,image/webp" onchange="previewLogo(this)">
+                            <input type="file" id="logo_input" name="logo" accept="image/jpeg,image/png,image/webp">
                             <?php if (!empty($tenant['logo_path'])): ?>
                                 <img src="<?= e(app_url($tenant['logo_path'])) ?>" id="preview_logo" class="dropzone-preview" alt="Logo actual" style="max-height: 80px; object-fit: contain;">
                                 <span class="btn btn-secondary btn-sm" style="margin-top: 10px; pointer-events: none;">
@@ -80,7 +80,7 @@
                     <div>
                         <label class="form-label">Banner de Portada</label>
                         <label for="banner_input" class="dropzone" id="dz_banner">
-                            <input type="file" id="banner_input" name="banner" accept="image/jpeg,image/png,image/webp" onchange="previewBanner(this)">
+                            <input type="file" id="banner_input" name="banner" accept="image/jpeg,image/png,image/webp">
                             <?php if (!empty($tenant['banner_path'])): ?>
                                 <img src="<?= e(app_url($tenant['banner_path'])) ?>" id="preview_banner" class="dropzone-preview" alt="Banner actual" style="max-height: 80px; object-fit: cover;">
                                 <span class="btn btn-secondary btn-sm" style="margin-top: 10px; pointer-events: none;">
@@ -107,25 +107,25 @@
                         <span style="font-size: 12px; color: var(--color-text-muted);">Haz clic para previsualizar</span>
                     </div>
                     <div class="palette-presets-list">
-                        <button type="button" class="preset-btn" onclick="aplicarPreset('#E85D04','#FFB703','#FFF7EA','#1E1B18')">
+                        <button type="button" class="preset-btn btn-preset" data-p="#E85D04" data-s="#FFB703" data-f="#FFF7EA" data-t="#1E1B18">
                             <span class="preset-swatch" style="background: #E85D04;"></span>Sazón
                         </button>
-                        <button type="button" class="preset-btn" onclick="aplicarPreset('#2A9D5C','#FFB703','#F6FBF4','#14281D')">
+                        <button type="button" class="preset-btn btn-preset" data-p="#2A9D5C" data-s="#FFB703" data-f="#F6FBF4" data-t="#14281D">
                             <span class="preset-swatch" style="background: #2A9D5C;"></span>Fresca
                         </button>
-                        <button type="button" class="preset-btn" onclick="aplicarPreset('#C1121F','#1E1B18','#FFFFFF','#1E1B18')">
+                        <button type="button" class="preset-btn btn-preset" data-p="#C1121F" data-s="#1E1B18" data-f="#FFFFFF" data-t="#1E1B18">
                             <span class="preset-swatch" style="background: #C1121F;"></span>Parrilla
                         </button>
-                        <button type="button" class="preset-btn" onclick="aplicarPreset('#6F4E37','#D4A373','#FAF3E8','#2B1B12')">
+                        <button type="button" class="preset-btn btn-preset" data-p="#6F4E37" data-s="#D4A373" data-f="#FAF3E8" data-t="#2B1B12">
                             <span class="preset-swatch" style="background: #6F4E37;"></span>Café
                         </button>
-                        <button type="button" class="preset-btn" onclick="aplicarPreset('#E5527A','#FFC8DD','#FFF5F8','#3A1F2B')">
+                        <button type="button" class="preset-btn btn-preset" data-p="#E5527A" data-s="#FFC8DD" data-f="#FFF5F8" data-t="#3A1F2B">
                             <span class="preset-swatch" style="background: #E5527A;"></span>Dulce
                         </button>
-                        <button type="button" class="preset-btn" onclick="aplicarPreset('#0077B6','#90E0EF','#F4FBFE','#0B2A3A')">
+                        <button type="button" class="preset-btn btn-preset" data-p="#0077B6" data-s="#90E0EF" data-f="#F4FBFE" data-t="#0B2A3A">
                             <span class="preset-swatch" style="background: #0077B6;"></span>Mar
                         </button>
-                        <button type="button" class="preset-btn" onclick="aplicarPreset('#FFB703','#E85D04','#16130F','#FFF7EA')">
+                        <button type="button" class="preset-btn btn-preset" data-p="#FFB703" data-s="#E85D04" data-f="#16130F" data-t="#FFF7EA">
                             <span class="preset-swatch" style="background: #16130F; border: 1px solid #aaa;"></span>Noche
                         </button>
                     </div>
@@ -136,29 +136,29 @@
                     <div class="form-group">
                         <label for="color_primario" class="form-label">Color Primario *</label>
                         <div class="color-input-wrap">
-                            <input type="color" id="picker_primario" value="<?= e($tenant['color_primario'] ?? '#E85D04') ?>" class="color-picker" oninput="syncColor('color_primario', this.value)">
-                            <input type="text" id="color_primario" name="color_primario" class="form-control" value="<?= e($tenant['color_primario'] ?? '#E85D04') ?>" pattern="^#[0-9a-fA-F]{6}$" required oninput="actualizarPreview()">
+                            <input type="color" id="picker_primario" value="<?= e($tenant['color_primario'] ?? '#E85D04') ?>" class="color-picker" data-sync="color_primario">
+                            <input type="text" id="color_primario" name="color_primario" class="form-control color-text-input" value="<?= e($tenant['color_primario'] ?? '#E85D04') ?>" pattern="^#[0-9a-fA-F]{6}$" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="color_secundario" class="form-label">Color Secundario *</label>
                         <div class="color-input-wrap">
-                            <input type="color" id="picker_secundario" value="<?= e($tenant['color_secundario'] ?? '#FFB703') ?>" class="color-picker" oninput="syncColor('color_secundario', this.value)">
-                            <input type="text" id="color_secundario" name="color_secundario" class="form-control" value="<?= e($tenant['color_secundario'] ?? '#FFB703') ?>" pattern="^#[0-9a-fA-F]{6}$" required oninput="actualizarPreview()">
+                            <input type="color" id="picker_secundario" value="<?= e($tenant['color_secundario'] ?? '#FFB703') ?>" class="color-picker" data-sync="color_secundario">
+                            <input type="text" id="color_secundario" name="color_secundario" class="form-control color-text-input" value="<?= e($tenant['color_secundario'] ?? '#FFB703') ?>" pattern="^#[0-9a-fA-F]{6}$" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="color_fondo" class="form-label">Fondo del Menú *</label>
                         <div class="color-input-wrap">
-                            <input type="color" id="picker_fondo" value="<?= e($tenant['color_fondo'] ?? '#FFF7EA') ?>" class="color-picker" oninput="syncColor('color_fondo', this.value)">
-                            <input type="text" id="color_fondo" name="color_fondo" class="form-control" value="<?= e($tenant['color_fondo'] ?? '#FFF7EA') ?>" pattern="^#[0-9a-fA-F]{6}$" required oninput="actualizarPreview()">
+                            <input type="color" id="picker_fondo" value="<?= e($tenant['color_fondo'] ?? '#FFF7EA') ?>" class="color-picker" data-sync="color_fondo">
+                            <input type="text" id="color_fondo" name="color_fondo" class="form-control color-text-input" value="<?= e($tenant['color_fondo'] ?? '#FFF7EA') ?>" pattern="^#[0-9a-fA-F]{6}$" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="color_texto" class="form-label">Color de Texto *</label>
                         <div class="color-input-wrap">
-                            <input type="color" id="picker_texto" value="<?= e($tenant['color_texto'] ?? '#1E1B18') ?>" class="color-picker" oninput="syncColor('color_texto', this.value)">
-                            <input type="text" id="color_texto" name="color_texto" class="form-control" value="<?= e($tenant['color_texto'] ?? '#1E1B18') ?>" pattern="^#[0-9a-fA-F]{6}$" required oninput="actualizarPreview()">
+                            <input type="color" id="picker_texto" value="<?= e($tenant['color_texto'] ?? '#1E1B18') ?>" class="color-picker" data-sync="color_texto">
+                            <input type="text" id="color_texto" name="color_texto" class="form-control color-text-input" value="<?= e($tenant['color_texto'] ?? '#1E1B18') ?>" pattern="^#[0-9a-fA-F]{6}$" required>
                         </div>
                     </div>
                 </div>
@@ -412,8 +412,12 @@ function setupDropzone(dzId, inputId, previewFn) {
 setupDropzone('dz_logo', 'logo_input', previewLogo);
 setupDropzone('dz_banner', 'banner_input', previewBanner);
 
+document.getElementById('logo_input')?.addEventListener('change', function() { previewLogo(this); });
+document.getElementById('banner_input')?.addEventListener('change', function() { previewBanner(this); });
+
 function syncColor(targetId, val) {
-    document.getElementById(targetId).value = val;
+    const el = document.getElementById(targetId);
+    if (el) el.value = val;
     actualizarPreview();
 }
 function aplicarPreset(p, s, f, t) {
@@ -423,6 +427,29 @@ function aplicarPreset(p, s, f, t) {
     document.getElementById('color_texto').value      = t; document.getElementById('picker_texto').value      = t;
     actualizarPreview();
 }
+
+document.querySelectorAll('.btn-preset').forEach(btn => {
+    btn.addEventListener('click', function() {
+        aplicarPreset(this.dataset.p, this.dataset.s, this.dataset.f, this.dataset.t);
+    });
+});
+
+document.querySelectorAll('.color-picker').forEach(picker => {
+    picker.addEventListener('input', function() {
+        syncColor(this.dataset.sync, this.value);
+    });
+});
+
+document.querySelectorAll('.color-text-input').forEach(inp => {
+    inp.addEventListener('input', function() {
+        const pickerId = 'picker_' + this.id.replace('color_', '');
+        const picker = document.getElementById(pickerId);
+        if (picker && /^#[0-9a-fA-F]{6}$/i.test(this.value)) {
+            picker.value = this.value;
+        }
+        actualizarPreview();
+    });
+});
 function getLuminance(hex) {
     hex = hex.replace('#',''); if (hex.length===3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
     return (0.299*parseInt(hex.substr(0,2),16)/255 + 0.587*parseInt(hex.substr(2,2),16)/255 + 0.114*parseInt(hex.substr(4,2),16)/255);

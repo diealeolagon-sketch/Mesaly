@@ -78,9 +78,9 @@ class App
 
     public function run(): void
     {
-        // Cabeceras globales de seguridad obligatorias (Sección 9.8)
+        // Cabeceras globales de seguridad obligatorias (Sección 9.8 y Auditoría 01)
         $nonce = View::getCspNonce();
-        header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' 'nonce-{$nonce}'; script-src 'self' 'unsafe-inline' 'nonce-{$nonce}'; img-src 'self' data: https:; font-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{$nonce}'; style-src 'self' 'nonce-{$nonce}'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';");
         header("X-Content-Type-Options: nosniff");
         header("X-Frame-Options: DENY");
         header("Referrer-Policy: strict-origin-when-cross-origin");

@@ -56,6 +56,23 @@ if (!function_exists('app_url')) {
     }
 }
 
+if (!function_exists('asset_url')) {
+    /**
+     * Build asset URL with automatic filemtime cache-busting.
+     */
+    function asset_url(string $path): string
+    {
+        $cleanPath = '/' . ltrim($path, '/');
+        $fullPath = dirname(__DIR__, 2) . '/public' . $cleanPath;
+        $url = app_url($cleanPath);
+        if (file_exists($fullPath)) {
+            $mtime = filemtime($fullPath);
+            return $url . (str_contains($url, '?') ? '&' : '?') . 'v=' . $mtime;
+        }
+        return $url;
+    }
+}
+
 if (!function_exists('format_cop')) {
     /**
      * Format Colombian Peso (COP) without decimals.
@@ -70,11 +87,13 @@ if (!function_exists('format_cop')) {
 if (!function_exists('icon')) {
     /**
      * Render consistent, lightweight SVG icon with 1.75px stroke.
+     * Complies with strict CSP: no inline style attribute, uses class .icon-svg.
      */
     function icon(string $name, int $size = 18, string $class = ''): string
     {
         $stroke = '1.75';
-        $attrs = 'width="' . $size . '" height="' . $size . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' . $stroke . '" stroke-linecap="round" stroke-linejoin="round" class="' . e($class) . '" style="display:inline-block; vertical-align:middle;"';
+        $classes = trim('icon-svg ' . $class);
+        $attrs = 'width="' . $size . '" height="' . $size . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' . $stroke . '" stroke-linecap="round" stroke-linejoin="round" class="' . e($classes) . '" aria-hidden="true"';
 
         return match ($name) {
             'dashboard' => '<svg ' . $attrs . '><rect width="7" height="9" x="3" y="3" rx="1.5"/><rect width="7" height="5" x="14" y="3" rx="1.5"/><rect width="7" height="9" x="14" y="12" rx="1.5"/><rect width="7" height="5" x="3" y="16" rx="1.5"/></svg>',
@@ -84,6 +103,7 @@ if (!function_exists('icon')) {
             'settings' => '<svg ' . $attrs . '><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
             'eye' => '<svg ' . $attrs . '><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
             'plus' => '<svg ' . $attrs . '><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
+            'minus' => '<svg ' . $attrs . '><path d="M5 12h14"/></svg>',
             'edit' => '<svg ' . $attrs . '><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>',
             'trash' => '<svg ' . $attrs . '><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>',
             'image' => '<svg ' . $attrs . '><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>',
@@ -100,6 +120,19 @@ if (!function_exists('icon')) {
             'truck' => '<svg ' . $attrs . '><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>',
             'arrow-left' => '<svg ' . $attrs . '><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>',
             'external-link' => '<svg ' . $attrs . '><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>',
+            'cutlery' => '<svg ' . $attrs . '><path d="M18 2v20"/><path d="M18 7a4 4 0 0 1-4-4V2"/><path d="M6 2v7a3 3 0 0 0 3 3v10"/><path d="M10 2v5"/><path d="M6 2v5"/></svg>',
+            'motorcycle' => '<svg ' . $attrs . '><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M9 17h6"/><path d="m12 14 3-6 4 1"/><path d="m5 17 5-5h3"/><path d="M15 8h2"/></svg>',
+            'shopping-bag' => '<svg ' . $attrs . '><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+            'cart' => '<svg ' . $attrs . '><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>',
+            'cash' => '<svg ' . $attrs . '><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>',
+            'smartphone' => '<svg ' . $attrs . '><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>',
+            'credit-card' => '<svg ' . $attrs . '><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>',
+            'search' => '<svg ' . $attrs . '><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+            'whatsapp' => '<svg ' . $attrs . '><path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1"/></svg>',
+            'lock' => '<svg ' . $attrs . '><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+            'tag' => '<svg ' . $attrs . '><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><circle cx="7" cy="7" r=".5" fill="currentColor"/></svg>',
+            'sparkles' => '<svg ' . $attrs . '><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>',
+            'alert' => '<svg ' . $attrs . '><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
             default => '<svg ' . $attrs . '><circle cx="12" cy="12" r="10"/></svg>',
         };
     }

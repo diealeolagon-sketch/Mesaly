@@ -6,7 +6,7 @@
         </p>
     </div>
     <div class="content-actions">
-        <button type="button" class="btn btn-primary btn-abrir-grupo" id="btnNuevoGrupo" onclick="abrirGrupoModal()">
+        <button type="button" class="btn btn-primary btn-abrir-grupo" id="btnNuevoGrupo">
             <?= icon('plus', 16) ?>
             <span>Nuevo Grupo de Modificadores</span>
         </button>
@@ -24,7 +24,7 @@
         <p style="color: var(--color-text-muted); font-size: 14px; max-width: 480px; margin: 0 auto 24px auto; line-height: 1.5;">
             Los modificadores permiten que tus clientes personalicen sus platos (ej: <em>"Término de la carne"</em>, <em>"Tipo de salsa"</em> o <em>"Adición de queso / tocineta"</em>).
         </p>
-        <button type="button" class="btn btn-primary btn-abrir-grupo" onclick="abrirGrupoModal()">
+        <button type="button" class="btn btn-primary btn-abrir-grupo">
             <?= icon('plus', 16) ?>
             <span>Crear Primer Grupo</span>
         </button>
@@ -63,11 +63,11 @@
                     </div>
 
                     <div class="modifier-group-actions">
-                        <button type="button" class="btn btn-secondary btn-sm btn-editar-grupo" data-grupo="<?= e(json_encode($grupo)) ?>" onclick="editarGrupo(<?= e(json_encode($grupo)) ?>)">
+                        <button type="button" class="btn btn-secondary btn-sm btn-editar-grupo" data-grupo="<?= e(json_encode($grupo)) ?>">
                             <?= icon('edit', 14) ?>
                             <span>Editar Grupo</span>
                         </button>
-                        <form method="POST" action="<?= e(app_url('/admin/modificadores/grupo/' . $grupo['id'] . '/eliminar')) ?>" onsubmit="return confirm('¿Seguro que deseas eliminar este grupo y todas sus opciones?');" style="display: inline;">
+                        <form method="POST" action="<?= e(app_url('/admin/modificadores/grupo/' . $grupo['id'] . '/eliminar')) ?>" data-confirm="¿Seguro que deseas eliminar este grupo y todas sus opciones?" style="display: inline;">
                             <?= csrf_field() ?>
                             <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-border);" title="Eliminar grupo completo">
                                 <?= icon('trash', 14) ?>
@@ -103,7 +103,7 @@
                                             <span style="color: var(--color-text-subtle); font-size: 12px; font-weight: 500;">(Sin costo adicional)</span>
                                         <?php endif; ?>
                                     </div>
-                                    <form method="POST" action="<?= e(app_url('/admin/modificadores/opcion/' . $op['id'] . '/eliminar')) ?>" onsubmit="return confirm('¿Eliminar la opción <?= e(addslashes($op['nombre'])) ?>?');" style="display: inline;">
+                                    <form method="POST" action="<?= e(app_url('/admin/modificadores/opcion/' . $op['id'] . '/eliminar')) ?>" data-confirm="¿Eliminar esta opción?" style="display: inline;">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); padding: 4px 8px;" title="Quitar opción">
                                             <?= icon('trash', 13) ?>
@@ -165,7 +165,7 @@
 
             <div class="form-group">
                 <label for="grupo_tipo" class="form-label">Tipo de Selección *</label>
-                <select id="grupo_tipo" name="tipo" class="form-control" onchange="toggleTipoGrupo(this.value)" required>
+                <select id="grupo_tipo" name="tipo" class="form-control" required>
                     <option value="unica">Selección Única (El cliente escoge exactamente una opción)</option>
                     <option value="multiple">Selección Múltiple (El cliente puede marcar varias adiciones)</option>
                 </select>
@@ -193,7 +193,7 @@
             </div>
 
             <div class="modal-footer" style="margin-top: 28px; padding-top: 20px;">
-                <button type="button" class="btn btn-secondary" id="btnCancelarGrupoModal" onclick="cerrarGrupoModal()">Cancelar</button>
+                <button type="button" class="btn btn-secondary" id="btnCancelarGrupoModal">Cancelar</button>
                 <button type="submit" class="btn btn-primary" style="padding: 10px 22px;">Guardar Grupo</button>
             </div>
         </form>
@@ -260,6 +260,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Enlace directo de eventos (compatible con CSP)
+document.getElementById('grupo_tipo')?.addEventListener('change', function() { toggleTipoGrupo(this.value); });
 document.querySelectorAll('.btn-abrir-grupo').forEach(btn => btn.addEventListener('click', abrirGrupoModal));
 document.getElementById('btnCancelarGrupoModal')?.addEventListener('click', cerrarGrupoModal);
 document.querySelectorAll('.btn-editar-grupo').forEach(btn => {

@@ -101,8 +101,7 @@ $agotados    = array_filter($productos, fn($p) =>  empty($p['disponible']));
                 </div>
 
                 <div class="avail-action">
-                    <form method="POST" action="<?= e(app_url('/admin/disponibilidad/toggle')) ?>"
-                          onsubmit="return toggleAjax(event, this, <?= (int)$prod['id'] ?>)">
+                    <form method="POST" action="<?= e(app_url('/admin/disponibilidad/toggle')) ?>" class="form-toggle-disponibilidad" data-prod-id="<?= (int)$prod['id'] ?>">
                         <?= csrf_field() ?>
                         <input type="hidden" name="id" value="<?= (int)$prod['id'] ?>">
                         <button type="submit" id="btn_prod_<?= $prod['id'] ?>"
@@ -173,4 +172,11 @@ async function toggleAjax(event, form, prodId) {
     }
     return false;
 }
+
+document.querySelectorAll('.form-toggle-disponibilidad').forEach(form => {
+    form.addEventListener('submit', function (e) {
+        const prodId = this.getAttribute('data-prod-id');
+        toggleAjax(e, this, prodId);
+    });
+});
 </script>

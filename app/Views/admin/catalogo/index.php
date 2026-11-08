@@ -7,7 +7,7 @@
     </div>
 
     <div class="content-actions">
-        <button type="button" class="btn btn-secondary" id="btnNuevaSeccion" onclick="abrirCatModal()">
+        <button type="button" class="btn btn-secondary" id="btnNuevaSeccion">
             <?= icon('folder', 16) ?>
             <span>Nueva Sección (<?= $totalCategorias ?>/<?= $maxCategorias ?>)</span>
         </button>
@@ -49,10 +49,10 @@
                     <span class="cat-chip-order">
                         #<?= (int)$cat['orden'] ?>
                     </span>
-                    <button type="button" class="cat-chip-btn btn-editar-cat" data-cat="<?= e(json_encode($cat)) ?>" onclick="editarCat(<?= e(json_encode($cat)) ?>)" title="Editar sección">
+                    <button type="button" class="cat-chip-btn btn-editar-cat" data-cat="<?= e(json_encode($cat)) ?>" title="Editar sección">
                         <?= icon('edit', 14) ?>
                     </button>
-                    <form method="POST" action="<?= e(app_url('/admin/catalogo/categoria/' . $cat['id'] . '/eliminar')) ?>" style="display: inline;" onsubmit="return confirm('¿Seguro que deseas eliminar esta sección?');">
+                    <form method="POST" action="<?= e(app_url('/admin/catalogo/categoria/' . $cat['id'] . '/eliminar')) ?>" style="display: inline;" data-confirm="¿Seguro que deseas eliminar esta sección?">
                         <?= csrf_field() ?>
                         <button type="submit" class="cat-chip-btn danger" title="Eliminar sección">
                             <?= icon('x', 14) ?>
@@ -160,7 +160,7 @@
                                         <?= icon('edit', 14) ?>
                                         <span>Editar</span>
                                     </a>
-                                    <form method="POST" action="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/eliminar')) ?>" onsubmit="return confirm('¿Seguro que deseas eliminar este producto? Se ocultará del menú pero su historial se mantendrá intacto.');" style="display: inline;">
+                                    <form method="POST" action="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/eliminar')) ?>" data-confirm="¿Seguro que deseas eliminar este producto? Se ocultará del menú pero su historial se mantendrá intacto." style="display: inline;">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger);" title="Eliminar plato">
                                             <?= icon('trash', 14) ?>
@@ -215,7 +215,7 @@
             </div>
 
             <div class="modal-footer" style="margin-top: 28px; padding-top: 20px;">
-                <button type="button" class="btn btn-secondary" id="btnCancelarCatModal" onclick="cerrarCatModal()">Cancelar</button>
+                <button type="button" class="btn btn-secondary" id="btnCancelarCatModal">Cancelar</button>
                 <button type="submit" class="btn btn-primary" style="padding: 10px 22px;">Guardar Sección</button>
             </div>
         </form>

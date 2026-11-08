@@ -22,83 +22,83 @@ class WhatsAppService
     }
 
     /**
-     * Construye el texto completo del pedido para WhatsApp con formato enriquecido.
+     * Construye el texto completo del pedido para WhatsApp con formato tipográfico limpio (sin emojis).
      */
     public static function formatearMensajePedido(array $restaurante, array $pedido, array $items): string
     {
         $lineas = [];
 
         // Encabezado
-        $lineas[] = "🍔 *NUEVO PEDIDO #{$pedido['codigo']}*";
-        $lineas[] = "🏪 *{$restaurante['nombre']}*";
-        $lineas[] = "📅 " . date('d/m/Y h:i A');
+        $lineas[] = "*NUEVO PEDIDO #{$pedido['codigo']}*";
+        $lineas[] = "*{$restaurante['nombre']}*";
+        $lineas[] = date('d/m/Y h:i A');
         $lineas[] = "--------------------------------";
 
         // Modalidad
         switch ($pedido['modalidad']) {
             case 'mesa':
                 $mesaTexto = !empty($pedido['mesa_numero']) ? "Mesa #{$pedido['mesa_numero']}" : "Mesa asignada";
-                $lineas[] = "🍽️ *Modalidad:* En Mesa ({$mesaTexto})";
+                $lineas[] = "*Modalidad:* En Mesa ({$mesaTexto})";
                 if (!empty($pedido['cliente_nombre'])) {
-                    $lineas[] = "👤 *Cliente:* {$pedido['cliente_nombre']}";
+                    $lineas[] = "*Cliente:* {$pedido['cliente_nombre']}";
                 }
                 break;
 
             case 'domicilio':
-                $lineas[] = "🛵 *Modalidad:* Domicilio";
-                $lineas[] = "👤 *Cliente:* {$pedido['cliente_nombre']}";
+                $lineas[] = "*Modalidad:* Domicilio";
+                $lineas[] = "*Cliente:* {$pedido['cliente_nombre']}";
                 if (!empty($pedido['cliente_telefono'])) {
-                    $lineas[] = "📞 *Teléfono:* {$pedido['cliente_telefono']}";
+                    $lineas[] = "*Teléfono:* {$pedido['cliente_telefono']}";
                 }
-                $lineas[] = "🏠 *Dirección:* {$pedido['direccion']}";
+                $lineas[] = "*Dirección:* {$pedido['direccion']}";
                 if (!empty($pedido['barrio'])) {
-                    $lineas[] = "📍 *Barrio:* {$pedido['barrio']}";
+                    $lineas[] = "*Barrio:* {$pedido['barrio']}";
                 }
                 if (!empty($pedido['notas_entrega'])) {
-                    $lineas[] = "📝 *Indicaciones:* {$pedido['notas_entrega']}";
+                    $lineas[] = "*Indicaciones:* {$pedido['notas_entrega']}";
                 }
                 break;
 
             case 'recoger':
-                $lineas[] = "🛍️ *Modalidad:* Para Llevar (Recoger)";
-                $lineas[] = "👤 *Cliente:* {$pedido['cliente_nombre']}";
+                $lineas[] = "*Modalidad:* Para Llevar (Recoger)";
+                $lineas[] = "*Cliente:* {$pedido['cliente_nombre']}";
                 if (!empty($pedido['cliente_telefono'])) {
-                    $lineas[] = "📞 *Teléfono:* {$pedido['cliente_telefono']}";
+                    $lineas[] = "*Teléfono:* {$pedido['cliente_telefono']}";
                 }
                 if (!empty($pedido['hora_recogida'])) {
-                    $lineas[] = "⏰ *Hora estimada de recogida:* {$pedido['hora_recogida']}";
+                    $lineas[] = "*Hora estimada de recogida:* {$pedido['hora_recogida']}";
                 }
                 break;
         }
 
         $lineas[] = "--------------------------------";
-        $lineas[] = "🛒 *DETALLE DEL PEDIDO:*";
+        $lineas[] = "*DETALLE DEL PEDIDO:*";
 
         // Listado de ítems
         foreach ($items as $item) {
             $subtotalItem = format_cop((int)$item['total_linea']);
-            $lineas[] = "• *{$item['cantidad']}x {$item['nombre_producto']}* ({$subtotalItem})";
+            $lineas[] = "- *{$item['cantidad']}x {$item['nombre_producto']}* ({$subtotalItem})";
 
             if (!empty($item['opciones']) && is_array($item['opciones'])) {
                 foreach ($item['opciones'] as $opc) {
                     $extraStr = !empty($opc['precio_extra']) ? " (+" . format_cop((int)$opc['precio_extra']) . ")" : "";
-                    $lineas[] = "   ▫ {$opc['nombre_grupo']}: {$opc['nombre_opcion']}{$extraStr}";
+                    $lineas[] = "   * {$opc['nombre_grupo']}: {$opc['nombre_opcion']}{$extraStr}";
                 }
             }
 
             if (!empty($item['nota'])) {
-                $lineas[] = "   💬 _Nota: {$item['nota']}_";
+                $lineas[] = "   - _Nota: {$item['nota']}_";
             }
         }
 
         $lineas[] = "--------------------------------";
-        $lineas[] = "💵 *Subtotal:* " . format_cop((int)$pedido['subtotal']);
+        $lineas[] = "*Subtotal:* " . format_cop((int)$pedido['subtotal']);
 
         if ($pedido['modalidad'] === 'domicilio' && (int)$pedido['costo_envio'] > 0) {
-            $lineas[] = "🛵 *Costo de envío:* " . format_cop((int)$pedido['costo_envio']);
+            $lineas[] = "*Costo de envío:* " . format_cop((int)$pedido['costo_envio']);
         }
 
-        $lineas[] = "💰 *TOTAL A PAGAR:* " . format_cop((int)$pedido['total']) . " COP";
+        $lineas[] = "*TOTAL A PAGAR:* " . format_cop((int)$pedido['total']) . " COP";
         $lineas[] = "--------------------------------";
 
         // Método de pago
@@ -108,7 +108,7 @@ class WhatsAppService
             'datafono' => 'Datáfono (Tarjeta débito / crédito)',
         ];
         $metodoNombre = $metodoMap[$pedido['metodo_pago']] ?? ucfirst((string)$pedido['metodo_pago']);
-        $lineas[] = "💳 *Método de pago informado:* {$metodoNombre}";
+        $lineas[] = "*Método de pago informado:* {$metodoNombre}";
 
         $lineas[] = "\n_¡Hola! Acabo de armar este pedido en su menú interactivo de Mesaly. ¿Me confirman recepción y tiempo de preparación?_";
 

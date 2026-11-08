@@ -336,7 +336,7 @@
         html += `
             <div class="modal-notes-section">
                 <label for="modalItemNotes" class="modal-notes-label">
-                    <span>📝 Instrucciones o notas para la cocina (Opcional)</span>
+                    <span>Instrucciones o notas para la cocina (Opcional)</span>
                 </label>
                 <textarea id="modalItemNotes" class="modal-notes-textarea" placeholder="Ej: Sin cebolla, salsas aparte, término bien sellado..." rows="2" maxlength="300"></textarea>
             </div>
@@ -550,7 +550,7 @@
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = `
                 <div class="cart-empty-message">
-                    <span class="empty-cart-icon">🛒</span>
+                    <span class="empty-cart-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span>
                     <p>Tu pedido está vacío. Elige tus platos favoritos de la carta para comenzar.</p>
                 </div>
             `;
@@ -581,7 +581,7 @@
 
                         ${item.nota ? `
                             <div class="cart-item-note">
-                                💬 "${escapeHtml(item.nota)}"
+                                "${escapeHtml(item.nota)}"
                             </div>
                         ` : ''}
                     </div>
@@ -755,6 +755,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    'X-CSRF-TOKEN': restaurant.csrf_token || '',
                 },
                 body: JSON.stringify(payload),
             });

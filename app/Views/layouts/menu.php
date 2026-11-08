@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? ($restaurante['nombre'] . ' — Menú Digital')) ?></title>
     
     <!-- Meta tags para compartir en WhatsApp y Redes Sociales -->
@@ -21,30 +21,74 @@
         <link rel="icon" type="image/svg+xml" href="<?= e(app_url('/assets/img/logo-icon.svg')) ?>">
     <?php endif; ?>
 
-    <!-- Fuentes de Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Fuentes Autohospedadas Locales (Sin CDN externo, compatible con CSP) -->
+    <link rel="preload" href="<?= e(app_url('/assets/fonts/inter_400_normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="<?= e(app_url('/assets/fonts/outfit_600_normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="<?= e(asset_url('/assets/css/fonts.css')) ?>">
 
-    <!-- CSS Unificado de Mesaly -->
-    <link rel="stylesheet" href="<?= e(app_url('/assets/css/mesaly.css')) ?>?v=7">
+    <!-- CSS de Mesaly con versionado automático -->
+    <link rel="stylesheet" href="<?= e(asset_url('/assets/css/mesaly.css')) ?>">
 
-    <!-- Variables Dinámicas de Marca del Restaurante -->
-    <style>
+    <?php
+    $fuente = $restaurante['fuente'] ?? 'Moderna';
+    if (in_array($fuente, ['Inter', 'Poppins', 'Outfit', 'Roboto'], true)) {
+        $fuente = 'Moderna';
+    } elseif (in_array($fuente, ['Playfair', 'Playfair Display'], true)) {
+        $fuente = 'Elegante';
+    } elseif ($fuente === 'System') {
+        $fuente = 'Sistema';
+    }
+
+    $pares = [
+        'Moderna' => [
+            'heading' => "'Outfit', sans-serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Calida' => [
+            'heading' => "'Fraunces', serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Elegante' => [
+            'heading' => "'Playfair Display', serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Urbana' => [
+            'heading' => "'Oswald', sans-serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Sistema' => [
+            'heading' => "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            'body' => "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        ],
+    ];
+    $parSeleccionado = $pares[$fuente] ?? $pares['Moderna'];
+    ?>
+
+    <!-- Variables Dinámicas de Marca del Restaurante con Nonce CSP -->
+    <style nonce="<?= e($cspNonce) ?>">
         :root {
             --menu-primary: <?= !empty($restaurante['color_primario']) ? e($restaurante['color_primario']) : '#E85D04' ?>;
             --menu-secondary: <?= !empty($restaurante['color_secundario']) ? e($restaurante['color_secundario']) : '#FFB703' ?>;
             --menu-bg: <?= !empty($restaurante['color_fondo']) ? e($restaurante['color_fondo']) : '#FFF7EA' ?>;
             --menu-text: <?= !empty($restaurante['color_texto']) ? e($restaurante['color_texto']) : '#1E1B18' ?>;
-            --menu-font: '<?= !empty($restaurante['fuente']) ? e($restaurante['fuente']) : 'Inter' ?>', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --menu-font-heading: <?= $parSeleccionado['heading'] ?>;
+            --menu-font-body: <?= $parSeleccionado['body'] ?>;
+            --menu-font: var(--menu-font-body);
         }
         body.public-menu-body {
-            font-family: var(--menu-font);
+            font-family: var(--menu-font-body);
             background-color: var(--menu-bg);
             color: var(--menu-text);
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
+        }
+        .menu-brand-title,
+        .menu-section-title,
+        .product-modal-title,
+        .group-title,
+        .checkout-section-title {
+            font-family: var(--menu-font-heading);
         }
     </style>
 </head>

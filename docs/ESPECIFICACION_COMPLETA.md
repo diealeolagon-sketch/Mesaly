@@ -20,6 +20,7 @@ El negocio paga una **suscripción mensual o anual** al dueño de la plataforma.
 - Los "métodos de pago aceptados" del restaurante son **solo informativos** (se muestran al cliente y se incluyen en el mensaje de WhatsApp).
 - El cobro de la suscripción es **manual**: el restaurante paga por fuera (Nequi, transferencia, efectivo, etc.) y el Super Admin **registra el pago** en su panel.
 - El cliente final **no se registra** nunca.
+- **Sin planes y sin límites de uso:** productos, categorías, mesas y pedidos ilimitados para todos los negocios. El precio se pacta por negocio y lo define el Super Admin (ver 5.5).
 - Todo debe funcionar bien en **celular con datos limitados** (Colombia).
 
 ### 1.3 Fuera de alcance de la versión 1 (no construir todavía)
@@ -93,11 +94,11 @@ mesaly/
 |---|:-:|:-:|:-:|
 | Crear / editar / suspender negocios | ✅ | ❌ | ❌ |
 | Crear usuario admin de un negocio / resetear su contraseña | ✅ | ❌ | ❌ |
-| Gestionar planes y límites | ✅ | ❌ | ❌ |
+| Definir el precio y ciclo acordado de cada negocio | ✅ | ❌ | ❌ |
 | Registrar pagos, extender fecha, suspender, "recordar pago" | ✅ | ❌ | ❌ |
 | Ver métricas globales (negocios, pedidos, MRR) | ✅ | ❌ | ❌ |
 | "Ver como" un negocio (soporte, queda en auditoría) | ✅ | ❌ | ❌ |
-| Ver su propio plan, fecha de vencimiento y estado | — | ✅ (solo lectura) | ❌ |
+| Ver su fecha de vencimiento y estado de suscripción | — | ✅ (solo lectura) | ❌ |
 | Marca: nombre, logo, banner, descripción, colores, fuente | ✅ | ✅ | ❌ |
 | Categorías (crear, editar, ordenar, activar/desactivar, eliminar) | ✅ | ✅ | ❌ |
 | Productos, variantes, modificadores, switch "Agotado" | ✅ | ✅ | ❌ |
@@ -108,7 +109,7 @@ mesaly/
 | Ver pedidos y cambiar su estado | ✅ | ✅ | ❌ |
 | **Eliminar pedidos** | ❌ | ❌ | ❌ (solo cancelar/archivar) |
 | Cambiar slug | ✅ | ⚠️ solo con advertencia clara (rompe QR impresos) | ❌ |
-| Superar límites de su plan | ❌ | ❌ | ❌ |
+| Cantidad de productos, categorías y mesas | Sin límite | Sin límite | — |
 | Ver datos de otro negocio | ✅ | ❌ **nunca** | ❌ |
 | Cambiar su contraseña / datos de contacto | ✅ | ✅ | ❌ |
 | Ver menú y enviar pedido | — | — | ✅ |
@@ -121,29 +122,33 @@ mesaly/
 
 ### 5.1 Pantalla principal: "Vencimientos"
 Lista de todos los negocios **ordenada por fecha de vencimiento ascendente**, con:
-- Semáforo de color (ver 7.2), nombre, plan, ciclo, fecha de vencimiento, días restantes (negativos si vencido), fecha y monto del último pago.
+- Semáforo de color (ver 7.2), nombre, precio acordado, ciclo, fecha de vencimiento, días restantes (negativos si vencido), fecha y monto del último pago.
 - Filtros rápidos: **Todos · Vencen esta semana · En gracia · Bloqueados · En prueba · Cancelados**.
 - Búsqueda por nombre o slug.
 - Acciones por fila: **Registrar pago · Recordar pago · Extender días · Suspender/Reactivar · Ver como · Editar**.
 
 ### 5.2 Gestión de negocios
-- Crear negocio: nombre, slug (validado y único), número de WhatsApp, plan, ciclo, fecha de inicio o prueba. Al crear, se genera el usuario Admin con **contraseña temporal** que se muestra una sola vez y obliga a cambiarla en el primer ingreso.
-- Editar datos, cambiar plan, resetear contraseña del admin, suspender manualmente, cancelar.
+- Crear negocio: nombre, slug (validado y único), número de WhatsApp, **precio acordado** (COP por periodo), ciclo, fecha de inicio o prueba, notas internas. Al crear, se genera el usuario Admin con **contraseña temporal** que se muestra una sola vez y obliga a cambiarla en el primer ingreso.
+- Editar datos, cambiar precio y ciclo, resetear contraseña del admin, suspender manualmente, cancelar.
 
 ### 5.3 Registro de pagos (manual)
-Formulario: negocio, **fecha de pago**, **monto**, **método** (Nequi, Daviplata, transferencia, efectivo, otro), **cantidad de periodos** (por defecto 1), **nota/referencia**. Reglas en 7.3. Historial de pagos por negocio, no editable (solo anulable con registro de auditoría).
+Formulario: negocio, **fecha de pago**, **monto** (se prellena con el precio acordado del negocio y es editable), **método** (Nequi, Daviplata, transferencia, efectivo, otro), **cantidad de periodos** (por defecto 1), **nota/referencia**. Reglas en 7.3. Historial de pagos por negocio, no editable (solo anulable con registro de auditoría).
 
 ### 5.4 Botón "Recordar pago"
 Abre un enlace `wa.me` hacia el WhatsApp del dueño del negocio con un mensaje prellenado, por ejemplo:
-> *Hola, te recuerdo que tu plan de Mesaly vence el 15 de noviembre. Cuando hagas el pago me avisas para registrarlo. ¡Gracias!*
+> *Hola, te recuerdo que tu suscripción de Mesaly vence el 15 de noviembre. Cuando hagas el pago me avisas para registrarlo. ¡Gracias!*
 
 El mensaje cambia según el estado (por vencer / en gracia / bloqueado). Al pulsarlo se guarda `ultimo_recordatorio_at` y se muestra "Último recordatorio: hace 2 días".
 
-### 5.5 Planes
-CRUD de planes: nombre, precio mensual, precio anual, `max_productos`, `max_mesas`, `max_categorias`, activo. Los límites se validan **en el servidor** al crear productos/mesas/categorías.
+### 5.5 Precio por negocio (sin planes y sin límites)
+**No existen planes ni límites de uso.** Todos los negocios tienen las mismas funciones y **ninguna cantidad está topada**: productos, categorías, mesas y pedidos son ilimitados. El Super Admin define **cuánto cobra a cada negocio** según su caso, directamente en la ficha del negocio:
+- `precio`: monto acordado en COP por periodo (mensual o anual, según el `ciclo`).
+- `notas_internas`: texto libre solo visible para el Super Admin (por ejemplo, "descuento por ser el primer cliente", "paga por Nequi").
+- `mostrar_marca`: indica si se muestra el pie "Menú digital por Mesaly" (por defecto sí; lo decide el Super Admin por negocio).
+El precio puede cambiarse en cualquier momento y aplica a los pagos futuros; los pagos ya registrados conservan su monto.
 
 ### 5.6 Métricas globales
-Total de negocios por estado, pedidos totales en la red (con filtro de fechas), **MRR** = suma del precio mensual de negocios activos (los anuales se dividen entre 12; las pruebas y suspendidos no cuentan), pagos registrados del mes.
+Total de negocios por estado, pedidos totales en la red (con filtro de fechas), **MRR** = suma del `precio` acordado de cada negocio activo, llevado a base mensual (los anuales se dividen entre 12; las pruebas, suspendidos y cancelados no cuentan), pagos registrados del mes.
 
 ### 5.7 "Ver como"
 El Super Admin puede entrar al panel de un negocio para dar soporte. Debe mostrarse un banner permanente "Estás viendo como: X — Salir", y **cada entrada queda en la tabla de auditoría**.
@@ -183,7 +188,7 @@ Selección múltiple: Efectivo, Transferencia / billeteras digitales, Datáfono 
 - **Edición rápida de agotados:** una pantalla simple con la lista de productos y un switch por cada uno, pensada para usarse desde el celular en plena operación.
 
 ### 6.6 Mesas y QR
-- El admin ingresa el número de mesas (validado contra el límite del plan). Puede darles nombre opcional ("Terraza 1").
+- El admin ingresa el número de mesas (sin límite). Puede darles nombre opcional ("Terraza 1").
 - El sistema genera:
   - **QR general:** `https://dominio.com/slug` (redes sociales, tarjetas, mostrador).
   - **Un QR por mesa:** `https://dominio.com/slug?mesa=N`.
@@ -205,14 +210,14 @@ Selección múltiple: Efectivo, Transferencia / billeteras digitales, Datáfono 
 - Se excluyen pedidos cancelados.
 
 ### 6.9 Banner de suscripción
-Si el estado es "Por vencer" o "En gracia", se muestra un banner con el color del semáforo en **todas** las pantallas del admin. El admin ve su plan y fecha de vencimiento pero no puede modificarlos.
+Si el estado es "Por vencer" o "En gracia", se muestra un banner con el color del semáforo en **todas** las pantallas del admin. El admin ve su fecha de vencimiento y estado pero no puede modificarlos.
 
 ---
 
 ## 7. Motor de suscripción (manual con semáforo)
 
 ### 7.1 Campos clave en `restaurantes`
-`plan_id`, `ciclo` (mensual/anual), `fecha_vencimiento` (DATE), `dia_corte`, `en_prueba` + `fecha_fin_prueba`, `estado_manual` (NULL | `suspendido` | `cancelado`), `ultimo_recordatorio_at`.
+`precio` (INT, COP por periodo), `ciclo` (mensual/anual), `notas_internas`, `mostrar_marca`, `fecha_vencimiento` (DATE), `dia_corte`, `en_prueba` + `fecha_fin_prueba`, `estado_manual` (NULL | `suspendido` | `cancelado`), `ultimo_recordatorio_at`.
 Configurables globalmente (tabla `configuracion`): **`dias_alerta` = 5**, **`dias_gracia` = 3**.
 
 ### 7.2 Estado calculado (NO se guarda, se calcula al vuelo)
@@ -237,7 +242,7 @@ Esta lógica vive en **un solo lugar** (`SuscripcionService::estadoDe($restauran
 |---|---|---|
 | AL_DIA | Normal | Normal |
 | POR_VENCER | Normal + banner amarillo con días restantes | Normal |
-| EN_GRACIA | Normal + banner fuerte "Tu plan venció, tienes X días" | **Normal** |
+| EN_GRACIA | Normal + banner fuerte "Tu suscripción venció, tienes X días" | **Normal** |
 | BLOQUEADO / SUSPENDIDO / CANCELADO | Solo ve **pantalla de reactivación** (fecha de vencimiento, instrucciones de pago con el WhatsApp del Super Admin). No puede usar ninguna otra ruta | Mensaje sobrio: "Este menú se encuentra temporalmente fuera de servicio". **Sin carrito y sin pedidos** |
 
 - El bloqueo se aplica en un **middleware** (`SuscripcionMiddleware`) y **también en el endpoint de crear pedido** (un cliente con la página abierta no puede enviar un pedido a un negocio bloqueado).
@@ -381,8 +386,7 @@ Convenciones: `id BIGINT UNSIGNED AUTO_INCREMENT PK`, `created_at`, `updated_at`
 | Tabla | Campos principales |
 |---|---|
 | `configuracion` | `clave` (PK), `valor` (ej. `dias_alerta`, `dias_gracia`, `whatsapp_soporte`, `nombre_plataforma`) |
-| `planes` | `nombre`, `precio_mensual`, `precio_anual`, `max_productos`, `max_mesas`, `max_categorias`, `activo` |
-| `restaurantes` | `nombre`, `slug` (UNIQUE), `descripcion`, `logo_path`, `banner_path`, `color_primario`, `color_secundario`, `color_fondo`, `color_texto`, `fuente`, `whatsapp`, `moneda` (COP), `recibiendo_pedidos` (bool), `acepta_mesa`, `acepta_domicilio`, `acepta_recoger`, `costo_envio`, `pedido_minimo`, `info_pago_texto`, `plan_id`, `ciclo`, `fecha_vencimiento`, `dia_corte`, `en_prueba`, `fecha_fin_prueba`, `estado_manual`, `ultimo_recordatorio_at`, `siguiente_consecutivo` |
+| `restaurantes` | `nombre`, `slug` (UNIQUE), `descripcion`, `logo_path`, `banner_path`, `color_primario`, `color_secundario`, `color_fondo`, `color_texto`, `fuente`, `whatsapp`, `moneda` (COP), `recibiendo_pedidos` (bool), `acepta_mesa`, `acepta_domicilio`, `acepta_recoger`, `costo_envio`, `pedido_minimo`, `info_pago_texto`, `precio`, `notas_internas`, `mostrar_marca`, `ciclo`, `fecha_vencimiento`, `dia_corte`, `en_prueba`, `fecha_fin_prueba`, `estado_manual`, `ultimo_recordatorio_at`, `siguiente_consecutivo` |
 | `usuarios` | `restaurante_id` (NULL = super admin), `nombre`, `email` (UNIQUE), `password_hash`, `rol` (`super_admin`/`admin_negocio`), `debe_cambiar_password`, `activo`, `ultimo_login_at` |
 | `horarios` | `restaurante_id`, `dia_semana` (0–6), `abre`, `cierra`, `tramo` (1/2), `activo` |
 | `metodos_pago_negocio` | `restaurante_id`, `metodo` (`efectivo`/`transferencia`/`datafono`) |
@@ -427,14 +431,13 @@ GET/POST /cambiar-password
 /admin/mesas                     Mesas + QR + exportar PDF
 /admin/configuracion             Marca, colores, contacto, horarios, modalidades, pagos
 /admin/perfil                    Cuenta y contraseña
-/admin/suscripcion               Estado del plan (solo lectura) / pantalla de reactivación
+/admin/suscripcion               Estado de la suscripción (solo lectura) / pantalla de reactivación
 ```
 **Super Admin** (prefijo `/superadmin`)
 ```
 /superadmin                      Vencimientos (pantalla principal)
 /superadmin/negocios             CRUD de negocios
 /superadmin/negocios/{id}/pagos  Historial y registro de pagos
-/superadmin/planes               CRUD de planes
 /superadmin/metricas             Métricas globales y MRR
 /superadmin/configuracion        Días de alerta/gracia, WhatsApp de soporte
 /superadmin/auditoria            Registro de acciones
@@ -467,7 +470,7 @@ Cada fase termina con algo **funcionando y probado** antes de pasar a la siguien
 
 **Fase 3 — Pedidos y métricas:** historial, estados, dashboard, gráficos, top 5.
 
-**Fase 4 — Suscripciones:** planes y límites, semáforo, pagos manuales, extender/suspender, "recordar pago", bloqueo automático con gracia, pantalla de reactivación, MRR, auditoría y "ver como".
+**Fase 4 — Suscripciones:** precio por negocio (sin planes ni límites), semáforo, pagos manuales, extender/suspender, "recordar pago", bloqueo automático con gracia, pantalla de reactivación, MRR, auditoría y "ver como".
 
 **Fase 5 — Pulido y despliegue:** PWA, optimización, pruebas, endurecimiento de seguridad (revisión de la sección 9 punto por punto), README y guía de despliegue en hosting compartido y VPS.
 
@@ -481,7 +484,6 @@ Cada fase termina con algo **funcionando y probado** antes de pasar a la siguien
 - [ ] Un negocio bloqueado no puede recibir pedidos ni usar el panel, y vuelve a la normalidad al registrar el pago.
 - [ ] Los QR impresos funcionan y fijan la mesa correctamente.
 - [ ] Instalación desde cero siguiendo solo el README.
-
 
 ---
 
@@ -549,7 +551,7 @@ Cada fase termina con algo **funcionando y probado** antes de pasar a la siguien
 ### 15.5 Dónde se aplica la marca de la plataforma
 - Panel de Super Admin, pantalla de login, páginas de error, pantalla de reactivación y landing: paleta de la plataforma.
 - **Menú público de cada negocio:** colores del negocio. Para un negocio nuevo, los colores por defecto son los de la plataforma.
-- Pie opcional "Menú digital por Mesaly" en el menú público y en las tarjetas PDF de QR (activable/desactivable por plan con un campo `quitar_marca` en `planes`). Es publicidad gratuita al estilo "Powered by".
+- Pie opcional "Menú digital por Mesaly" en el menú público y en las tarjetas PDF de QR (activable/desactivable por negocio con el campo `mostrar_marca` de `restaurantes`, que decide el Super Admin). Es publicidad gratuita al estilo "Powered by".
 - Variables CSS globales en `public/assets/css/brand.css` (`--brand-primary`, `--brand-accent`, `--brand-secondary`, `--brand-ink`, `--brand-cream`, y las de estado) para que el cambio de marca sea editar un solo archivo.
 
 **Paletas predefinidas para los restaurantes (presets).** En la configuración de marca (6.1), además del selector libre, el admin puede elegir una paleta lista con un clic y luego ajustarla:
@@ -570,7 +572,7 @@ Página de presentación para conseguir clientes, **sin registro público** (con
 - Tres beneficios (menú con QR, pedidos directo a WhatsApp, métricas de ventas).
 - Cómo funciona en tres pasos.
 - Enlace a un **restaurante demo** real dentro de la plataforma.
-- Planes y precios (leídos de la tabla `planes`).
+- Precios: texto orientativo editable desde `configuracion` (el precio real se pacta con cada negocio; no hay planes cerrados).
 - Preguntas frecuentes y pie con enlaces a Términos y Privacidad.
 - Muy liviana (sin frameworks), con la paleta de la plataforma y optimizada para celular.
 - `/` queda reservada para la landing y no puede ser un slug.

@@ -88,7 +88,7 @@
                                         <?= icon('edit', 14) ?>
                                         <span>Editar</span>
                                     </a>
-                                    <form method="POST" action="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/reset-password')) ?>" style="display: inline;" onsubmit="return confirm('¿Seguro que deseas restablecer la contraseña del admin de este negocio? Se generará una clave temporal nueva.');">
+                                    <form method="POST" action="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/reset-password')) ?>" style="display: inline;" data-confirm="¿Seguro que deseas restablecer la contraseña del admin de este negocio? Se generará una clave temporal nueva.">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-border);" title="Generar clave temporal nueva">
                                             <?= icon('zap', 13) ?>

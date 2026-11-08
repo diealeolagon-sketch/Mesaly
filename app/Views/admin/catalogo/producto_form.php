@@ -32,7 +32,7 @@
 
                     <!-- Dropzone accesible como LABEL nativo -->
                     <label for="imagen_input" class="dropzone" id="dropzone_container">
-                        <input type="file" id="imagen_input" name="imagen" accept="image/jpeg,image/png,image/webp" onchange="previewImage(this)">
+                        <input type="file" id="imagen_input" name="imagen" accept="image/jpeg,image/png,image/webp">
 
                         <div id="preview_wrapper" style="width: 100%;">
                             <?php if (!empty($producto['imagen_path'])): ?>
@@ -225,6 +225,7 @@ const dropzone = document.getElementById('dropzone_container');
 const fileInput = document.getElementById('imagen_input');
 
 if (dropzone && fileInput) {
+    fileInput.addEventListener('change', function() { previewImage(this); });
     ['dragenter', 'dragover'].forEach(eventName => {
         dropzone.addEventListener(eventName, (e) => {
             e.preventDefault();

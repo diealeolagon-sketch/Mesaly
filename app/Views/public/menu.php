@@ -39,7 +39,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
                     <div class="menu-brand-top-row">
                         <h1 class="menu-brand-title"><?= e($restaurante['nombre']) ?></h1>
                         <button type="button" class="menu-header-cart-btn" id="btnHeaderCart" title="Ver mi pedido">
-                            <span class="header-cart-icon">🛒</span>
+                            <span class="header-cart-icon"><?= icon('cart', 18) ?></span>
                             <span class="header-cart-label">Mi Pedido</span>
                             <span class="header-cart-badge" id="headerCartBadge">0</span>
                         </button>
@@ -65,13 +65,13 @@ $tieneLogo = !empty($restaurante['logo_path']);
                         <!-- Modalidades activas -->
                         <div class="modalities-chips">
                             <?php if (!empty($restaurante['acepta_mesa'])): ?>
-                                <span class="chip-modality" title="Atención en Mesa">🍽️ Mesa</span>
+                                <span class="chip-modality" title="Atención en Mesa"><?= icon('cutlery', 13) ?> Mesa</span>
                             <?php endif; ?>
                             <?php if (!empty($restaurante['acepta_domicilio'])): ?>
-                                <span class="chip-modality" title="Servicio a Domicilio">🛵 Domicilio</span>
+                                <span class="chip-modality" title="Servicio a Domicilio"><?= icon('motorcycle', 13) ?> Domicilio</span>
                             <?php endif; ?>
                             <?php if (!empty($restaurante['acepta_recoger'])): ?>
-                                <span class="chip-modality" title="Para Llevar">🛍️ Recoger</span>
+                                <span class="chip-modality" title="Para Llevar"><?= icon('shopping-bag', 13) ?> Recoger</span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -86,7 +86,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
             <?php if ($mesaNumero !== null): ?>
                 <div class="menu-table-banner">
                     <div class="table-info">
-                        <span class="table-icon">🍽️</span>
+                        <span class="table-icon"><?= icon('cutlery', 20) ?></span>
                         <div>
                             <strong>Estás ordenando para la Mesa #<?= e((string)$mesaNumero) ?></strong>
                             <small>Tus pedidos se asociarán directamente a esta mesa</small>
@@ -104,12 +104,12 @@ $tieneLogo = !empty($restaurante['logo_path']);
     <nav class="menu-category-nav" id="categoryNav">
         <div class="category-nav-scroll">
             <button type="button" class="category-nav-pill active" data-cat="all">
-                🍽️ Todos los Platos
+                <?= icon('cutlery', 14) ?> Todos los Platos
             </button>
 
             <?php if (!empty($destacados)): ?>
                 <button type="button" class="category-nav-pill" data-cat="cat-destacados">
-                    ⭐ Populares (<?= count($destacados) ?>)
+                    <?= icon('sparkles', 13) ?> Populares (<?= count($destacados) ?>)
                 </button>
             <?php endif; ?>
 
@@ -129,7 +129,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
         <?php if (!empty($destacados)): ?>
             <section class="menu-section" id="cat-destacados">
                 <div class="menu-section-header">
-                    <h2 class="menu-section-title">⭐ Platos Populares</h2>
+                    <h2 class="menu-section-title"><?= icon('sparkles', 16) ?> Platos Populares</h2>
                     <span class="menu-section-count"><?= count($destacados) ?> recomendados</span>
                 </div>
 
@@ -162,7 +162,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
 
         <?php if (empty($destacados) && empty($categorias)): ?>
             <div class="menu-empty-state">
-                <div class="empty-icon">🍽️</div>
+                <div class="empty-icon"><?= icon('cutlery', 40) ?></div>
                 <h3>La carta se está preparando</h3>
                 <p>El restaurante está actualizando sus platos y precios. ¡Vuelve pronto!</p>
             </div>
@@ -187,7 +187,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
             </div>
             <div class="cart-btn-right">
                 <span class="cart-btn-total" id="cartBtnTotal">$ 0</span>
-                <span class="cart-btn-arrow">➔</span>
+                <span class="cart-btn-arrow">&rarr;</span>
             </div>
         </button>
     </div>
@@ -249,7 +249,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
                             <label class="modality-option <?= ($mesaNumero !== null) ? 'selected' : '' ?>">
                                 <input type="radio" name="modalidad" value="mesa" <?= ($mesaNumero !== null) ? 'checked' : '' ?>>
                                 <span class="modality-card">
-                                    <span class="icon">🍽️</span>
+                                    <span class="icon"><?= icon('cutlery', 18) ?></span>
                                     <span class="name">En Mesa</span>
                                 </span>
                             </label>
@@ -259,7 +259,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
                             <label class="modality-option <?= ($mesaNumero === null && !empty($restaurante['acepta_domicilio'])) ? 'selected' : '' ?>">
                                 <input type="radio" name="modalidad" value="domicilio" <?= ($mesaNumero === null && !empty($restaurante['acepta_domicilio'])) ? 'checked' : '' ?>>
                                 <span class="modality-card">
-                                    <span class="icon">🛵</span>
+                                    <span class="icon"><?= icon('motorcycle', 18) ?></span>
                                     <span class="name">Domicilio</span>
                                 </span>
                             </label>
@@ -269,7 +269,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
                             <label class="modality-option <?= ($mesaNumero === null && empty($restaurante['acepta_domicilio']) && !empty($restaurante['acepta_recoger'])) ? 'selected' : '' ?>">
                                 <input type="radio" name="modalidad" value="recoger" <?= ($mesaNumero === null && empty($restaurante['acepta_domicilio']) && !empty($restaurante['acepta_recoger'])) ? 'checked' : '' ?>>
                                 <span class="modality-card">
-                                    <span class="icon">🛍️</span>
+                                    <span class="icon"><?= icon('shopping-bag', 18) ?></span>
                                     <span class="name">Para Llevar</span>
                                 </span>
                             </label>
@@ -336,13 +336,13 @@ $tieneLogo = !empty($restaurante['logo_path']);
                         <div class="payment-methods-grid">
                             <?php
                             $metodosInfo = [
-                                'efectivo' => ['icon' => '💵', 'nombre' => 'Efectivo'],
-                                'transferencia' => ['icon' => '📱', 'nombre' => 'Transferencia / Nequi / Daviplata'],
-                                'datafono' => ['icon' => '💳', 'nombre' => 'Datáfono (Contra entrega)'],
+                                'efectivo' => ['icon' => icon('cash', 18), 'nombre' => 'Efectivo'],
+                                'transferencia' => ['icon' => icon('smartphone', 18), 'nombre' => 'Transferencia / Nequi / Daviplata'],
+                                'datafono' => ['icon' => icon('credit-card', 18), 'nombre' => 'Datáfono (Contra entrega)'],
                             ];
                             ?>
                             <?php foreach ($metodosPago as $idx => $m): ?>
-                                <?php $info = $metodosInfo[$m] ?? ['icon' => '💳', 'nombre' => ucfirst($m)]; ?>
+                                <?php $info = $metodosInfo[$m] ?? ['icon' => icon('credit-card', 18), 'nombre' => ucfirst($m)]; ?>
                                 <label class="payment-method-option <?= $idx === 0 ? 'selected' : '' ?>">
                                     <input type="radio" name="metodo_pago" value="<?= e($m) ?>" <?= $idx === 0 ? 'checked' : '' ?>>
                                     <span class="payment-card">
@@ -355,7 +355,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
 
                         <?php if (!empty($restaurante['info_pago_texto'])): ?>
                             <div class="payment-instructions-box" id="paymentInstructions">
-                                <span class="instructions-icon">ℹ️</span>
+                                <span class="instructions-icon"><?= icon('alert', 16) ?></span>
                                 <div><?= nl2br(e($restaurante['info_pago_texto'])) ?></div>
                             </div>
                         <?php endif; ?>
@@ -382,12 +382,12 @@ $tieneLogo = !empty($restaurante['logo_path']);
 
                     <!-- Botón Enviar a WhatsApp -->
                     <button type="submit" class="btn-submit-order" id="btnSubmitOrder">
-                        <span class="btn-wa-icon">🟢</span>
+                        <span class="btn-wa-icon"><?= icon('whatsapp', 18) ?></span>
                         <span id="submitOrderBtnText">Enviar Pedido por WhatsApp</span>
                     </button>
 
                     <button type="button" class="btn-continue-shopping" id="btnContinueShopping">
-                        ← Seguir agregando platos
+                        &larr; Seguir agregando platos
                     </button>
                 </form>
             </div>
@@ -397,14 +397,14 @@ $tieneLogo = !empty($restaurante['logo_path']);
     <!-- 7. MODAL DE CONFIRMACIÓN / ÉXITO -->
     <div class="modal-backdrop" id="successModalBackdrop" style="display: none;">
         <div class="success-modal-sheet">
-            <div class="success-icon-bubble">🎉</div>
+            <div class="success-icon-bubble"><?= icon('check', 28) ?></div>
             <h2 class="success-title">¡Pedido Generado!</h2>
             <p class="success-code">Código: <strong id="successOrderCode">PAR-0000</strong></p>
             <p class="success-desc">
                 Tu pedido ha sido preparado para enviarse a WhatsApp. Si no se abrió automáticamente, presiona el botón a continuación:
             </p>
             <a href="#" id="successWaLink" class="btn-open-wa" target="_blank" rel="noopener">
-                Abrir WhatsApp Ahora ➔
+                Abrir WhatsApp Ahora &rarr;
             </a>
             <button type="button" class="btn-close-success" id="btnCloseSuccessModal">Cerrar y volver al Menú</button>
         </div>
@@ -413,7 +413,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
 </div>
 
 <!-- Datos del Restaurante en JSON para el motor de la app -->
-<script id="mesalyRestaurantData" type="application/json">
+<script nonce="<?= e($cspNonce) ?>" id="mesalyRestaurantData" type="application/json">
 <?= json_encode([
     'id' => (int)$restaurante['id'],
     'slug' => $restaurante['slug'],
@@ -427,16 +427,17 @@ $tieneLogo = !empty($restaurante['logo_path']);
     'mesa_numero' => $mesaNumero,
     'base_url' => app_url(''),
     'endpoint_pedido' => app_url('/' . $restaurante['slug'] . '/pedido'),
+    'csrf_token' => csrf_token(),
 ], JSON_UNESCAPED_UNICODE) ?>
 </script>
 
 <!-- Datos de los Productos en JSON -->
-<script id="mesalyCatalogData" type="application/json">
+<script nonce="<?= e($cspNonce) ?>" id="mesalyCatalogData" type="application/json">
 <?= json_encode($todosLosProductos, JSON_UNESCAPED_UNICODE) ?>
 </script>
 
 <!-- Script del Menú Interactivo de Mesaly -->
-<script src="<?= e(app_url('/assets/js/menu-app.js')) ?>?v=7"></script>
+<script nonce="<?= e($cspNonce) ?>" src="<?= e(asset_url('/assets/js/menu-app.js')) ?>"></script>
 
 <?php
 /**
@@ -458,7 +459,7 @@ function renderProductCard(array $prod): string
                 <img src="<?= e(app_url($prod['imagen_path'])) ?>" alt="<?= e($prod['nombre']) ?>" loading="lazy">
             <?php else: ?>
                 <div class="product-card-thumb-fallback">
-                    <span>🍽️</span>
+                    <span><?= icon('cutlery', 24) ?></span>
                 </div>
             <?php endif; ?>
 
@@ -467,10 +468,10 @@ function renderProductCard(array $prod): string
                     <span class="badge-out">Agotado</span>
                 <?php else: ?>
                     <?php if (!empty($prod['destacado'])): ?>
-                        <span class="badge-featured">⭐ Recomendado</span>
+                        <span class="badge-featured"><?= icon('sparkles', 11) ?> Recomendado</span>
                     <?php endif; ?>
                     <?php if ($tieneModificadores): ?>
-                        <span class="badge-customizable">🥩 Término / Opciones</span>
+                        <span class="badge-customizable"><?= icon('tag', 11) ?> Opciones</span>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>

@@ -11,7 +11,7 @@
         </p>
 
         <div class="alert" style="background: var(--color-warning-bg); border: 1px solid var(--color-warning-border); color: var(--color-warning); margin-bottom: 20px; border-radius: var(--radius-md);">
-            <span style="font-size: 15px;">⚠️</span>
+            <span><?= icon('alert', 16) ?></span>
             <div>
                 <strong style="display: block; margin-bottom: 2px;">Contraseña Temporal — Visible una sola vez</strong>
                 <span style="font-size: 12.5px;">El administrador estará obligado a cambiarla inmediatamente al iniciar sesión.</span>
