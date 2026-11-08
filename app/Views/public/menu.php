@@ -19,11 +19,11 @@ $tieneLogo = !empty($restaurante['logo_path']);
 
     <!-- 1. HERO HEADER DEL RESTAURANTE -->
     <header class="menu-hero <?= $tieneBanner ? 'has-banner' : 'no-banner' ?>">
-        <?php if ($tieneBanner): ?>
-            <div class="menu-hero-banner" style="background-image: url('<?= e(app_url($restaurante['banner_path'])) ?>');"></div>
-        <?php else: ?>
-            <div class="menu-hero-banner default-gradient"></div>
-        <?php endif; ?>
+        <div class="menu-hero-banner <?= $tieneBanner ? '' : 'default-gradient' ?>">
+            <?php if ($tieneBanner): ?>
+                <img src="<?= e(app_url($restaurante['banner_path'])) ?>" alt="Portada de <?= e($restaurante['nombre']) ?>" class="menu-hero-banner-img" loading="eager">
+            <?php endif; ?>
+        </div>
 
         <div class="menu-hero-content">
             <div class="menu-brand-header">
