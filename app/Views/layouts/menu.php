@@ -27,7 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CSS Unificado de Mesaly -->
-    <link rel="stylesheet" href="<?= e(app_url('/assets/css/mesaly.css')) ?>?v=6">
+    <link rel="stylesheet" href="<?= e(app_url('/assets/css/mesaly.css')) ?>?v=7">
 
     <!-- Variables Dinámicas de Marca del Restaurante -->
     <style>

@@ -371,6 +371,10 @@ $tieneLogo = !empty($restaurante['logo_path']);
                         <span class="btn-wa-icon">🟢</span>
                         <span id="submitOrderBtnText">Enviar Pedido por WhatsApp</span>
                     </button>
+
+                    <button type="button" class="btn-continue-shopping" id="btnContinueShopping">
+                        ← Seguir agregando platos
+                    </button>
                 </form>
             </div>
         </div>
@@ -407,6 +411,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
     'acepta_domicilio' => !empty($restaurante['acepta_domicilio']),
     'acepta_recoger' => !empty($restaurante['acepta_recoger']),
     'mesa_numero' => $mesaNumero,
+    'base_url' => app_url(''),
     'endpoint_pedido' => app_url('/' . $restaurante['slug'] . '/pedido'),
 ], JSON_UNESCAPED_UNICODE) ?>
 </script>
@@ -417,7 +422,7 @@ $tieneLogo = !empty($restaurante['logo_path']);
 </script>
 
 <!-- Script del Menú Interactivo de Mesaly -->
-<script src="<?= e(app_url('/assets/js/menu-app.js')) ?>?v=3"></script>
+<script src="<?= e(app_url('/assets/js/menu-app.js')) ?>?v=7"></script>
 
 <?php
 /**
@@ -432,26 +437,34 @@ function renderProductCard(array $prod): string
     ob_start();
     ?>
     <div class="menu-product-card <?= !$disponible ? 'is-out-of-stock' : '' ?>" 
-         data-id="<?= (int)$prod['id'] ?>"
-         <?= $disponible ? 'role="button" tabindex="0"' : '' ?>>
+         data-id="<?= (int)$prod['id'] ?>">
         
-        <?php if ($tieneImagen): ?>
-            <div class="product-card-thumb">
+        <div class="product-card-thumb">
+            <?php if ($tieneImagen): ?>
                 <img src="<?= e(app_url($prod['imagen_path'])) ?>" alt="<?= e($prod['nombre']) ?>" loading="lazy">
+            <?php else: ?>
+                <div class="product-card-thumb-fallback">
+                    <span>🍽️</span>
+                </div>
+            <?php endif; ?>
+
+            <div class="product-card-badges">
                 <?php if (!$disponible): ?>
                     <span class="badge-out">Agotado</span>
-                <?php elseif (!empty($prod['destacado'])): ?>
-                    <span class="badge-featured">⭐ Popular</span>
+                <?php else: ?>
+                    <?php if (!empty($prod['destacado'])): ?>
+                        <span class="badge-featured">⭐ Recomendado</span>
+                    <?php endif; ?>
+                    <?php if ($tieneModificadores): ?>
+                        <span class="badge-customizable">🥩 Término / Opciones</span>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
-        <?php endif; ?>
+        </div>
 
         <div class="product-card-content">
             <div class="product-card-header">
                 <h3 class="product-title"><?= e($prod['nombre']) ?></h3>
-                <?php if (!$tieneImagen && !$disponible): ?>
-                    <span class="badge-out">Agotado</span>
-                <?php endif; ?>
             </div>
 
             <?php if (!empty($prod['descripcion'])): ?>
@@ -459,11 +472,14 @@ function renderProductCard(array $prod): string
             <?php endif; ?>
 
             <div class="product-card-footer">
-                <span class="product-price"><?= format_cop((int)$prod['precio']) ?></span>
+                <div class="product-price-box">
+                    <span class="product-price"><?= format_cop((int)$prod['precio']) ?></span>
+                </div>
 
                 <?php if ($disponible): ?>
-                    <button type="button" class="btn-add-product" data-id="<?= (int)$prod['id'] ?>" aria-label="Agregar <?= e($prod['nombre']) ?>">
-                        <span>+ Agregar</span>
+                    <button type="button" class="btn-add-product" data-id="<?= (int)$prod['id'] ?>">
+                        <span class="btn-plus-icon">+</span>
+                        <span><?= $tieneModificadores ? 'Personalizar' : 'Pedir' ?></span>
                     </button>
                 <?php else: ?>
                     <button type="button" class="btn-add-product disabled" disabled>

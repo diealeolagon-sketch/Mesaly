@@ -10,14 +10,31 @@
     const rawRestData = document.getElementById('mesalyRestaurantData')?.textContent || '{}';
     const rawCatData = document.getElementById('mesalyCatalogData')?.textContent || '[]';
 
-    const restaurant = JSON.parse(rawRestData);
-    const catalog = JSON.parse(rawCatData);
+    let restaurant = {};
+    let catalog = [];
+
+    try {
+        restaurant = JSON.parse(rawRestData);
+        catalog = JSON.parse(rawCatData);
+    } catch (err) {
+        console.error('Error parseando datos de Mesaly:', err);
+    }
 
     const catalogMap = new Map();
-    catalog.forEach(p => catalogMap.set(p.id, p));
+    catalog.forEach(p => {
+        catalogMap.set(parseInt(p.id, 10), p);
+    });
+
+    // Helper: Resuelve URL de imágenes absolutas y relativas
+    function getImageUrl(path) {
+        if (!path) return '';
+        if (path.startsWith('http://') || path.startsWith('https://')) return path;
+        const base = (restaurant.base_url || '').replace(/\/$/, '');
+        return base + (path.startsWith('/') ? path : '/' + path);
+    }
 
     // Clave de almacenamiento local para persistir el carrito durante la sesión
-    const CART_STORAGE_KEY = `mesaly_cart_${restaurant.id}`;
+    const CART_STORAGE_KEY = `mesaly_cart_${restaurant.id || 0}`;
 
     // 2. Estado del Carrito
     let cart = [];
@@ -54,6 +71,7 @@
     // Cart Drawer
     const cartDrawerBackdrop = document.getElementById('cartDrawerBackdrop');
     const btnCloseCartDrawer = document.getElementById('btnCloseCartDrawer');
+    const btnContinueShopping = document.getElementById('btnContinueShopping');
     const cartItemsContainer = document.getElementById('cartItemsContainer');
     const cartItemsCountText = document.getElementById('cartItemsCountText');
     const checkoutForm = document.getElementById('checkoutForm');
@@ -91,12 +109,16 @@
 
     // 5. Enlace de Eventos
     function bindEvents() {
-        // Abrir modal de producto al hacer click en cualquier tarjeta disponible
-        document.querySelectorAll('.menu-product-card:not(.is-out-of-stock)').forEach(card => {
-            card.addEventListener('click', function (e) {
-                const prodId = parseInt(this.getAttribute('data-id'), 10);
+        // Delegación de eventos para abrir modal al hacer clic en tarjeta o botón
+        document.querySelector('.menu-catalog-main')?.addEventListener('click', function (e) {
+            const card = e.target.closest('.menu-product-card');
+            if (!card || card.classList.contains('is-out-of-stock')) return;
+
+            e.preventDefault();
+            const prodId = parseInt(card.getAttribute('data-id'), 10);
+            if (prodId > 0) {
                 openProductModal(prodId);
-            });
+            }
         });
 
         // Cerrar modal de producto
@@ -124,12 +146,13 @@
             }
         });
 
-        // Botón Agregar al Carrito
+        // Botón Agregar al Carrito (Abre checkout directamente)
         btnAddToCart?.addEventListener('click', handleAddToCart);
 
         // Abrir / Cerrar Drawer del Carrito
         btnOpenCart?.addEventListener('click', openCartDrawer);
         btnCloseCartDrawer?.addEventListener('click', closeCartDrawer);
+        btnContinueShopping?.addEventListener('click', closeCartDrawer);
         cartDrawerBackdrop?.addEventListener('click', function (e) {
             if (e.target === cartDrawerBackdrop) {
                 closeCartDrawer();
@@ -159,7 +182,9 @@
 
         // Cerrar Modal Éxito
         btnCloseSuccessModal?.addEventListener('click', () => {
+            successModalBackdrop.classList.remove('is-active');
             successModalBackdrop.style.display = 'none';
+            document.body.style.overflow = '';
         });
     }
 
@@ -186,35 +211,48 @@
         updateModalTotalPrice();
 
         productModalBackdrop.style.display = 'flex';
+        // Forzar reflow para animación CSS
+        void productModalBackdrop.offsetWidth;
+        productModalBackdrop.classList.add('is-active');
         document.body.style.overflow = 'hidden';
     }
 
     function closeProductModal() {
-        productModalBackdrop.style.display = 'none';
-        document.body.style.overflow = '';
+        productModalBackdrop.classList.remove('is-active');
+        setTimeout(() => {
+            if (!productModalBackdrop.classList.contains('is-active')) {
+                productModalBackdrop.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }, 220);
         activeProduct = null;
     }
 
     function renderModalContent(prod) {
         let html = '';
 
-        if (prod.imagen_path) {
+        const imgUrl = getImageUrl(prod.imagen_path);
+
+        if (imgUrl) {
             html += `
                 <div class="product-modal-image">
-                    <img src="${prod.imagen_path}" alt="${escapeHtml(prod.nombre)}">
+                    <img src="${imgUrl}" alt="${escapeHtml(prod.nombre)}" loading="lazy">
+                    <div class="product-modal-image-gradient"></div>
                 </div>
             `;
         }
 
         html += `
             <div class="product-modal-header-info">
-                <h2 class="product-modal-title">${escapeHtml(prod.nombre)}</h2>
-                <div class="product-modal-price">${formatCop(prod.precio)}</div>
+                <div class="modal-title-row">
+                    <h2 class="product-modal-title">${escapeHtml(prod.nombre)}</h2>
+                    <span class="product-modal-price-badge">${formatCop(prod.precio)}</span>
+                </div>
                 ${prod.descripcion ? `<p class="product-modal-desc">${escapeHtml(prod.descripcion)}</p>` : ''}
             </div>
         `;
 
-        // Renderizar grupos de modificadores
+        // Renderizar grupos de modificadores (Términos, Toppings, etc.)
         if (prod.grupos && prod.grupos.length > 0) {
             html += `<div class="modifier-groups-container">`;
 
@@ -224,15 +262,18 @@
 
                 let badgeText = isRequired ? 'Obligatorio' : 'Opcional';
                 if (isSingle) {
-                    badgeText += ' • Elige 1';
+                    badgeText += ' • Elige 1 opción';
                 } else if (grp.max_selecciones > 0) {
-                    badgeText += ` • Máx ${grp.max_selecciones}`;
+                    badgeText += ` • Máximo ${grp.max_selecciones}`;
                 }
 
                 html += `
                     <div class="modal-modifier-group" data-group-id="${grp.id}" data-type="${grp.tipo}" data-required="${grp.obligatorio}" data-min="${grp.min_selecciones}" data-max="${grp.max_selecciones}">
                         <div class="group-header">
-                            <h3 class="group-title">${escapeHtml(grp.nombre)}</h3>
+                            <div>
+                                <h3 class="group-title">${escapeHtml(grp.nombre)}</h3>
+                                <span class="group-instruction">${isSingle ? 'Selecciona una opción' : 'Puedes elegir varios adicionales'}</span>
+                            </div>
                             <span class="group-badge ${isRequired ? 'required' : 'optional'}">${badgeText}</span>
                         </div>
                         <div class="options-list">
@@ -241,19 +282,22 @@
                 if (grp.opciones && grp.opciones.length > 0) {
                     grp.opciones.forEach(opc => {
                         const isChecked = selectedOptionIds.has(opc.id);
-                        const extraPriceText = opc.precio_extra > 0 ? `+${formatCop(opc.precio_extra)}` : 'Gratis';
+                        const extraPriceText = opc.precio_extra > 0 ? `+${formatCop(opc.precio_extra)}` : 'Incluido';
 
                         html += `
-                            <label class="modifier-option-item ${isChecked ? 'selected' : ''}">
-                                <input type="${isSingle ? 'radio' : 'checkbox'}" 
-                                       name="group_${grp.id}" 
-                                       value="${opc.id}" 
-                                       data-group-id="${grp.id}"
-                                       data-price="${opc.precio_extra}"
-                                       ${isChecked ? 'checked' : ''}
-                                       class="option-input">
-                                <span class="option-name">${escapeHtml(opc.nombre)}</span>
-                                <span class="option-extra">${extraPriceText}</span>
+                            <label class="modifier-option-card ${isChecked ? 'selected' : ''}">
+                                <div class="option-card-left">
+                                    <input type="${isSingle ? 'radio' : 'checkbox'}" 
+                                           name="group_${grp.id}" 
+                                           value="${opc.id}" 
+                                           data-group-id="${grp.id}"
+                                           data-price="${opc.precio_extra}"
+                                           ${isChecked ? 'checked' : ''}
+                                           class="option-input">
+                                    <span class="custom-indicator ${isSingle ? 'radio-dot' : 'check-box'}"></span>
+                                    <span class="option-name">${escapeHtml(opc.nombre)}</span>
+                                </div>
+                                <span class="option-extra-badge ${opc.precio_extra > 0 ? 'has-extra' : ''}">${extraPriceText}</span>
                             </label>
                         `;
                     });
@@ -272,9 +316,9 @@
         html += `
             <div class="modal-notes-section">
                 <label for="modalItemNotes" class="modal-notes-label">
-                    <span>Instrucciones o notas para la cocina (Opcional)</span>
+                    <span>📝 Instrucciones o notas para la cocina (Opcional)</span>
                 </label>
-                <textarea id="modalItemNotes" class="modal-notes-textarea" placeholder="Ej: Sin cebolla, salsas aparte, término bien asado..." rows="2" maxlength="300"></textarea>
+                <textarea id="modalItemNotes" class="modal-notes-textarea" placeholder="Ej: Sin cebolla, salsas aparte, término bien sellado..." rows="2" maxlength="300"></textarea>
             </div>
         `;
 
@@ -299,34 +343,33 @@
                 const otherId = parseInt(other.value, 10);
                 if (other !== input) {
                     selectedOptionIds.delete(otherId);
-                    other.closest('.modifier-option-item')?.classList.remove('selected');
+                    other.closest('.modifier-option-card')?.classList.remove('selected');
                 }
             });
 
             if (input.checked) {
                 selectedOptionIds.add(optId);
-                input.closest('.modifier-option-item')?.classList.add('selected');
+                input.closest('.modifier-option-card')?.classList.add('selected');
             } else {
                 selectedOptionIds.delete(optId);
-                input.closest('.modifier-option-item')?.classList.remove('selected');
+                input.closest('.modifier-option-card')?.classList.remove('selected');
             }
         } else {
             // Múltiple selección
             if (input.checked) {
-                // Verificar si excede el máximo permitido
                 if (max > 0) {
                     const checkedInGroup = grpEl.querySelectorAll('.option-input:checked').length;
                     if (checkedInGroup > max) {
                         input.checked = false;
-                        alert(`Solo puedes elegir hasta ${max} opciones en este grupo.`);
+                        alert(`Solo puedes elegir hasta ${max} opciones en "${grpEl.querySelector('.group-title')?.textContent}".`);
                         return;
                     }
                 }
                 selectedOptionIds.add(optId);
-                input.closest('.modifier-option-item')?.classList.add('selected');
+                input.closest('.modifier-option-card')?.classList.add('selected');
             } else {
                 selectedOptionIds.delete(optId);
-                input.closest('.modifier-option-item')?.classList.remove('selected');
+                input.closest('.modifier-option-card')?.classList.remove('selected');
             }
         }
 
@@ -338,7 +381,6 @@
 
         let unitTotal = activeProduct.precio;
 
-        // Sumar extras de opciones seleccionadas
         if (activeProduct.grupos) {
             activeProduct.grupos.forEach(grp => {
                 if (grp.opciones) {
@@ -370,7 +412,7 @@
                     }
                     const min = grp.min_selecciones || 1;
                     if (count < min) {
-                        alert(`Por favor selecciona las opciones requeridas en "${grp.nombre}".`);
+                        alert(`Por favor elige tu opción en "${grp.nombre}".`);
                         return;
                     }
                 }
@@ -405,7 +447,6 @@
         // Crear ítem del carrito
         const itemKey = `${activeProduct.id}_${Array.from(selectedOptionIds).sort().join('-')}_${notas}`;
 
-        // Verificar si ya existe exactamente el mismo ítem con idénticas opciones y notas
         const existingIndex = cart.findIndex(it => it.item_key === itemKey);
         if (existingIndex > -1) {
             cart[existingIndex].cantidad = Math.min(10, cart[existingIndex].cantidad + activeQty);
@@ -429,9 +470,10 @@
         closeProductModal();
         updateCartUI();
 
-        // Pequeña animación en la barra flotante
-        floatingCartBar.classList.add('bounce');
-        setTimeout(() => floatingCartBar.classList.remove('bounce'), 400);
+        // Abre el Drawer de Checkout inmediatamente para revisar y pedir
+        setTimeout(() => {
+            openCartDrawer();
+        }, 150);
     }
 
     function saveCart() {
@@ -460,13 +502,21 @@
     function openCartDrawer() {
         renderCartDrawerItems();
         updateCartTotals();
+
         cartDrawerBackdrop.style.display = 'flex';
+        void cartDrawerBackdrop.offsetWidth;
+        cartDrawerBackdrop.classList.add('is-active');
         document.body.style.overflow = 'hidden';
     }
 
     function closeCartDrawer() {
-        cartDrawerBackdrop.style.display = 'none';
-        document.body.style.overflow = '';
+        cartDrawerBackdrop.classList.remove('is-active');
+        setTimeout(() => {
+            if (!cartDrawerBackdrop.classList.contains('is-active')) {
+                cartDrawerBackdrop.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }, 220);
     }
 
     function renderCartDrawerItems() {
@@ -498,8 +548,8 @@
                             <div class="cart-item-modifiers">
                                 ${item.opciones.map(opc => `
                                     <div class="cart-modifier-badge">
-                                        <span>• ${escapeHtml(opc.nombre_grupo)}: ${escapeHtml(opc.nombre_opcion)}</span>
-                                        ${opc.precio_extra > 0 ? `<small>(+${formatCop(opc.precio_extra)})</small>` : ''}
+                                        <span>• ${escapeHtml(opc.nombre_grupo)}: <strong>${escapeHtml(opc.nombre_opcion)}</strong></span>
+                                        ${opc.precio_extra > 0 ? `<small class="extra-cost">(+${formatCop(opc.precio_extra)})</small>` : ''}
                                     </div>
                                 `).join('')}
                             </div>
@@ -595,7 +645,6 @@
         checkoutSubtotal.textContent = formatCop(subtotal);
         checkoutGrandTotal.textContent = formatCop(grandTotal);
 
-        // Alerta de pedido mínimo para domicilio
         const minAlert = document.getElementById('deliveryMinAlert');
         if (minAlert && modalidad === 'domicilio') {
             if (restaurant.pedido_minimo > 0 && subtotal < restaurant.pedido_minimo) {
@@ -622,7 +671,6 @@
         const clienteTelefono = formData.get('cliente_telefono')?.trim();
         const subtotal = cart.reduce((sum, it) => sum + it.total_linea, 0);
 
-        // Validaciones en cliente
         if (!clienteNombre) {
             showCheckoutError('Por favor escribe tu nombre completo.');
             return;
@@ -655,7 +703,6 @@
             }
         }
 
-        // Construir Payload
         const payload = {
             modalidad: modalidad,
             cliente_nombre: clienteNombre,
@@ -675,7 +722,6 @@
             })),
         };
 
-        // Estado de carga
         btnSubmitOrder.disabled = true;
         submitOrderBtnText.textContent = 'Enviando a WhatsApp...';
 
@@ -708,8 +754,9 @@
             successOrderCode.textContent = data.codigo;
             successWaLink.href = data.whatsapp_url;
             successModalBackdrop.style.display = 'flex';
+            void successModalBackdrop.offsetWidth;
+            successModalBackdrop.classList.add('is-active');
 
-            // Redirigir directamente a WhatsApp
             setTimeout(() => {
                 window.location.href = data.whatsapp_url;
             }, 600);
@@ -736,7 +783,6 @@
 
         if (!sections.length || !pills.length) return;
 
-        // Click en píldora con scroll suave
         pills.forEach(pill => {
             pill.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -753,7 +799,6 @@
             });
         });
 
-        // IntersectionObserver para actualizar la píldora activa según el scroll
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
