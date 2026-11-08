@@ -51,7 +51,23 @@ INSERT INTO `restaurantes` (
 )
 ON DUPLICATE KEY UPDATE `nombre` = VALUES(`nombre`), `slug` = VALUES(`slug`);
 
--- 4. Usuario Admin del Restaurante Demo
+-- 4. Usuario Super Administrador
+-- Contraseña: "Password123*" (Argon2id)
+INSERT INTO `usuarios` (
+    `id`, `restaurante_id`, `nombre`, `email`, `password_hash`, `rol`, `debe_cambiar_password`, `activo`
+) VALUES (
+    1,
+    NULL,
+    'Super Admin Mesaly',
+    'admin@mesaly.co',
+    '$argon2id$v=19$m=65536,t=4,p=1$dEdIMzlSOUlVLkVxc0R6Vw$w/KBY5IF1vD5W5HGq7mPI30nZXtCxre2UYXF8v7hS9M',
+    'super_admin',
+    0,
+    1
+)
+ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
+
+-- 5. Usuario Admin del Restaurante Demo
 -- Contraseña: "Password123*" (Argon2id)
 INSERT INTO `usuarios` (
     `id`, `restaurante_id`, `nombre`, `email`, `password_hash`, `rol`, `debe_cambiar_password`, `activo`
