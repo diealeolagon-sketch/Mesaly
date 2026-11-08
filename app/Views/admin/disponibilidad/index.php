@@ -1,118 +1,176 @@
 <div class="content-header">
     <div>
-        <h1 class="page-title">Disponibilidad Rápida</h1>
+        <h1 class="page-title">Control de Agotados</h1>
         <p class="page-subtitle">
-            Control de agotados en tiempo real. Apaga o enciende platos en un toque durante las horas pico de servicio.
+            Activa o desactiva platos en tiempo real. Los cambios son instantáneos en tu carta digital.
         </p>
+    </div>
+    <div class="content-actions">
+        <a href="<?= e(app_url('/admin/catalogo')) ?>" class="btn btn-secondary btn-sm">
+            <?= icon('catalog', 14) ?>
+            <span>Ir al Catálogo</span>
+        </a>
+    </div>
+</div>
+
+<?php if (empty($productos)): ?>
+    <div class="card" style="text-align: center; padding: 56px 24px;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg-subtle); display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-subtle); margin-bottom: 16px;">
+            <?= icon('zap', 24) ?>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 8px 0;">Sin productos registrados</h3>
+        <p style="color: var(--color-text-muted); font-size: 14px; margin: 0 0 20px 0;">
+            Agrega platos en el Catálogo para poder controlar su disponibilidad aquí.
+        </p>
+        <a href="<?= e(app_url('/admin/catalogo')) ?>" class="btn btn-primary">
+            <?= icon('plus', 16) ?>
+            <span>Ir al Catálogo</span>
+        </a>
+    </div>
+<?php else: ?>
+
+<?php
+$disponibles = array_filter($productos, fn($p) => !empty($p['disponible']));
+$agotados    = array_filter($productos, fn($p) =>  empty($p['disponible']));
+?>
+
+<div class="kpi-grid" style="margin-bottom: 24px;">
+    <div class="kpi-card">
+        <div class="kpi-label">
+            <span>Disponibles</span>
+            <?= icon('check', 16) ?>
+        </div>
+        <div class="kpi-value" style="color: var(--color-success);"><?= count($disponibles) ?></div>
+        <div class="kpi-subtext">Visibles en la carta digital</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">
+            <span>Agotados</span>
+            <?= icon('x', 16) ?>
+        </div>
+        <div class="kpi-value" style="color: var(--color-danger);"><?= count($agotados) ?></div>
+        <div class="kpi-subtext">No se pueden pedir</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">
+            <span>Total platos</span>
+            <?= icon('store', 16) ?>
+        </div>
+        <div class="kpi-value"><?= count($productos) ?></div>
+        <div class="kpi-subtext">En tu catálogo</div>
     </div>
 </div>
 
 <div class="card" style="padding: 0; overflow: hidden;">
-    <div style="padding: 16px 20px; border-bottom: 1px solid var(--color-border-subtle); background: var(--color-bg-subtle); display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 13px; font-weight: 600; color: var(--color-text-muted);">
-            Total: <?= count($productos) ?> platos
-        </span>
-        <span style="font-size: 12px; color: var(--color-text-subtle);">
-            Los cambios se guardan al instante
-        </span>
+    <div style="padding: 18px 24px; border-bottom: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-subtle);">
+        <div>
+            <span style="font-size: 14px; font-weight: 700; color: var(--color-text-main);">Todos los Platos</span>
+            <span style="font-size: 12px; color: var(--color-text-muted); margin-left: 8px;">Toca el toggle para cambiar el estado al instante</span>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <span class="badge badge-success" style="font-size: 11px;"><?= count($disponibles) ?> disponibles</span>
+            <span class="badge badge-danger" style="font-size: 11px;"><?= count($agotados) ?> agotados</span>
+        </div>
     </div>
 
-    <?php if (empty($productos)): ?>
-        <div style="text-align: center; padding: 48px 20px;">
-            <p style="color: var(--color-text-muted); font-size: 14px; margin: 0 0 16px 0;">
-                No tienes productos registrados en tu catálogo.
-            </p>
-            <a href="<?= e(app_url('/admin/catalogo')) ?>" class="btn btn-primary btn-sm">
-                Ir al Catálogo
-            </a>
-        </div>
-    <?php else: ?>
-        <div style="display: flex; flex-direction: column;" id="lista_disponibilidad">
-            <?php foreach ($productos as $prod): ?>
-                <?php $isDisponible = !empty($prod['disponible']); ?>
-                <div class="producto-fila" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--color-border-subtle); background: <?= $isDisponible ? 'var(--color-surface)' : 'var(--color-danger-subtle)' ?>; transition: background 150ms var(--ease-fluid); gap: 16px;">
-                    <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
-                        <?php if (!empty($prod['imagen_path'])): ?>
-                            <img src="<?= e(app_url($prod['imagen_path'])) ?>" alt="" style="width: 44px; height: 44px; border-radius: var(--radius-sm); object-fit: cover; border: 1px solid var(--color-border); flex-shrink: 0;">
-                        <?php else: ?>
-                            <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--color-bg-subtle); border: 1px dashed var(--color-border); display: flex; align-items: center; justify-content: center; color: var(--color-text-subtle); flex-shrink: 0;">
-                                <?= icon('image', 18) ?>
-                            </div>
-                        <?php endif; ?>
-                        <div style="min-width: 0;">
-                            <span style="font-size: 14px; font-weight: 600; display: block; color: <?= $isDisponible ? 'var(--color-text-main)' : 'var(--color-danger)' ?>; <?= !$isDisponible ? 'text-decoration: line-through;' : '' ?>; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="txt_prod_<?= $prod['id'] ?>">
-                                <?= e($prod['nombre']) ?>
-                            </span>
-                            <span style="font-size: 12.5px; color: var(--color-text-muted); display: block; margin-top: 2px;">
-                                <?= e($prod['categoria_nombre'] ?? 'Sin sección') ?> · <strong style="font-variant-numeric: tabular-nums;"><?= format_cop($prod['precio']) ?></strong>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div style="flex-shrink: 0;">
-                        <form method="POST" action="<?= e(app_url('/admin/disponibilidad/toggle')) ?>" onsubmit="return toggleAjax(event, this, <?= (int)$prod['id'] ?>)">
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="id" value="<?= (int)$prod['id'] ?>">
-                            <button type="submit" class="badge <?= $isDisponible ? 'badge-success' : 'badge-danger' ?>" id="btn_prod_<?= $prod['id'] ?>" style="min-width: 120px; padding: 8px 14px; font-weight: 700; font-size: 12px; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
-                                <?= $isDisponible ? icon('check', 13) . ' Disponible' : icon('x', 13) . ' Agotado' ?>
-                            </button>
-                        </form>
-                    </div>
+    <div id="lista_disponibilidad">
+        <?php foreach ($productos as $prod): ?>
+            <?php $isDisponible = !empty($prod['disponible']); ?>
+            <div class="avail-row <?= $isDisponible ? '' : 'avail-row--off' ?>" id="row_prod_<?= $prod['id'] ?>">
+                <div class="avail-thumb">
+                    <?php if (!empty($prod['imagen_path'])): ?>
+                        <img src="<?= e(app_url($prod['imagen_path'])) ?>" alt="" class="avail-img">
+                    <?php else: ?>
+                        <div class="avail-img-ph"><?= icon('image', 18) ?></div>
+                    <?php endif; ?>
                 </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+
+                <div class="avail-info">
+                    <span class="avail-name" id="txt_prod_<?= $prod['id'] ?>"><?= e($prod['nombre']) ?></span>
+                    <span class="avail-meta">
+                        <span class="badge badge-neutral" style="font-size: 11px;"><?= e($prod['categoria_nombre'] ?? 'Sin sección') ?></span>
+                        <span style="font-weight: 700; color: var(--color-text-secondary); font-variant-numeric: tabular-nums;"><?= format_cop($prod['precio']) ?></span>
+                    </span>
+                </div>
+
+                <div class="avail-pill-wrap">
+                    <span class="avail-pill <?= $isDisponible ? 'avail-pill--on' : 'avail-pill--off' ?>" id="pill_prod_<?= $prod['id'] ?>">
+                        <span class="avail-dot"></span>
+                        <?= $isDisponible ? 'Disponible' : 'Agotado' ?>
+                    </span>
+                </div>
+
+                <div class="avail-action">
+                    <form method="POST" action="<?= e(app_url('/admin/disponibilidad/toggle')) ?>"
+                          onsubmit="return toggleAjax(event, this, <?= (int)$prod['id'] ?>)">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="id" value="<?= (int)$prod['id'] ?>">
+                        <button type="submit" id="btn_prod_<?= $prod['id'] ?>"
+                                class="avail-toggle <?= $isDisponible ? 'avail-toggle--on' : 'avail-toggle--off' ?>"
+                                title="<?= $isDisponible ? 'Desactivar' : 'Activar' ?>">
+                            <span class="avail-toggle-track">
+                                <span class="avail-toggle-thumb"></span>
+                            </span>
+                            <span class="avail-toggle-label" id="label_prod_<?= $prod['id'] ?>">
+                                <?= $isDisponible ? 'ON' : 'OFF' ?>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
 </div>
+<?php endif; ?>
 
 <script nonce="<?= e($cspNonce) ?>">
 async function toggleAjax(event, form, prodId) {
     if (!window.fetch) return true;
     event.preventDefault();
 
-    const btn = document.getElementById('btn_prod_' + prodId);
-    const txt = document.getElementById('txt_prod_' + prodId);
-    const originalHtml = btn.innerHTML;
-    btn.innerText = 'Cambiando...';
+    const btn   = document.getElementById('btn_prod_' + prodId);
+    const label = document.getElementById('label_prod_' + prodId);
+    const pill  = document.getElementById('pill_prod_' + prodId);
+    const row   = document.getElementById('row_prod_' + prodId);
+    const name  = document.getElementById('txt_prod_' + prodId);
+
     btn.disabled = true;
+    btn.style.opacity = '0.5';
 
     try {
-        const formData = new FormData(form);
-        const res = await fetch(form.action, {
+        const res  = await fetch(form.action, {
             method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+            body: new FormData(form),
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
-
         const data = await res.json();
+
         if (data.success) {
-            const fila = btn.closest('.producto-fila');
             if (data.disponible == 1) {
-                btn.className = 'badge badge-success';
-                btn.innerHTML = '<?= icon('check', 13) ?> Disponible';
-                btn.style.cssText = 'min-width: 120px; padding: 8px 14px; font-weight: 700; font-size: 12px; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;';
-                fila.style.background = 'var(--color-surface)';
-                txt.style.textDecoration = 'none';
-                txt.style.color = 'var(--color-text-main)';
+                btn.className = 'avail-toggle avail-toggle--on';
+                label.textContent = 'ON';
+                row.className = 'avail-row';
+                name.style.textDecoration = 'none';
+                name.style.color = '';
+                pill.className = 'avail-pill avail-pill--on';
+                pill.innerHTML = '<span class="avail-dot"></span> Disponible';
             } else {
-                btn.className = 'badge badge-danger';
-                btn.innerHTML = '<?= icon('x', 13) ?> Agotado';
-                btn.style.cssText = 'min-width: 120px; padding: 8px 14px; font-weight: 700; font-size: 12px; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;';
-                fila.style.background = 'var(--color-danger-subtle)';
-                txt.style.textDecoration = 'line-through';
-                txt.style.color = 'var(--color-danger)';
+                btn.className = 'avail-toggle avail-toggle--off';
+                label.textContent = 'OFF';
+                row.className = 'avail-row avail-row--off';
+                name.style.textDecoration = 'line-through';
+                pill.className = 'avail-pill avail-pill--off';
+                pill.innerHTML = '<span class="avail-dot"></span> Agotado';
             }
         } else {
             alert(data.message || 'Error al cambiar estado.');
-            btn.innerHTML = originalHtml;
         }
     } catch (e) {
         form.submit();
     } finally {
         btn.disabled = false;
+        btn.style.opacity = '1';
     }
-
     return false;
 }
 </script>

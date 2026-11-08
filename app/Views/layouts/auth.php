@@ -5,95 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Iniciar Sesión — Mesaly') ?></title>
     <link rel="icon" type="image/svg+xml" href="<?= e(app_url('/assets/img/logo-icon.svg')) ?>">
-    <link rel="stylesheet" href="<?= e(app_url('/assets/css/admin.css')) ?>?v=2">
-    <style nonce="<?= e($cspNonce) ?>">
-        body.auth-body {
-            background-color: #F8FAFC;
-            background-image: radial-gradient(at 0% 0%, rgba(232, 93, 4, 0.04) 0px, transparent 50%),
-                              radial-gradient(at 100% 100%, rgba(255, 183, 3, 0.05) 0px, transparent 50%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
-        .auth-wrapper {
-            width: 100%;
-            max-width: 420px;
-        }
-
-        .auth-brand {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .auth-brand img {
-            height: 38px;
-            width: auto;
-        }
-
-        .auth-card-main {
-            background: #FFFFFF;
-            border: 1px solid rgba(15, 23, 42, 0.08);
-            border-radius: 16px;
-            padding: 36px 32px;
-            box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 12px 24px -4px rgba(15, 23, 42, 0.06);
-        }
-
-        .auth-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0F172A;
-            margin: 0 0 6px 0;
-            letter-spacing: -0.015em;
-        }
-
-        .auth-subtitle {
-            font-size: 13.5px;
-            color: #64748B;
-            margin: 0 0 24px 0;
-            line-height: 1.45;
-        }
-
-        .auth-footer-text {
-            text-align: center;
-            font-size: 12.5px;
-            color: #94A3B8;
-            margin-top: 24px;
-        }
-    </style>
+    <link rel="stylesheet" href="<?= e(app_url('/assets/css/mesaly.css')) ?>?v=5">
 </head>
 <body class="auth-body">
-    <div class="auth-wrapper">
-        <div class="auth-brand">
-            <a href="<?= e(app_url('/')) ?>" style="display: inline-block;">
-                <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly">
-            </a>
-        </div>
+    <div class="auth-split-layout">
+        <!-- Panel Izquierdo: Showcase de Marca y Propuesta de Valor -->
+        <aside class="auth-hero-panel">
+            <div class="auth-hero-top">
+                <a href="<?= e(app_url('/')) ?>" style="display: inline-flex; align-items: center; text-decoration: none;">
+                    <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" style="height: 38px; width: auto; filter: brightness(0) invert(1);">
+                </a>
+                <span class="auth-hero-badge">
+                    <span>⚡ SaaS Gastronómico</span>
+                </span>
+            </div>
 
-        <div class="auth-card-main">
-            <?php if (!empty($flash_success)): ?>
-                <div class="alert alert-success" style="margin-bottom: 20px;">
-                    <?= icon('check', 16) ?>
-                    <span><?= e($flash_success) ?></span>
+            <div class="auth-hero-content">
+                <h1 class="auth-hero-headline">
+                    Tu restaurante en el <span class="highlight">bolsillo</span> de tus clientes.
+                </h1>
+                <p class="auth-hero-subtext">
+                    La plataforma operativa diseñada para restaurantes modernos: cartas digitales interactivas, pedidos directos a tu WhatsApp y control de platos en tiempo real.
+                </p>
+
+                <!-- Mockup de Menú Digital en Vivo -->
+                <div class="auth-mockup-card">
+                    <div class="auth-mockup-header">
+                        <div class="auth-mockup-store">
+                            <span style="font-size: 18px;">🔥</span>
+                            <div>
+                                <span style="display: block; line-height: 1.2;">Fuego & Brasa Grill</span>
+                                <span style="font-size: 11px; color: #10B981; font-weight: 500;">● Abierto · Recibiendo pedidos</span>
+                            </div>
+                        </div>
+                        <span class="auth-mockup-badge">Mesa 04</span>
+                    </div>
+
+                    <div class="auth-mockup-item">
+                        <div class="auth-mockup-thumb">🥩</div>
+                        <div class="auth-mockup-details">
+                            <h4 class="auth-mockup-title">Churrasco al Carbón 350g</h4>
+                            <p class="auth-mockup-desc">Corte Angus madurado + Papas criollas + Chimichurri</p>
+                        </div>
+                        <div style="text-align: right; flex-shrink: 0;">
+                            <span class="auth-mockup-price">$ 42.000</span>
+                            <span style="display: block; font-size: 10px; color: #94A3B8;">COP</span>
+                        </div>
+                    </div>
                 </div>
-            <?php endif; ?>
 
-            <?php if (!empty($flash_error)): ?>
-                <div class="alert alert-error" style="margin-bottom: 20px;">
-                    <?= icon('x', 16) ?>
-                    <span><?= e($flash_error) ?></span>
+                <!-- Píldoras de Beneficios -->
+                <div class="auth-hero-features">
+                    <span class="auth-feature-chip">
+                        <span>🏷️</span> 0% Comisiones por venta
+                    </span>
+                    <span class="auth-feature-chip">
+                        <span>📲</span> QR para mesa y domicilio
+                    </span>
+                    <span class="auth-feature-chip">
+                        <span>⚡</span> Agotados en 1 segundo
+                    </span>
                 </div>
-            <?php endif; ?>
+            </div>
 
-            <?= $content ?>
-        </div>
+            <div class="auth-hero-footer">
+                <span>© <?= date('Y') ?> Mesaly</span>
+                <span>·</span>
+                <span>Plataforma de Menús Digitales Interactivos</span>
+            </div>
+        </aside>
 
-        <div class="auth-footer-text">
-            &copy; <?= date('Y') ?> Mesaly &middot; Menús Digitales Interactivos
-        </div>
+        <!-- Panel Derecho: Formulario de Autenticación -->
+        <main class="auth-form-panel">
+            <div class="auth-form-top">
+                <span style="font-size: 13px; color: #64748B;">
+                    ¿Nuevo negocio? <a href="https://wa.me/573001234567" target="_blank" rel="noopener" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Contactar Soporte</a>
+                </span>
+            </div>
+
+            <div class="auth-form-container">
+                <!-- Logo en móvil -->
+                <div style="margin-bottom: 24px; display: none;" class="auth-mobile-logo">
+                    <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" style="height: 34px;">
+                </div>
+
+                <?php if (!empty($flash_success)): ?>
+                    <div class="alert alert-success" style="margin-bottom: 20px;">
+                        <?= icon('check', 16) ?>
+                        <span><?= e($flash_success) ?></span>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty($flash_error)): ?>
+                    <div class="alert alert-error" style="margin-bottom: 20px;">
+                        <?= icon('x', 16) ?>
+                        <span><?= e($flash_error) ?></span>
+                    </div>
+                <?php endif; ?>
+
+                <?= $content ?>
+            </div>
+
+            <div class="auth-panel-bottom">
+                <span>🔒 Acceso seguro con cifrado SSL</span>
+                <span>Colombia · COP</span>
+            </div>
+        </main>
     </div>
+
+    <style nonce="<?= e($cspNonce) ?>">
+        @media (max-width: 960px) {
+            .auth-mobile-logo {
+                display: block !important;
+                text-align: center;
+            }
+        }
+    </style>
 </body>
 </html>

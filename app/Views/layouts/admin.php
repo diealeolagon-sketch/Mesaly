@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Panel de Control — Mesaly') ?></title>
     <link rel="icon" type="image/svg+xml" href="<?= e(app_url('/assets/img/logo-icon.svg')) ?>">
-    <link rel="stylesheet" href="<?= e(app_url('/assets/css/admin.css')) ?>?v=2">
+    <link rel="stylesheet" href="<?= e(app_url('/assets/css/mesaly.css')) ?>?v=5">
 </head>
 <body class="admin-body">
     <?php
