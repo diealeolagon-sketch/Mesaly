@@ -39,10 +39,6 @@
             </nav>
 
             <div class="nav-user-actions" style="display: flex; align-items: center; gap: 12px;">
-                <a href="<?= e(app_url('/superadmin/negocios/crear')) ?>" class="btn btn-primary btn-sm" style="font-weight: 700;">
-                    <?= icon('plus', 14) ?>
-                    <span>Nuevo Negocio</span>
-                </a>
                 <span class="nav-user-name" style="font-size: 13px; font-weight: 600; color: var(--color-text-main);">
                     <?= e($user['nombre'] ?? 'Super Admin') ?>
                 </span>

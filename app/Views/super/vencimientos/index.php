@@ -66,55 +66,59 @@
 </div>
 
 <!-- 2. BARRA DE FILTROS Y BÚSQUEDA -->
-<div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-        <!-- Pestañas de estado -->
-        <div class="cat-chips-wrap" style="margin: 0; display: flex; gap: 8px; flex-wrap: wrap;">
-            <a href="<?= e(app_url('/superadmin?filtro=todos' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
-               class="cat-chip <?= $filtroActivo === 'todos' ? 'active' : '' ?>">
-                Todos (<?= (int)$conteo['todos'] ?>)
-            </a>
-            <a href="<?= e(app_url('/superadmin?filtro=semana' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
-               class="cat-chip <?= $filtroActivo === 'semana' ? 'active' : '' ?>">
-                Vencen esta semana (<?= (int)$conteo['semana'] ?>)
-            </a>
-            <a href="<?= e(app_url('/superadmin?filtro=gracia' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
-               class="cat-chip <?= $filtroActivo === 'gracia' ? 'active' : '' ?>">
-                En Gracia (<?= (int)$conteo['gracia'] ?>)
-            </a>
-            <a href="<?= e(app_url('/superadmin?filtro=bloqueados' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
-               class="cat-chip <?= $filtroActivo === 'bloqueados' ? 'active' : '' ?>">
-                Bloqueados (<?= (int)$conteo['bloqueados'] ?>)
-            </a>
-            <a href="<?= e(app_url('/superadmin?filtro=al_dia' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
-               class="cat-chip <?= $filtroActivo === 'al_dia' ? 'active' : '' ?>">
-                Al Día (<?= (int)$conteo['al_dia'] ?>)
-            </a>
-            <a href="<?= e(app_url('/superadmin?filtro=cancelados' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
-               class="cat-chip <?= $filtroActivo === 'cancelados' ? 'active' : '' ?>">
-                Cancelados (<?= (int)$conteo['cancelados'] ?>)
-            </a>
-        </div>
+<div class="filter-bar-card">
+    <!-- Pestañas de estado -->
+    <div class="filter-pills-group">
+        <a href="<?= e(app_url('/superadmin?filtro=todos' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
+           class="filter-pill <?= $filtroActivo === 'todos' ? 'active' : '' ?>">
+            <span>Todos</span>
+            <span class="filter-count"><?= (int)$conteo['todos'] ?></span>
+        </a>
+        <a href="<?= e(app_url('/superadmin?filtro=semana' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
+           class="filter-pill <?= $filtroActivo === 'semana' ? 'active' : '' ?>">
+            <span>Vencen esta semana</span>
+            <span class="filter-count"><?= (int)$conteo['semana'] ?></span>
+        </a>
+        <a href="<?= e(app_url('/superadmin?filtro=gracia' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
+           class="filter-pill <?= $filtroActivo === 'gracia' ? 'active' : '' ?>">
+            <span>En Gracia</span>
+            <span class="filter-count"><?= (int)$conteo['gracia'] ?></span>
+        </a>
+        <a href="<?= e(app_url('/superadmin?filtro=bloqueados' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
+           class="filter-pill <?= $filtroActivo === 'bloqueados' ? 'active' : '' ?>">
+            <span>Bloqueados</span>
+            <span class="filter-count"><?= (int)$conteo['bloqueados'] ?></span>
+        </a>
+        <a href="<?= e(app_url('/superadmin?filtro=al_dia' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
+           class="filter-pill <?= $filtroActivo === 'al_dia' ? 'active' : '' ?>">
+            <span>Al Día</span>
+            <span class="filter-count"><?= (int)$conteo['al_dia'] ?></span>
+        </a>
+        <a href="<?= e(app_url('/superadmin?filtro=cancelados' . ($busqueda ? '&q=' . urlencode($busqueda) : ''))) ?>" 
+           class="filter-pill <?= $filtroActivo === 'cancelados' ? 'active' : '' ?>">
+            <span>Cancelados</span>
+            <span class="filter-count"><?= (int)$conteo['cancelados'] ?></span>
+        </a>
+    </div>
 
-        <!-- Buscador -->
-        <form method="GET" action="<?= e(app_url('/superadmin')) ?>" style="display: flex; gap: 8px; align-items: center;">
-            <input type="hidden" name="filtro" value="<?= e($filtroActivo) ?>">
-            <div style="position: relative;">
-                <input type="text" name="q" value="<?= e($busqueda) ?>" class="form-control" placeholder="Buscar negocio o slug..." style="width: 230px; padding: 7px 12px 7px 32px; font-size: 13px;">
-                <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-subtle);">
-                    <?= icon('search', 13) ?>
-                </span>
-            </div>
-            <button type="submit" class="btn btn-secondary btn-sm" style="padding: 7px 14px;">
-                Buscar
-            </button>
+    <!-- Buscador -->
+    <form method="GET" action="<?= e(app_url('/superadmin')) ?>" class="filter-search-form">
+        <input type="hidden" name="filtro" value="<?= e($filtroActivo) ?>">
+        <div class="filter-search-box">
+            <span class="filter-search-icon">
+                <?= icon('search', 14) ?>
+            </span>
+            <input type="text" name="q" value="<?= e($busqueda) ?>" class="filter-search-input" placeholder="Buscar negocio o slug...">
             <?php if (!empty($busqueda)): ?>
-                <a href="<?= e(app_url('/superadmin?filtro=' . urlencode($filtroActivo))) ?>" class="btn btn-secondary btn-sm" title="Limpiar búsqueda">
+                <a href="<?= e(app_url('/superadmin?filtro=' . urlencode($filtroActivo))) ?>" class="filter-search-clear" title="Limpiar búsqueda">
                     &times;
                 </a>
             <?php endif; ?>
-        </form>
-    </div>
+        </div>
+        <button type="submit" class="btn btn-secondary btn-sm filter-search-btn">
+            Buscar
+        </button>
+    </form>
 </div>
 
 <!-- 3. TABLA DE NEGOCIOS Y VENCIMIENTOS -->

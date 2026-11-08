@@ -133,6 +133,11 @@ if (!function_exists('icon')) {
             'tag' => '<svg ' . $attrs . '><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><circle cx="7" cy="7" r=".5" fill="currentColor"/></svg>',
             'sparkles' => '<svg ' . $attrs . '><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>',
             'alert' => '<svg ' . $attrs . '><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
+            'more' => '<svg ' . $attrs . '><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>',
+            'more-vertical' => '<svg ' . $attrs . '><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>',
+            'chart' => '<svg ' . $attrs . '><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>',
+            'copy' => '<svg ' . $attrs . '><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
+            'coin' => '<svg ' . $attrs . '><circle cx="12" cy="12" r="9"/><path d="M12 6v12M15 9.5A2.5 2.5 0 0 0 12.5 7h-1A2.5 2.5 0 0 0 9 9.5 2.5 2.5 0 0 0 11.5 12h1a2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5h-1A2.5 2.5 0 0 1 9 14.5"/></svg>',
             default => '<svg ' . $attrs . '><circle cx="12" cy="12" r="10"/></svg>',
         };
     }

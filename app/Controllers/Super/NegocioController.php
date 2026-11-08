@@ -15,6 +15,7 @@ use App\Models\Auditoria;
 use App\Models\Restaurante;
 use App\Models\Usuario;
 use App\Services\SuscripcionService;
+use PDO;
 
 class NegocioController extends Controller
 {
@@ -560,7 +561,7 @@ class NegocioController extends Controller
         // Métricas de pedidos en la red
         $totalPedidos = (int)$pdo->query("SELECT COUNT(*) FROM `pedidos` WHERE `estado` != 'cancelado'")->fetchColumn();
         $volumenVentasRed = (int)$pdo->query("SELECT COALESCE(SUM(total), 0) FROM `pedidos` WHERE `estado` != 'cancelado'")->fetchColumn();
-        $totalMesas = (int)$pdo->query("SELECT COUNT(*) FROM `mesas` WHERE `activo` = 1")->fetchColumn();
+        $totalMesas = (int)$pdo->query("SELECT COUNT(*) FROM `mesas` WHERE `activa` = 1 AND `deleted_at` IS NULL")->fetchColumn();
         $totalProductos = (int)$pdo->query("SELECT COUNT(*) FROM `productos` WHERE `deleted_at` IS NULL")->fetchColumn();
 
         // Pagos recaudados mes actual
