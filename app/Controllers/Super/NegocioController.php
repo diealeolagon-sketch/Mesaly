@@ -564,21 +564,44 @@ class NegocioController extends Controller
         $totalMesas = (int)$pdo->query("SELECT COUNT(*) FROM `mesas` WHERE `activa` = 1 AND `deleted_at` IS NULL")->fetchColumn();
         $totalProductos = (int)$pdo->query("SELECT COUNT(*) FROM `productos` WHERE `deleted_at` IS NULL")->fetchColumn();
 
-        // Pagos recaudados mes actual
+        // Pagos recaudados mes actual e histórico 6 meses
         $mesActual = date('Y-m');
         $recaudadoMes = (int)$pdo->query("SELECT COALESCE(SUM(monto), 0) FROM `pagos_suscripcion` WHERE DATE_FORMAT(fecha_pago, '%Y-%m') = '{$mesActual}' AND anulado = 0")->fetchColumn();
+
+        $historicoMeses = [];
+        $mesesEspanol = ['Jan' => 'Ene', 'Feb' => 'Feb', 'Mar' => 'Mar', 'Apr' => 'Abr', 'May' => 'May', 'Jun' => 'Jun', 'Jul' => 'Jul', 'Aug' => 'Ago', 'Sep' => 'Sep', 'Oct' => 'Oct', 'Nov' => 'Nov', 'Dec' => 'Dic'];
+        for ($i = 5; $i >= 0; $i--) {
+            $ts = strtotime("-{$i} months");
+            $ym = date('Y-m', $ts);
+            $engMes = date('M', $ts);
+            $label = ($mesesEspanol[$engMes] ?? $engMes) . ' ' . date('y', $ts);
+            $stmtM = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM `pagos_suscripcion` WHERE DATE_FORMAT(fecha_pago, '%Y-%m') = :ym AND anulado = 0");
+            $stmtM->execute(['ym' => $ym]);
+            $historicoMeses[] = [
+                'periodo' => $ym,
+                'label' => $label,
+                'total' => (int)$stmtM->fetchColumn(),
+            ];
+        }
+
+        $totalNegocios = count($todosNegocios);
+        $tasaCobranza = $totalNegocios > 0 ? (float)round(($conteoEstados['al_dia'] / $totalNegocios) * 100, 1) : 0.0;
+        $arpu = $totalNegocios > 0 ? (int)round($mrr / $totalNegocios) : 0;
 
         return $this->render('super/metricas/index', [
             'title' => 'Métricas Globales de la Red — Super Admin',
             'mrr' => $mrr,
             'arr' => $mrr * 12,
             'conteoEstados' => $conteoEstados,
-            'totalNegocios' => count($todosNegocios),
+            'totalNegocios' => $totalNegocios,
+            'tasaCobranza' => $tasaCobranza,
+            'arpu' => $arpu,
             'totalPedidos' => $totalPedidos,
             'volumenVentasRed' => $volumenVentasRed,
             'totalMesas' => $totalMesas,
             'totalProductos' => $totalProductos,
             'recaudadoMes' => $recaudadoMes,
+            'historicoMeses' => $historicoMeses,
         ], 'super');
     }
 }

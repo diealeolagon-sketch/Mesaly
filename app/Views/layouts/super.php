@@ -71,6 +71,7 @@
         <?= $content ?>
     </main>
 
+    <script nonce="<?= e($cspNonce) ?>" src="<?= e(asset_url('/assets/vendor/chartjs/chart.umd.js')) ?>"></script>
     <script nonce="<?= e($cspNonce) ?>" src="<?= e(asset_url('/assets/js/admin.js')) ?>"></script>
 </body>
 </html>
