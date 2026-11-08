@@ -142,10 +142,73 @@
         });
     }
 
-    // 4. Inicializar al cargar el DOM
+    // 4. Sistema de menús desplegables de acciones (.dropdown-wrap)
+    function setupDropdowns() {
+        document.addEventListener('click', function (e) {
+            const trigger = e.target.closest('.dropdown-trigger');
+            const openWrap = trigger ? trigger.closest('.dropdown-wrap') : null;
+
+            // Cerrar cualquier otro dropdown abierto
+            document.querySelectorAll('.dropdown-wrap.is-open').forEach(function (wrap) {
+                if (wrap !== openWrap) {
+                    wrap.classList.remove('is-open');
+                }
+            });
+
+            // Si se hizo clic en un trigger, alternar apertura
+            if (openWrap) {
+                e.preventDefault();
+                e.stopPropagation();
+                openWrap.classList.toggle('is-open');
+            }
+        });
+
+        // Cerrar con Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.dropdown-wrap.is-open').forEach(function (wrap) {
+                    wrap.classList.remove('is-open');
+                });
+            }
+        });
+    }
+
+    // 5. Generación automática y amigable de slugs (data-slug-from="...")
+    function setupSlugifiers() {
+        document.querySelectorAll('input[data-slug-from]').forEach(function (slugInput) {
+            const sourceId = slugInput.getAttribute('data-slug-from');
+            const sourceEl = document.getElementById(sourceId);
+            if (!sourceEl) return;
+
+            let isUserModified = slugInput.value.trim().length > 0;
+
+            slugInput.addEventListener('input', function () {
+                isUserModified = this.value.trim().length > 0;
+            });
+
+            sourceEl.addEventListener('input', function () {
+                if (isUserModified) return;
+                const text = this.value || '';
+                const slug = text
+                    .toString()
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '') // Quitar tildes
+                    .replace(/[^a-z0-9\s-]/g, '')    // Quitar caracteres especiales
+                    .trim()
+                    .replace(/\s+/g, '-')            // Espacios a guiones
+                    .replace(/-+/g, '-');            // Evitar guiones múltiples
+                slugInput.value = slug;
+            });
+        });
+    }
+
+    // 6. Inicializar al cargar el DOM
     function init() {
         setupDropzones();
         setupImagePreviews();
+        setupDropdowns();
+        setupSlugifiers();
     }
 
     if (document.readyState === 'loading') {

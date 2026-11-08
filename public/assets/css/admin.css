@@ -914,3 +914,274 @@ body.admin-body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   SUPER ADMIN — Action Dropdowns, Semáforos y Modales Modernos
+   ========================================================================== */
+
+/* Action Dropdown / Menú Kebab */
+.dropdown-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: #FFFFFF;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 120ms ease;
+    padding: 0;
+}
+
+.dropdown-trigger:hover,
+.dropdown-trigger:focus-visible,
+.dropdown-wrap.is-open .dropdown-trigger {
+    background: var(--color-bg-subtle);
+    border-color: var(--color-border-strong);
+    color: var(--color-text-main);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 14px 28px -4px rgba(15, 23, 42, 0.12), 0 8px 12px -6px rgba(15, 23, 42, 0.08);
+    min-width: 210px;
+    z-index: 1000;
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dropdown-wrap.is-open .dropdown-menu {
+    display: flex;
+    animation: dropdownFadeIn 130ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-main);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background 100ms ease, color 100ms ease;
+    box-sizing: border-box;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus-visible {
+    background: var(--color-bg-subtle);
+    color: var(--color-brand);
+}
+
+.dropdown-item.text-danger {
+    color: #DC2626;
+}
+
+.dropdown-item.text-danger:hover {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--color-border-subtle);
+    margin: 4px 0;
+}
+
+/* Semáforo Moderno y Badges */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.status-pill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.status-pill.al-dia {
+    background: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+}
+.status-pill.al-dia .status-pill-dot {
+    background: #10B981;
+}
+
+.status-pill.por-vencer {
+    background: #FFFBEB;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+.status-pill.por-vencer .status-pill-dot {
+    background: #F59E0B;
+}
+
+.status-pill.en-gracia {
+    background: #FFF7ED;
+    color: #9A3412;
+    border: 1px solid #FED7AA;
+}
+.status-pill.en-gracia .status-pill-dot {
+    background: #EA580C;
+    animation: pulseDot 2s infinite ease-in-out;
+}
+
+.status-pill.bloqueado {
+    background: #FEF2F2;
+    color: #991B1B;
+    border: 1px solid #FECACA;
+}
+.status-pill.bloqueado .status-pill-dot {
+    background: #EF4444;
+}
+
+.status-pill.suspendido {
+    background: #F3F4F6;
+    color: #4B5563;
+    border: 1px solid #E5E7EB;
+}
+.status-pill.suspendido .status-pill-dot {
+    background: #6B7280;
+}
+
+.status-pill.cancelado {
+    background: #F1F5F9;
+    color: #64748B;
+    border: 1px solid #CBD5E1;
+}
+.status-pill.cancelado .status-pill-dot {
+    background: #94A3B8;
+}
+
+@keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.2); }
+}
+
+/* Modales Premium */
+.modal-backdrop-modern {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.modal-dialog-modern {
+    width: 100%;
+    max-width: 520px;
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    border: 1px solid var(--color-border);
+    animation: modalSlideUp 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header-modern {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #FAFAFC;
+}
+
+.modal-body-modern {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.modal-footer-modern {
+    padding: 16px 24px;
+    border-top: 1px solid var(--color-border-subtle);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: #FAFAFC;
+}
+
+@keyframes modalSlideUp {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* KPI Cards Mejoradas */
+.kpi-card-modern {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.kpi-card-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+}
+
+.kpi-card-modern .kpi-icon-badge {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-subtle);
+    color: var(--color-text-muted);
+}

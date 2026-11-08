@@ -64,6 +64,9 @@ $router->post('/superadmin/negocios/{id}/extender', [NegocioController::class, '
 $router->post('/superadmin/negocios/{id}/estado', [NegocioController::class, 'cambiarEstado'], $superPostMiddlewares);
 $router->post('/superadmin/negocios/{id}/ver-como', [NegocioController::class, 'verComo'], $superPostMiddlewares);
 $router->post('/superadmin/dejar-ver-como', [NegocioController::class, 'dejarVerComo'], $superPostMiddlewares);
+$router->get('/superadmin/pagos', [NegocioController::class, 'pagos'], $superMiddlewares);
+$router->get('/superadmin/negocios/{id}/pagos-json', [NegocioController::class, 'historialPagosJson'], $superMiddlewares);
+$router->get('/superadmin/metricas', [NegocioController::class, 'metricas'], $superMiddlewares);
 
 // -----------------------------------------------------------------------------
 // Admin de Negocio (/admin)

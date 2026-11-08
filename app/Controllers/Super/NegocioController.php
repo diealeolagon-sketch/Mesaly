@@ -449,4 +449,135 @@ class NegocioController extends Controller
         Session::flash('info', 'Has regresado al panel Super Admin.');
         return $this->redirect(app_url('/superadmin'));
     }
+
+    /**
+     * Historial general de todos los pagos registrados en la plataforma
+     */
+    public function pagos(Request $request): Response
+    {
+        $pdo = Model::getPdo();
+        $busqueda = trim((string)$request->query('q', ''));
+        $metodoFiltro = trim((string)$request->query('metodo', ''));
+
+        $sql = "SELECT p.*, r.nombre AS restaurante_nombre, r.slug AS restaurante_slug, u.nombre AS superadmin_nombre
+                FROM `pagos_suscripcion` p
+                JOIN `restaurantes` r ON p.restaurante_id = r.id
+                JOIN `usuarios` u ON p.registrado_por = u.id";
+
+        $where = [];
+        $params = [];
+
+        if (!empty($busqueda)) {
+            $where[] = "(r.nombre LIKE :q OR r.slug LIKE :q OR p.nota LIKE :q)";
+            $params['q'] = "%{$busqueda}%";
+        }
+        if (!empty($metodoFiltro)) {
+            $where[] = "p.metodo = :metodo";
+            $params['metodo'] = $metodoFiltro;
+        }
+
+        if (!empty($where)) {
+            $sql .= " WHERE " . implode(' AND ', $where);
+        }
+
+        $sql .= " ORDER BY p.fecha_pago DESC, p.id DESC LIMIT 100";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Totales
+        $mesActual = date('Y-m');
+        $totalMes = (int)$pdo->query("SELECT COALESCE(SUM(monto), 0) FROM `pagos_suscripcion` WHERE DATE_FORMAT(fecha_pago, '%Y-%m') = '{$mesActual}' AND anulado = 0")->fetchColumn();
+        $totalHistorico = (int)$pdo->query("SELECT COALESCE(SUM(monto), 0) FROM `pagos_suscripcion` WHERE anulado = 0")->fetchColumn();
+        $conteoTransacciones = (int)$pdo->query("SELECT COUNT(*) FROM `pagos_suscripcion` WHERE anulado = 0")->fetchColumn();
+
+        return $this->render('super/pagos/index', [
+            'title' => 'Historial de Pagos — Super Admin',
+            'pagos' => $pagos,
+            'busqueda' => $busqueda,
+            'metodoFiltro' => $metodoFiltro,
+            'totalMes' => $totalMes,
+            'totalHistorico' => $totalHistorico,
+            'conteoTransacciones' => $conteoTransacciones,
+            'metodosPago' => SuscripcionService::METODOS_PAGO,
+        ], 'super');
+    }
+
+    /**
+     * Retorna el historial de pagos de un restaurante en formato JSON para el modal
+     */
+    public function historialPagosJson(Request $request, array $params): Response
+    {
+        $id = (int)($params['id'] ?? 0);
+        $pdo = Model::getPdo();
+
+        $stmt = $pdo->prepare("SELECT p.*, u.nombre AS superadmin_nombre
+                               FROM `pagos_suscripcion` p
+                               JOIN `usuarios` u ON p.registrado_por = u.id
+                               WHERE p.restaurante_id = :id
+                               ORDER BY p.fecha_pago DESC, p.id DESC");
+        $stmt->execute(['id' => $id]);
+        $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $this->json([
+            'success' => true,
+            'pagos' => $pagos,
+        ]);
+    }
+
+    /**
+     * Métricas globales de la plataforma (Sección 5.6)
+     */
+    public function metricas(Request $request): Response
+    {
+        $pdo = Model::getPdo();
+        $todosNegocios = $this->restauranteModel->allForVencimientos(null, null);
+
+        $mrr = 0;
+        $conteoEstados = [
+            'al_dia' => 0,
+            'por_vencer' => 0,
+            'en_gracia' => 0,
+            'bloqueado' => 0,
+            'suspendido' => 0,
+            'cancelado' => 0,
+        ];
+
+        foreach ($todosNegocios as $n) {
+            $est = $n['estado_suscripcion']['codigo'];
+            if (isset($conteoEstados[$est])) {
+                $conteoEstados[$est]++;
+            }
+            if (!empty($n['estado_suscripcion']['por_vencer'])) {
+                $conteoEstados['por_vencer']++;
+            }
+            if ($est !== SuscripcionService::ESTADO_CANCELADO) {
+                $precio = (int)($n['precio'] ?? 49000);
+                $mrr += ($n['ciclo'] === 'anual') ? (int)round($precio / 12) : $precio;
+            }
+        }
+
+        // Métricas de pedidos en la red
+        $totalPedidos = (int)$pdo->query("SELECT COUNT(*) FROM `pedidos` WHERE `estado` != 'cancelado'")->fetchColumn();
+        $volumenVentasRed = (int)$pdo->query("SELECT COALESCE(SUM(total), 0) FROM `pedidos` WHERE `estado` != 'cancelado'")->fetchColumn();
+        $totalMesas = (int)$pdo->query("SELECT COUNT(*) FROM `mesas` WHERE `activo` = 1")->fetchColumn();
+        $totalProductos = (int)$pdo->query("SELECT COUNT(*) FROM `productos` WHERE `deleted_at` IS NULL")->fetchColumn();
+
+        // Pagos recaudados mes actual
+        $mesActual = date('Y-m');
+        $recaudadoMes = (int)$pdo->query("SELECT COALESCE(SUM(monto), 0) FROM `pagos_suscripcion` WHERE DATE_FORMAT(fecha_pago, '%Y-%m') = '{$mesActual}' AND anulado = 0")->fetchColumn();
+
+        return $this->render('super/metricas/index', [
+            'title' => 'Métricas Globales de la Red — Super Admin',
+            'mrr' => $mrr,
+            'arr' => $mrr * 12,
+            'conteoEstados' => $conteoEstados,
+            'totalNegocios' => count($todosNegocios),
+            'totalPedidos' => $totalPedidos,
+            'volumenVentasRed' => $volumenVentasRed,
+            'totalMesas' => $totalMesas,
+            'totalProductos' => $totalProductos,
+            'recaudadoMes' => $recaudadoMes,
+        ], 'super');
+    }
 }
