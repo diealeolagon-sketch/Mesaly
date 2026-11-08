@@ -28,7 +28,7 @@ class SuscripcionMiddleware implements MiddlewareInterface
         $estado = SuscripcionService::estadoDe($tenant);
 
         // Si está bloqueado y no está en la página de cuenta suspendida
-        $path = $request->path();
+        $path = $request->getUri();
         if ($estado['bloqueado'] && $path !== '/admin/suscripcion-vencida') {
             $res = new Response();
             return $res->redirect(app_url('/admin/suscripcion-vencida'));

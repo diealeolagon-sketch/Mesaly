@@ -98,6 +98,16 @@ class Request
         return $this->uri;
     }
 
+    public function uri(): string
+    {
+        return $this->uri;
+    }
+
+    public function path(): string
+    {
+        return $this->uri;
+    }
+
     public function query(?string $key = null, mixed $default = null): mixed
     {
         if ($key === null) {
