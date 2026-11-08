@@ -46,10 +46,23 @@ class MenuController extends Controller
         $restauranteId = (int)$restaurante['id'];
         TenantContext::setTenant($restaurante);
 
-        // Verificar mesa en sesión (expira en 4 horas)
+        // Verificar mesa desde parámetro ?mesa=N o sesión (expira en 4 horas)
         $mesaNumero = null;
         $sessionKey = 'mesaly_mesa_' . $restauranteId;
-        if (!empty($_SESSION[$sessionKey]) && is_array($_SESSION[$sessionKey])) {
+        $mesaParam = (int)$request->get('mesa', 0);
+        $mesaModel = new \App\Models\Mesa();
+
+        if ($mesaParam > 0) {
+            $mesaDb = $mesaModel->findByNumero($restauranteId, $mesaParam);
+            if ($mesaDb && !empty($mesaDb['activa'])) {
+                $mesaNumero = $mesaParam;
+                $_SESSION[$sessionKey] = [
+                    'numero' => $mesaNumero,
+                    'id' => (int)$mesaDb['id'],
+                    'expires_at' => time() + (4 * 3600), // 4 horas
+                ];
+            }
+        } elseif (!empty($_SESSION[$sessionKey]) && is_array($_SESSION[$sessionKey])) {
             if (time() <= (int)($_SESSION[$sessionKey]['expires_at'] ?? 0)) {
                 $mesaNumero = (int)$_SESSION[$sessionKey]['numero'];
             } else {
@@ -408,9 +421,17 @@ class MenuController extends Controller
         $totalGeneral = $subtotalCalculado + $costoEnvio;
 
         // 9. Registrar el pedido en la base de datos
+        $mesaId = null;
+        if ($mesaNumero > 0) {
+            $mDb = (new \App\Models\Mesa())->findByNumero($restauranteId, $mesaNumero);
+            if ($mDb) {
+                $mesaId = (int)$mDb['id'];
+            }
+        }
+
         $datosParaGuardar = [
             'modalidad' => $modalidad,
-            'mesa_id' => null,
+            'mesa_id' => $mesaId,
             'mesa_numero' => $mesaNumero,
             'cliente_nombre' => $clienteNombre,
             'cliente_telefono' => $clienteTelefono ?: null,

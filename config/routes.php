@@ -10,6 +10,7 @@ use App\Controllers\Admin\CatalogoController;
 use App\Controllers\Admin\ConfigController;
 use App\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Controllers\Admin\DisponibilidadController;
+use App\Controllers\Admin\MesaController;
 use App\Controllers\Admin\ModificadorController;
 use App\Controllers\AuthController;
 use App\Controllers\Public\MenuController;
@@ -103,6 +104,17 @@ $router->post('/admin/modificadores/opcion/{id}/eliminar', [ModificadorControlle
 // Disponibilidad rápida
 $router->get('/admin/disponibilidad', [DisponibilidadController::class, 'index'], $adminMiddlewares);
 $router->post('/admin/disponibilidad/toggle', [DisponibilidadController::class, 'toggle'], $adminPostMiddlewares);
+
+// Mesas y Códigos QR (Fase 2)
+$router->get('/admin/mesas', [MesaController::class, 'index'], $adminMiddlewares);
+$router->post('/admin/mesas/crear', [MesaController::class, 'guardar'], $adminPostMiddlewares);
+$router->post('/admin/mesas/lote', [MesaController::class, 'generarLote'], $adminPostMiddlewares);
+$router->post('/admin/mesas/{id}/editar', [MesaController::class, 'actualizar'], $adminPostMiddlewares);
+$router->post('/admin/mesas/{id}/toggle', [MesaController::class, 'toggle'], $adminPostMiddlewares);
+$router->post('/admin/mesas/{id}/eliminar', [MesaController::class, 'eliminar'], $adminPostMiddlewares);
+$router->get('/admin/mesas/{id}/qr', [MesaController::class, 'descargarQr'], $adminMiddlewares);
+$router->get('/admin/mesas/qr-general', [MesaController::class, 'descargarQrGeneral'], $adminMiddlewares);
+$router->get('/admin/mesas/pdf', [MesaController::class, 'descargarPdf'], $adminMiddlewares);
 
 // -----------------------------------------------------------------------------
 // Menú Digital Público (Comensales)

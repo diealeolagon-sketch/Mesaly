@@ -7,6 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="<?= e(app_url('/assets/img/logo-icon.svg')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('/assets/css/fonts.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('/assets/css/mesaly.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset_url('/assets/css/admin.css')) ?>">
 </head>
 <body class="admin-body">
     <?php if (!empty(\App\Core\Session::get('impersonating_tenant_id'))): ?>
@@ -53,6 +54,10 @@
                 <a href="<?= e(app_url('/admin/modificadores')) ?>" class="nav-link-item <?= str_contains($currentUri, '/modificadores') ? 'active' : '' ?>">
                     <?= icon('modifiers', 16) ?>
                     <span>Modificadores</span>
+                </a>
+                <a href="<?= e(app_url('/admin/mesas')) ?>" class="nav-link-item <?= str_contains($currentUri, '/mesas') ? 'active' : '' ?>">
+                    <?= icon('cutlery', 16) ?>
+                    <span>Mesas &amp; QR</span>
                 </a>
                 <a href="<?= e(app_url('/admin/disponibilidad')) ?>" class="nav-link-item nav-link-agotados <?= str_contains($currentUri, '/disponibilidad') ? 'active' : '' ?>">
                     <?= icon('zap', 16) ?>
