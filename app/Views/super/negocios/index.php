@@ -1,34 +1,48 @@
 <div class="content-header">
     <div>
         <h1 class="page-title">Restaurantes y Negocios</h1>
-        <p class="page-subtitle">Administra los restaurantes registrados en la plataforma.</p>
+        <p class="page-subtitle">Administra los restaurantes registrados en la plataforma Mesaly y sus accesos.</p>
     </div>
     <div class="content-actions">
         <a href="<?= e(app_url('/superadmin/negocios/crear')) ?>" class="btn btn-primary">
             <?= icon('plus', 16) ?>
-            <span>Registrar Negocio</span>
+            <span>Registrar Nuevo Restaurante</span>
         </a>
     </div>
 </div>
 
 <div class="card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 18px 24px; border-bottom: 1px solid var(--color-border-subtle); background: var(--color-bg-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <span style="font-size: 13.5px; font-weight: 700; color: var(--color-text-main);">
+            Total registrados: <?= count($negocios ?? []) ?> restaurantes
+        </span>
+        <span style="font-size: 12.5px; color: var(--color-text-muted);">
+            Cada negocio opera con aislamiento estricto de datos (Multi-tenant)
+        </span>
+    </div>
+
     <?php if (empty($negocios)): ?>
-        <div style="text-align: center; padding: 56px 24px;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-bg-subtle); display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-subtle); margin-bottom: 16px;">
-                <?= icon('store', 22) ?>
+        <div style="text-align: center; padding: 64px 24px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--color-brand-subtle); color: var(--color-brand); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <?= icon('store', 26) ?>
             </div>
-            <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 6px 0;">Aún no hay negocios registrados</h3>
-            <p style="color: var(--color-text-muted); font-size: 14px; margin: 0 auto 20px auto;">Crea el primero con el botón superior.</p>
+            <h3 style="font-size: 17px; font-weight: 700; color: var(--color-text-main); margin: 0 0 8px 0;">Aún no hay restaurantes registrados</h3>
+            <p style="color: var(--color-text-muted); font-size: 14px; margin: 0 auto 24px auto; max-width: 440px;">
+                Comienza registrando el primer negocio para generar automáticamente su carta digital y credenciales de acceso.
+            </p>
+            <a href="<?= e(app_url('/superadmin/negocios/crear')) ?>" class="btn btn-primary">
+                <?= icon('plus', 16) ?>
+                <span>Registrar Primer Negocio</span>
+            </a>
         </div>
     <?php else: ?>
         <div class="table-container">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Negocio</th>
-                        <th>Slug</th>
-                        <th>WhatsApp</th>
-                        <th>Plan</th>
+                        <th>Negocio / Carta Digital</th>
+                        <th>WhatsApp Receptor</th>
+                        <th>Plan Contratado</th>
                         <th>Ciclo</th>
                         <th>Vencimiento</th>
                         <th style="text-align: right;">Acciones</th>
@@ -38,37 +52,46 @@
                     <?php foreach ($negocios as $negocio): ?>
                         <tr>
                             <td>
-                                <strong style="color: var(--color-text-main);"><?= e($negocio['nombre']) ?></strong>
+                                <strong style="color: var(--color-text-main); font-size: 14px;"><?= e($negocio['nombre']) ?></strong>
+                                <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                                    <a href="<?= e(app_url('/' . $negocio['slug'])) ?>" target="_blank" style="font-size: 12px; color: var(--color-brand); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;">
+                                        <span>/<?= e($negocio['slug']) ?></span>
+                                        <?= icon('external-link', 11) ?>
+                                    </a>
+                                    <?php if (!empty($negocio['en_prueba'])): ?>
+                                        <span class="badge badge-warning" style="font-size: 10px; padding: 1px 6px;">Prueba 15d</span>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                             <td>
-                                <code style="font-size: 12px; background: var(--color-bg-subtle); padding: 2px 6px; border-radius: 4px;"><?= e($negocio['slug']) ?></code>
-                            </td>
-                            <td>
-                                <a href="https://wa.me/<?= e($negocio['whatsapp']) ?>" target="_blank" rel="noopener" style="color: var(--color-brand);">
-                                    +<?= e($negocio['whatsapp']) ?>
+                                <a href="https://wa.me/<?= e($negocio['whatsapp']) ?>" target="_blank" rel="noopener" style="color: var(--color-text-main); font-weight: 600; text-decoration: none; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 6px;">
+                                    <?= icon('phone', 13) ?>
+                                    <span>+<?= e($negocio['whatsapp']) ?></span>
                                 </a>
                             </td>
                             <td>
-                                <span class="badge badge-neutral">
+                                <span class="badge badge-neutral" style="font-weight: 600;">
                                     <?= e($negocio['plan_nombre'] ?? 'Sin Plan') ?>
                                 </span>
                             </td>
-                            <td style="color: var(--color-text-secondary);">
+                            <td style="color: var(--color-text-secondary); font-size: 13px;">
                                 <?= e(ucfirst($negocio['ciclo'])) ?>
                             </td>
-                            <td style="color: var(--color-text-secondary); font-size: 13px;">
-                                <?= e($negocio['fecha_vencimiento'] ?? 'N/A') ?>
+                            <td>
+                                <span style="font-variant-numeric: tabular-nums; font-weight: 600; font-size: 13.5px; color: var(--color-text-main);">
+                                    <?= e($negocio['fecha_vencimiento'] ?? 'N/A') ?>
+                                </span>
                             </td>
                             <td style="text-align: right;">
                                 <div class="action-btns">
-                                    <a href="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/editar')) ?>" class="btn btn-secondary btn-sm">
+                                    <a href="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/editar')) ?>" class="btn btn-secondary btn-sm" title="Editar configuración">
                                         <?= icon('edit', 14) ?>
                                         <span>Editar</span>
                                     </a>
-                                    <form method="POST" action="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/reset-password')) ?>" style="display: inline;" onsubmit="return confirm('¿Seguro que deseas restablecer la contraseña del admin de este negocio?');">
+                                    <form method="POST" action="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/reset-password')) ?>" style="display: inline;" onsubmit="return confirm('¿Seguro que deseas restablecer la contraseña del admin de este negocio? Se generará una clave temporal nueva.');">
                                         <?= csrf_field() ?>
-                                        <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger);">
-                                            <?= icon('x', 14) ?>
+                                        <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-border);" title="Generar clave temporal nueva">
+                                            <?= icon('zap', 13) ?>
                                             <span>Reset Clave</span>
                                         </button>
                                     </form>

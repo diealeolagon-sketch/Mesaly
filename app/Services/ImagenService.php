@@ -8,7 +8,7 @@ use RuntimeException;
 
 class ImagenService
 {
-    private const MAX_SIZE_BYTES = 3145728; // 3 MB
+    private const MAX_SIZE_BYTES = 8388608; // 8 MB (permite fotos directas de celular que luego se comprimen)
     private const ALLOWED_MIMES = [
         'image/jpeg' => 'jpg',
         'image/png'  => 'png',
@@ -21,12 +21,22 @@ class ImagenService
      */
     public function procesarYGuardar(array $file, int $tenantId, int $maxWidth = 1200, int $quality = 85): string
     {
+        if (isset($file['error']) && $file['error'] !== UPLOAD_ERR_OK) {
+            $errorMsg = match ($file['error']) {
+                UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => "El archivo excede el tamaño máximo permitido por el servidor.",
+                UPLOAD_ERR_PARTIAL => "La subida del archivo fue interrumpida. Por favor intenta de nuevo.",
+                UPLOAD_ERR_NO_FILE => "No se ha seleccionado ningún archivo.",
+                default => "Error en la subida del archivo (código {$file['error']}).",
+            };
+            throw new RuntimeException($errorMsg);
+        }
+
         if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
             throw new RuntimeException("No se ha proporcionado un archivo válido.");
         }
 
         if ($file['size'] > self::MAX_SIZE_BYTES) {
-            throw new RuntimeException("La imagen excede el tamaño máximo permitido de 3 MB.");
+            throw new RuntimeException("La imagen excede el tamaño máximo permitido de 8 MB.");
         }
 
         // 1. Validación estricta con finfo (tipo MIME real)

@@ -178,34 +178,45 @@
 
 <!-- MODAL DE SECCIÓN -->
 <div id="modal_categoria" class="modal-backdrop" style="display: none !important;">
-    <div class="modal-dialog">
-        <h3 id="cat_modal_title" class="modal-title">
-            Nueva Sección del Menú
-        </h3>
+    <div class="modal-dialog" style="max-width: 480px;">
+        <div style="margin-bottom: 20px;">
+            <h3 id="cat_modal_title" class="modal-title" style="margin: 0 0 6px 0;">
+                Nueva Sección del Menú
+            </h3>
+            <p style="font-size: 13px; color: var(--color-text-muted); margin: 0;">
+                Las secciones organizan los platos en pestañas para tus clientes (ej: Entradas, Carnes, Bebidas).
+            </p>
+        </div>
+
         <form method="POST" action="<?= e(app_url('/admin/catalogo/categoria/guardar')) ?>">
             <?= csrf_field() ?>
             <input type="hidden" id="cat_id" name="id" value="0">
 
             <div class="form-group">
                 <label for="cat_nombre" class="form-label">Nombre de la Sección *</label>
-                <input type="text" id="cat_nombre" name="nombre" class="form-control" placeholder="Ej: Platos Fuertes, Bebidas, Postres" required>
+                <input type="text" id="cat_nombre" name="nombre" class="form-control" placeholder="Ej: Platos Fuertes, Bebidas, Postres" required autofocus>
+                <span class="form-hint">Aparecerá en la barra de navegación del menú.</span>
             </div>
 
             <div class="form-group">
-                <label for="cat_orden" class="form-label">Posición en el menú (0 = primera pestaña)</label>
-                <input type="number" id="cat_orden" name="orden" class="form-control" value="0" min="0">
+                <label for="cat_orden" class="form-label">Posición en el menú</label>
+                <input type="number" id="cat_orden" name="orden" class="form-control" value="0" min="0" style="max-width: 140px;">
+                <span class="form-hint">0 = primera pestaña visible para los comensales.</span>
             </div>
 
-            <div class="form-group" style="margin-top: 14px;">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; color: var(--color-text-main);">
-                    <input type="checkbox" id="cat_activa" name="activa" value="1" checked style="width: 16px; height: 16px; accent-color: var(--color-brand);">
-                    <span>Sección activa y visible en el menú público</span>
+            <div class="form-group">
+                <label class="toggle-option-card" style="margin: 0;">
+                    <input type="checkbox" id="cat_activa" name="activa" value="1" checked style="width: 18px; height: 18px; margin-top: 2px; accent-color: var(--color-brand); flex-shrink: 0;">
+                    <div>
+                        <span class="toggle-option-title">Sección visible y activa</span>
+                        <span class="toggle-option-desc">Si se desactiva, se ocultará temporalmente en la carta digital.</span>
+                    </div>
                 </label>
             </div>
 
-            <div class="modal-footer">
+            <div class="modal-footer" style="margin-top: 28px; padding-top: 20px;">
                 <button type="button" class="btn btn-secondary" onclick="cerrarCatModal()">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar Sección</button>
+                <button type="submit" class="btn btn-primary" style="padding: 10px 22px;">Guardar Sección</button>
             </div>
         </form>
     </div>
