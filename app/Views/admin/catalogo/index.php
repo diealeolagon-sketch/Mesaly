@@ -9,11 +9,11 @@
     <div class="content-actions">
         <button type="button" class="btn btn-secondary" id="btnNuevaSeccion">
             <?= icon('folder', 16) ?>
-            <span>Nueva Sección (<?= $totalCategorias ?>/<?= $maxCategorias ?>)</span>
+            <span>Nueva Sección</span>
         </button>
         <a href="<?= e(app_url('/admin/catalogo/producto/nuevo')) ?>" class="btn btn-primary">
             <?= icon('plus', 16) ?>
-            <span>Nuevo Plato (<?= $totalProductos ?>/<?= $maxProductos ?>)</span>
+            <span>Nuevo Plato</span>
         </a>
     </div>
 </div>
@@ -30,7 +30,7 @@
             </p>
         </div>
         <span class="badge badge-neutral">
-            <?= $totalCategorias ?> de <?= $maxCategorias ?> secciones permitidas
+            <?= $totalCategorias ?> <?= $totalCategorias === 1 ? 'sección' : 'secciones' ?>
         </span>
     </div>
 

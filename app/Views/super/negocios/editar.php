@@ -1,14 +1,14 @@
 <div style="max-width: 760px; margin: 0 auto;">
     <div style="margin-bottom: 32px;">
-        <a href="<?= e(app_url('/superadmin/negocios')) ?>" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--color-text-muted); text-decoration: none; margin-bottom: 14px; transition: color 150ms var(--ease-fluid);">
+        <a href="<?= e(app_url('/superadmin')) ?>" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--color-text-muted); text-decoration: none; margin-bottom: 14px; transition: color 150ms var(--ease-fluid);">
             <?= icon('arrow-left', 16) ?>
-            <span>Volver a la lista de negocios</span>
+            <span>Volver a Vencimientos</span>
         </a>
         <h1 class="page-title" style="font-size: 24px; margin-bottom: 6px;">
             Editar Negocio: <?= e($negocio['nombre']) ?>
         </h1>
         <p class="page-subtitle" style="font-size: 14px; color: var(--color-text-muted); margin: 0;">
-            Modifica la configuración de suscripción, canales de contacto y datos principales del restaurante.
+            Modifica los datos comerciales, precio pactado y parámetros de vencimiento.
         </p>
     </div>
 
@@ -43,31 +43,45 @@
                 <span class="form-hint">Con código de país sin símbolos (ej: 573001234567).</span>
             </div>
 
+            <!-- PRECIO ACORDADO Y CICLO -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="config-grid-2">
                 <div class="form-group">
-                    <label for="plan_id" class="form-label">Plan Asignado *</label>
-                    <select id="plan_id" name="plan_id" class="form-control" required>
-                        <?php foreach ($planes as $plan): ?>
-                            <option value="<?= e($plan['id']) ?>" <?= $plan['id'] == $negocio['plan_id'] ? 'selected' : '' ?>>
-                                <?= e($plan['nombre']) ?> (<?= format_cop($plan['precio_mensual']) ?>/mes)
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <span class="form-hint">Límites y funcionalidades del restaurante.</span>
+                    <label for="precio" class="form-label">Precio Acordado (COP) *</label>
+                    <input type="number" id="precio" name="precio" class="form-control" value="<?= (int)($negocio['precio'] ?? 49000) ?>" min="10000" step="1000" required style="font-size: 15px; font-weight: 700;">
+                    <span class="form-hint">Tarifa que paga el negocio por período.</span>
                 </div>
 
                 <div class="form-group">
                     <label for="ciclo" class="form-label">Ciclo de Facturación *</label>
                     <select id="ciclo" name="ciclo" class="form-control" required>
-                        <option value="mensual" <?= $negocio['ciclo'] === 'mensual' ? 'selected' : '' ?>>Mensual</option>
-                        <option value="anual" <?= $negocio['ciclo'] === 'anual' ? 'selected' : '' ?>>Anual</option>
+                        <option value="mensual" <?= ($negocio['ciclo'] ?? 'mensual') === 'mensual' ? 'selected' : '' ?>>Mensual</option>
+                        <option value="anual" <?= ($negocio['ciclo'] ?? '') === 'anual' ? 'selected' : '' ?>>Anual</option>
                     </select>
-                    <span class="form-hint">Frecuencia de corte y renovación.</span>
+                    <span class="form-hint">Frecuencia de renovación pactada.</span>
                 </div>
             </div>
 
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="config-grid-2">
+                <div class="form-group">
+                    <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento Actual *</label>
+                    <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" class="form-control" value="<?= e($negocio['fecha_vencimiento'] ?? date('Y-m-d')) ?>" required>
+                    <span class="form-hint">Fecha en la que expira la suscripción actual.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="dias_gracia" class="form-label">Días de Gracia</label>
+                    <input type="number" id="dias_gracia" name="dias_gracia" class="form-control" value="<?= (int)($negocio['dias_gracia'] ?? 3) ?>" min="1" max="30" required>
+                    <span class="form-hint">Margen permitido tras el vencimiento antes del bloqueo.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="notas_internas" class="form-label">Notas Internas (Solo Super Admin)</label>
+                <textarea id="notas_internas" name="notas_internas" class="form-control" rows="2" placeholder="Notas sobre acuerdos comerciales, contacto o cobranzas..."><?= e($negocio['notas_internas'] ?? '') ?></textarea>
+            </div>
+
             <div style="display: flex; justify-content: flex-end; gap: 14px; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--color-border-subtle);">
-                <a href="<?= e(app_url('/superadmin/negocios')) ?>" class="btn btn-secondary" style="padding: 11px 24px;">
+                <a href="<?= e(app_url('/superadmin')) ?>" class="btn btn-secondary" style="padding: 11px 24px;">
                     Cancelar
                 </a>
                 <button type="submit" class="btn btn-primary" style="padding: 11px 32px; font-size: 14px; font-weight: 700;">

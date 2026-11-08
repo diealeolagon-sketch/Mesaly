@@ -10,8 +10,8 @@ use App\Core\Response;
 use App\Core\TenantContext;
 use App\Models\Categoria;
 use App\Models\GrupoModificador;
-use App\Models\Plan;
 use App\Models\Producto;
+use App\Services\SuscripcionService;
 
 class DashboardController extends Controller
 {
@@ -22,22 +22,33 @@ class DashboardController extends Controller
         $categoriaModel = new Categoria();
         $productoModel = new Producto();
         $modificadorModel = new GrupoModificador();
-        $planModel = new Plan();
 
         $totalCategorias = $categoriaModel->count();
         $totalProductos = $productoModel->count();
         $totalGrupos = $modificadorModel->count();
-        $plan = $tenant['plan_id'] ? $planModel->find((int)$tenant['plan_id']) : null;
+        $estadoSuscripcion = SuscripcionService::estadoDe($tenant);
 
         return $this->render('admin/dashboard/index', [
             'title' => 'Panel de Control — ' . ($tenant['nombre'] ?? 'Mesaly'),
             'tenant' => $tenant,
-            'plan' => $plan,
+            'estadoSuscripcion' => $estadoSuscripcion,
             'stats' => [
                 'categorias' => $totalCategorias,
                 'productos' => $totalProductos,
                 'grupos' => $totalGrupos,
             ],
         ], 'admin');
+    }
+
+    public function suscripcionVencida(Request $request): Response
+    {
+        $tenant = TenantContext::getTenant();
+        $estado = SuscripcionService::estadoDe($tenant);
+
+        return $this->render('admin/suscripcion_vencida', [
+            'title' => 'Suscripción Suspendida — ' . ($tenant['nombre'] ?? 'Mesaly'),
+            'tenant' => $tenant,
+            'estado' => $estado,
+        ], 'auth');
     }
 }

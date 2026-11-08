@@ -1,14 +1,14 @@
 <div style="max-width: 760px; margin: 0 auto;">
     <div style="margin-bottom: 32px;">
-        <a href="<?= e(app_url('/superadmin/negocios')) ?>" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--color-text-muted); text-decoration: none; margin-bottom: 14px; transition: color 150ms var(--ease-fluid);">
+        <a href="<?= e(app_url('/superadmin')) ?>" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--color-text-muted); text-decoration: none; margin-bottom: 14px; transition: color 150ms var(--ease-fluid);">
             <?= icon('arrow-left', 16) ?>
-            <span>Volver a la lista de negocios</span>
+            <span>Volver a Vencimientos</span>
         </a>
         <h1 class="page-title" style="font-size: 24px; margin-bottom: 6px;">
             Registrar Nuevo Restaurante
         </h1>
         <p class="page-subtitle" style="font-size: 14px; color: var(--color-text-muted); margin: 0;">
-            Al dar de alta el negocio se creará su base de datos aislada y se generará una contraseña temporal de un solo uso para su administrador.
+            Crea el catálogo del restaurante con uso ilimitado (productos, categorías y mesas ilimitadas) y define su precio acordado.
         </p>
     </div>
 
@@ -54,26 +54,35 @@
                     <span class="form-hint">Incluye el código de país sin espacios ni símbolos (ej: 57 para Colombia).</span>
                 </div>
 
+                <!-- PRECIO Y ACUERDO COMERCIAL -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="config-grid-2">
                     <div class="form-group">
-                        <label for="plan_id" class="form-label">Plan de Suscripción *</label>
-                        <select id="plan_id" name="plan_id" class="form-control" required>
-                            <?php foreach ($planes as $plan): ?>
-                                <option value="<?= e($plan['id']) ?>">
-                                    <?= e($plan['nombre']) ?> (<?= format_cop($plan['precio_mensual']) ?>/mes)
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <span class="form-hint">Define límites de platos, categorías y funcionalidades.</span>
+                        <label for="precio" class="form-label">Precio Acordado (COP) *</label>
+                        <input type="number" id="precio" name="precio" class="form-control" value="49000" min="10000" step="1000" required style="font-size: 15px; font-weight: 700;">
+                        <span class="form-hint">Tarifa pactada que cobrarás manualmente por período.</span>
                     </div>
 
                     <div class="form-group">
-                        <label for="ciclo" class="form-label">Ciclo de Facturación *</label>
+                        <label for="ciclo" class="form-label">Ciclo de Cobro *</label>
                         <select id="ciclo" name="ciclo" class="form-control" required>
-                            <option value="mensual">Mensual (Facturación recurrente cada 30 días)</option>
-                            <option value="anual">Anual (Facturación cada 365 días)</option>
+                            <option value="mensual" selected>Mensual (Cada 30 días)</option>
+                            <option value="anual">Anual (Cada 365 días)</option>
                         </select>
-                        <span class="form-hint">Frecuencia de renovación pactada con el cliente.</span>
+                        <span class="form-hint">Frecuencia acordada para la renovación.</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="config-grid-2">
+                    <div class="form-group">
+                        <label for="dias_gracia" class="form-label">Días de Gracia tras Vencimiento</label>
+                        <input type="number" id="dias_gracia" name="dias_gracia" class="form-control" value="3" min="1" max="30" required>
+                        <span class="form-hint">Días adicionales antes de bloquear el acceso al menú.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notas_internas" class="form-label">Notas Internas (Solo Super Admin)</label>
+                        <input type="text" id="notas_internas" name="notas_internas" class="form-control" placeholder="Ej: Contactado por Instagram, paga por Nequi">
+                        <span class="form-hint">Notas privadas no visibles para el cliente.</span>
                     </div>
                 </div>
 
@@ -88,7 +97,7 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN 2 -->
+            <!-- SECCIÓN 2: CUENTA DEL ADMINISTRADOR -->
             <div style="margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--color-border-subtle);">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--color-border-subtle);">
                     <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: #E6F9EF; color: #059669; display: flex; align-items: center; justify-content: center;">
@@ -98,31 +107,29 @@
                         <h2 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0;">
                             2. Cuenta del Administrador del Restaurante
                         </h2>
-                        <span style="font-size: 12.5px; color: var(--color-text-muted);">Credenciales para el dueño o gerente del local</span>
+                        <span style="font-size: 12.5px; color: var(--color-text-muted);">Credenciales con las que el dueño del restaurante ingresará a su panel</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="admin_nombre" class="form-label">Nombre del Contacto / Dueño *</label>
-                    <input type="text" id="admin_nombre" name="admin_nombre" class="form-control" placeholder="Ej: Carlos Restrepo" required>
-                    <span class="form-hint">Persona responsable del establecimiento.</span>
+                    <label for="admin_nombre" class="form-label">Nombre del Contacto o Encargado *</label>
+                    <input type="text" id="admin_nombre" name="admin_nombre" class="form-control" placeholder="Ej: Carlos Gómez" required>
                 </div>
 
                 <div class="form-group">
                     <label for="admin_email" class="form-label">Correo Electrónico de Acceso *</label>
-                    <input type="email" id="admin_email" name="admin_email" class="form-control" placeholder="admin@restaurante.com" required>
-                    <span class="form-hint">Se usará como usuario para iniciar sesión en el panel del restaurante.</span>
+                    <input type="email" id="admin_email" name="admin_email" class="form-control" placeholder="gerencia@hamburguesasla80.com" required style="font-family: monospace;">
+                    <span class="form-hint">Se utilizará para iniciar sesión en Mesaly. Se generará una contraseña temporal automática.</span>
                 </div>
             </div>
 
-            <!-- BOTONES -->
-            <div style="display: flex; justify-content: flex-end; gap: 14px; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--color-border-subtle);">
-                <a href="<?= e(app_url('/superadmin/negocios')) ?>" class="btn btn-secondary" style="padding: 11px 24px;">
+            <div style="margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--color-border-subtle); display: flex; justify-content: flex-end; gap: 12px;">
+                <a href="<?= e(app_url('/superadmin')) ?>" class="btn btn-secondary">
                     Cancelar
                 </a>
-                <button type="submit" class="btn btn-primary" style="padding: 11px 32px; font-size: 14px; font-weight: 700;">
+                <button type="submit" class="btn btn-primary" style="padding: 12px 28px; font-size: 14.5px;">
                     <?= icon('check', 16) ?>
-                    <span>Registrar y Generar Clave</span>
+                    <span>Registrar Negocio y Generar Acceso</span>
                 </button>
             </div>
         </form>

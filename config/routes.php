@@ -13,12 +13,12 @@ use App\Controllers\Admin\DisponibilidadController;
 use App\Controllers\Admin\ModificadorController;
 use App\Controllers\AuthController;
 use App\Controllers\Public\MenuController;
-use App\Controllers\Super\DashboardController as SuperDashboardController;
 use App\Controllers\Super\NegocioController;
 use App\Core\Auth;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CsrfMiddleware;
 use App\Middleware\RolMiddleware;
+use App\Middleware\SuscripcionMiddleware;
 use App\Middleware\TenantMiddleware;
 
 // -----------------------------------------------------------------------------
@@ -50,22 +50,29 @@ $router->get('/', function ($request) {
 $superMiddlewares = [new AuthMiddleware(), new RolMiddleware(Auth::ROLE_SUPER_ADMIN)];
 $superPostMiddlewares = [new AuthMiddleware(), new RolMiddleware(Auth::ROLE_SUPER_ADMIN), new CsrfMiddleware()];
 
-$router->get('/superadmin', [SuperDashboardController::class, 'index'], $superMiddlewares);
+$router->get('/superadmin', [NegocioController::class, 'index'], $superMiddlewares);
 
-// Negocios
+// Negocios y Vencimientos
 $router->get('/superadmin/negocios', [NegocioController::class, 'index'], $superMiddlewares);
 $router->get('/superadmin/negocios/crear', [NegocioController::class, 'showCrear'], $superMiddlewares);
 $router->post('/superadmin/negocios/crear', [NegocioController::class, 'crear'], $superPostMiddlewares);
 $router->get('/superadmin/negocios/{id}/editar', [NegocioController::class, 'showEditar'], $superMiddlewares);
 $router->post('/superadmin/negocios/{id}/editar', [NegocioController::class, 'editar'], $superPostMiddlewares);
 $router->post('/superadmin/negocios/{id}/reset-password', [NegocioController::class, 'resetPassword'], $superPostMiddlewares);
+$router->post('/superadmin/negocios/{id}/pago', [NegocioController::class, 'registrarPago'], $superPostMiddlewares);
+$router->post('/superadmin/negocios/{id}/extender', [NegocioController::class, 'extenderDias'], $superPostMiddlewares);
+$router->post('/superadmin/negocios/{id}/estado', [NegocioController::class, 'cambiarEstado'], $superPostMiddlewares);
+$router->post('/superadmin/negocios/{id}/ver-como', [NegocioController::class, 'verComo'], $superPostMiddlewares);
+$router->post('/superadmin/dejar-ver-como', [NegocioController::class, 'dejarVerComo'], $superPostMiddlewares);
 
 // -----------------------------------------------------------------------------
 // Admin de Negocio (/admin)
 // -----------------------------------------------------------------------------
-$adminMiddlewares = [new AuthMiddleware(), new TenantMiddleware()];
-$adminPostMiddlewares = [new AuthMiddleware(), new TenantMiddleware(), new CsrfMiddleware()];
+$adminBaseMiddlewares = [new AuthMiddleware(), new TenantMiddleware()];
+$adminMiddlewares = [new AuthMiddleware(), new TenantMiddleware(), new SuscripcionMiddleware()];
+$adminPostMiddlewares = [new AuthMiddleware(), new TenantMiddleware(), new SuscripcionMiddleware(), new CsrfMiddleware()];
 
+$router->get('/admin/suscripcion-vencida', [AdminDashboardController::class, 'suscripcionVencida'], $adminBaseMiddlewares);
 $router->get('/admin', [AdminDashboardController::class, 'index'], $adminMiddlewares);
 
 // Configuración

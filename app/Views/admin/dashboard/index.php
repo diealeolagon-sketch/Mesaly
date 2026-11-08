@@ -4,7 +4,7 @@
         <p class="page-subtitle">
             Menú digital para tus clientes: 
             <a href="<?= e(app_url('/' . $tenant['slug'])) ?>" target="_blank" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">
-                <?= e(app_url('/' . $tenant['slug'])) ?> ↗
+                <?= e(app_url('/' . $tenant['slug'])) ?> &rarr;
             </a>
         </p>
     </div>
@@ -24,6 +24,22 @@
     </div>
 </div>
 
+<?php if (!empty($estadoSuscripcion['en_gracia'])): ?>
+    <div class="alert alert-warning" style="margin-bottom: 24px; display: flex; align-items: center; gap: 12px; background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 14px 18px; border-radius: var(--radius-md);">
+        <?= icon('alert', 20) ?>
+        <div>
+            <strong>Período de Gracia Activo:</strong> Tu suscripción venció el <strong><?= !empty($tenant['fecha_vencimiento']) ? date('d/m/Y', strtotime($tenant['fecha_vencimiento'])) : 'recientemente' ?></strong>. Tienes <strong><?= (int)($estadoSuscripcion['dias_gracia_restantes'] ?? 0) ?> días</strong> restantes para enviar el soporte de pago antes de la suspensión automática del servicio.
+        </div>
+    </div>
+<?php elseif (!empty($estadoSuscripcion['por_vencer'])): ?>
+    <div class="alert alert-info" style="margin-bottom: 24px; display: flex; align-items: center; gap: 12px; background: #e8f4fd; border: 1px solid #b8daff; color: #004085; padding: 14px 18px; border-radius: var(--radius-md);">
+        <?= icon('alert', 20) ?>
+        <div>
+            <strong>Recordatorio de Pago:</strong> Tu suscripción vencerá el <strong><?= date('d/m/Y', strtotime($tenant['fecha_vencimiento'])) ?></strong> (<?= (int)$estadoSuscripcion['dias_restantes'] === 0 ? 'hoy' : 'en ' . (int)$estadoSuscripcion['dias_restantes'] . ' días' ?>). Realiza la transferencia a tiempo para mantener tu catálogo activo.
+        </div>
+    </div>
+<?php endif; ?>
+
 <!-- KPI CARDS -->
 <div class="kpi-grid">
     <div class="kpi-card">
@@ -32,7 +48,7 @@
             <?= icon('catalog', 16) ?>
         </div>
         <div class="kpi-value"><?= (int)$stats['categorias'] ?></div>
-        <div class="kpi-subtext">Límite del plan: <?= (int)($plan['max_categorias'] ?? 0) ?></div>
+        <div class="kpi-subtext">Ilimitadas</div>
     </div>
 
     <div class="kpi-card">
@@ -41,7 +57,7 @@
             <?= icon('store', 16) ?>
         </div>
         <div class="kpi-value" style="color: var(--color-brand);"><?= (int)$stats['productos'] ?></div>
-        <div class="kpi-subtext">Límite del plan: <?= (int)($plan['max_productos'] ?? 0) ?></div>
+        <div class="kpi-subtext">Ilimitados</div>
     </div>
 
     <div class="kpi-card">
@@ -56,10 +72,14 @@
     <div class="kpi-card">
         <div class="kpi-label">
             <span>Suscripción</span>
-            <span class="badge-pill success" style="font-size: 11px; padding: 2px 8px;">Al día</span>
+            <span class="badge-pill" style="font-size: 11px; padding: 2px 8px; color: <?= e($estadoSuscripcion['color']) ?>; background: <?= e($estadoSuscripcion['bg_color']) ?>;">
+                <?= e($estadoSuscripcion['label']) ?>
+            </span>
         </div>
-        <div class="kpi-value" style="font-size: 18px; margin-top: 4px;"><?= e($plan['nombre'] ?? 'Plan Pro') ?></div>
-        <div class="kpi-subtext">Vence: <?= e($tenant['fecha_vencimiento'] ?? 'Activo') ?></div>
+        <div class="kpi-value" style="font-size: 18px; margin-top: 4px;"><?= format_cop((int)($tenant['precio'] ?? 49000)) ?></div>
+        <div class="kpi-subtext">
+            Vence: <?= !empty($tenant['fecha_vencimiento']) ? date('d/m/Y', strtotime($tenant['fecha_vencimiento'])) : 'Sin fecha' ?>
+        </div>
     </div>
 </div>
 
@@ -88,7 +108,7 @@
                         Organiza tus categorías de platos y sube tus productos con fotografías, descripción y precios en pesos colombianos.
                     </p>
                 </div>
-                <span class="module-card-link">Abrir catálogo →</span>
+                <span class="module-card-link">Abrir catálogo &rarr;</span>
             </a>
 
             <a href="<?= e(app_url('/admin/disponibilidad')) ?>" class="module-card" style="border-color: rgba(239, 68, 68, 0.2); background: #FFFBFB;">
@@ -101,7 +121,7 @@
                         Diseñado para la hora pico: apaga un plato en 1 segundo cuando se agote un ingrediente en cocina para que los clientes no puedan pedirlo.
                     </p>
                 </div>
-                <span class="module-card-link" style="color: var(--color-danger);">Ver disponibles y agotados →</span>
+                <span class="module-card-link" style="color: var(--color-danger);">Ver disponibles y agotados &rarr;</span>
             </a>
 
             <a href="<?= e(app_url('/admin/modificadores')) ?>" class="module-card">
@@ -114,7 +134,7 @@
                         Configura preguntas obligatorias (ej: término de carne) o adiciones con costo adicional (ej: tocineta o queso extra).
                     </p>
                 </div>
-                <span class="module-card-link">Gestionar modificadores →</span>
+                <span class="module-card-link">Gestionar modificadores &rarr;</span>
             </a>
 
             <a href="<?= e(app_url('/admin/configuracion')) ?>" class="module-card">
@@ -127,7 +147,7 @@
                         Define tu número de WhatsApp para recibir pedidos, sube tu logo, personaliza tus colores, horarios y modalidades de entrega.
                     </p>
                 </div>
-                <span class="module-card-link">Editar configuración →</span>
+                <span class="module-card-link">Editar configuración &rarr;</span>
             </a>
         </div>
     </div>

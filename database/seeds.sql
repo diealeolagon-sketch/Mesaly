@@ -14,19 +14,13 @@ INSERT INTO `configuracion` (`clave`, `valor`) VALUES
 ('dias_gracia', '3')
 ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`);
 
--- 2. Planes
-INSERT INTO `planes` (`id`, `nombre`, `precio_mensual`, `precio_anual`, `max_productos`, `max_mesas`, `max_categorias`, `quitar_marca`, `activo`) VALUES
-(1, 'Plan Emprendedor', 49000, 490000, 50, 15, 10, 0, 1),
-(2, 'Plan Crecimiento', 89000, 890000, 150, 40, 25, 1, 1)
-ON DUPLICATE KEY UPDATE `nombre` = VALUES(`nombre`);
-
--- 3. Restaurante Demo
+-- 2. Restaurante Demo
 INSERT INTO `restaurantes` (
     `id`, `nombre`, `slug`, `descripcion`, `logo_path`, `banner_path`,
     `color_primario`, `color_secundario`, `color_fondo`, `color_texto`, `fuente`,
     `whatsapp`, `moneda`, `recibiendo_pedidos`, `acepta_mesa`, `acepta_domicilio`, `acepta_recoger`,
-    `costo_envio`, `pedido_minimo`, `info_pago_texto`, `plan_id`, `ciclo`,
-    `fecha_vencimiento`, `dia_corte`, `en_prueba`, `siguiente_consecutivo`
+    `costo_envio`, `pedido_minimo`, `info_pago_texto`, `precio`, `notas_internas`, `mostrar_marca`,
+    `ciclo`, `fecha_vencimiento`, `dias_gracia`, `dia_corte`, `en_prueba`, `siguiente_consecutivo`
 ) VALUES (
     1,
     'La Parrilla Paisa',
@@ -45,9 +39,12 @@ INSERT INTO `restaurantes` (
     4000,
     15000,
     'Transferencias por Nequi o Daviplata al 300 123 4567. También recibimos efectivo y datáfono contra entrega.',
+    49000,
+    'Cliente pionero de Medellín. Contacto: Carlos Restrepo.',
     1,
     'mensual',
     DATE_ADD(CURRENT_DATE, INTERVAL 30 DAY),
+    3,
     DAY(CURRENT_DATE),
     0,
     1

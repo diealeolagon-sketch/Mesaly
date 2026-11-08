@@ -9,6 +9,20 @@
     <link rel="stylesheet" href="<?= e(asset_url('/assets/css/mesaly.css')) ?>">
 </head>
 <body class="admin-body">
+    <?php if (!empty(\App\Core\Session::get('impersonating_tenant_id'))): ?>
+        <div style="background: #1e1b18; color: #fff; padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; z-index: 99999; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <?= icon('sparkles', 15) ?>
+                <span>Modo Soporte Super Admin: Estás administrando <strong><?= e($tenant['nombre'] ?? '') ?></strong>. Acciones registradas en auditoría.</span>
+            </div>
+            <form method="POST" action="<?= e(app_url('/superadmin/dejar-ver-como')) ?>" style="margin: 0;">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-sm" style="background: #e85d04; color: #fff; border: none; padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 4px; cursor: pointer;">
+                    Volver a Super Admin &rarr;
+                </button>
+            </form>
+        </div>
+    <?php endif; ?>
     <?php
     $currentUri = $_SERVER['REQUEST_URI'] ?? '';
     ?>

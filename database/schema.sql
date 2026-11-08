@@ -19,24 +19,7 @@ CREATE TABLE IF NOT EXISTS `configuracion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------------------------
--- 2. Tabla: planes
--- ------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `planes` (
-    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `nombre` VARCHAR(100) NOT NULL,
-    `precio_mensual` INT UNSIGNED NOT NULL,
-    `precio_anual` INT UNSIGNED NOT NULL,
-    `max_productos` INT UNSIGNED NOT NULL DEFAULT 50,
-    `max_mesas` INT UNSIGNED NOT NULL DEFAULT 15,
-    `max_categorias` INT UNSIGNED NOT NULL DEFAULT 10,
-    `quitar_marca` TINYINT(1) NOT NULL DEFAULT 0,
-    `activo` TINYINT(1) NOT NULL DEFAULT 1,
-    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ------------------------------------------------------------------------------
--- 3. Tabla: restaurantes
+-- 2. Tabla: restaurantes
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `restaurantes` (
     `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -59,9 +42,12 @@ CREATE TABLE IF NOT EXISTS `restaurantes` (
     `costo_envio` INT UNSIGNED NOT NULL DEFAULT 0,
     `pedido_minimo` INT UNSIGNED NOT NULL DEFAULT 0,
     `info_pago_texto` TEXT NULL,
-    `plan_id` BIGINT UNSIGNED NULL,
+    `precio` INT UNSIGNED NOT NULL DEFAULT 49000,
+    `notas_internas` TEXT NULL,
+    `mostrar_marca` TINYINT(1) NOT NULL DEFAULT 1,
     `ciclo` ENUM('mensual','anual') NOT NULL DEFAULT 'mensual',
     `fecha_vencimiento` DATE NULL,
+    `dias_gracia` TINYINT UNSIGNED NOT NULL DEFAULT 3,
     `dia_corte` TINYINT UNSIGNED NULL,
     `en_prueba` TINYINT(1) NOT NULL DEFAULT 0,
     `fecha_fin_prueba` DATE NULL,
@@ -72,8 +58,7 @@ CREATE TABLE IF NOT EXISTS `restaurantes` (
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted_at` DATETIME NULL,
     KEY `idx_restaurantes_slug` (`slug`),
-    KEY `idx_restaurantes_vencimiento` (`fecha_vencimiento`),
-    CONSTRAINT `fk_restaurantes_plan` FOREIGN KEY (`plan_id`) REFERENCES `planes` (`id`) ON DELETE SET NULL
+    KEY `idx_restaurantes_vencimiento` (`fecha_vencimiento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------------------------

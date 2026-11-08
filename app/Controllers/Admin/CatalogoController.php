@@ -14,7 +14,6 @@ use App\Core\Validator;
 use App\Models\Auditoria;
 use App\Models\Categoria;
 use App\Models\GrupoModificador;
-use App\Models\Plan;
 use App\Models\Producto;
 use App\Services\ImagenService;
 
@@ -23,7 +22,6 @@ class CatalogoController extends Controller
     private Categoria $categoriaModel;
     private Producto $productoModel;
     private GrupoModificador $grupoModel;
-    private Plan $planModel;
     private ImagenService $imagenService;
 
     public function __construct()
@@ -31,7 +29,6 @@ class CatalogoController extends Controller
         $this->categoriaModel = new Categoria();
         $this->productoModel = new Producto();
         $this->grupoModel = new GrupoModificador();
-        $this->planModel = new Plan();
         $this->imagenService = new ImagenService();
     }
 
@@ -42,11 +39,6 @@ class CatalogoController extends Controller
         $productos = $this->productoModel->allWithCategory();
         $grupos = $this->grupoModel->allWithOptions();
 
-        // Obtener límites del plan
-        $plan = $tenant['plan_id'] ? $this->planModel->find((int)$tenant['plan_id']) : null;
-        $maxCategorias = $plan ? (int)$plan['max_categorias'] : 999;
-        $maxProductos = $plan ? (int)$plan['max_productos'] : 999;
-
         return $this->render('admin/catalogo/index', [
             'title' => 'Catálogo y Menú — ' . ($tenant['nombre'] ?? 'Mesaly'),
             'categorias' => $categorias,
@@ -54,8 +46,6 @@ class CatalogoController extends Controller
             'grupos' => $grupos,
             'totalCategorias' => count($categorias),
             'totalProductos' => count($productos),
-            'maxCategorias' => $maxCategorias,
-            'maxProductos' => $maxProductos,
         ], 'admin');
     }
 
@@ -82,9 +72,6 @@ class CatalogoController extends Controller
         }
 
         $tenant = TenantContext::getTenant();
-        $plan = $tenant['plan_id'] ? $this->planModel->find((int)$tenant['plan_id']) : null;
-        $maxCategorias = $plan ? (int)$plan['max_categorias'] : 999;
-
         if ($id > 0) {
             // Edición
             $cat = $this->categoriaModel->find($id);
@@ -106,12 +93,7 @@ class CatalogoController extends Controller
 
             Session::flash('success', 'Categoría actualizada exitosamente.');
         } else {
-            // Creación: validar límite del plan
-            if ($this->categoriaModel->count() >= $maxCategorias) {
-                Session::flash('error', "Has alcanzado el límite máximo de {$maxCategorias} categorías permitido en tu plan.");
-                return $this->back();
-            }
-
+            // Creación sin límites de plan
             $catId = $this->categoriaModel->create([
                 'nombre' => $nombre,
                 'orden' => $orden,
@@ -215,8 +197,6 @@ class CatalogoController extends Controller
 
         $tenant = TenantContext::getTenant();
         $tenantId = (int)$tenant['id'];
-        $plan = $tenant['plan_id'] ? $this->planModel->find((int)$tenant['plan_id']) : null;
-        $maxProductos = $plan ? (int)$plan['max_productos'] : 999;
 
         // Subida de imagen si viene un archivo
         $imagenPath = null;
@@ -262,13 +242,7 @@ class CatalogoController extends Controller
                 Auditoria::registrar('editar_producto', 'productos', $id, $existente, $data, $tenantId);
                 Session::flash('success', 'Producto actualizado exitosamente.');
             } else {
-                // Validar límite del plan
-                if ($this->productoModel->count() >= $maxProductos) {
-                    Model::rollBack();
-                    Session::flash('error', "Has alcanzado el límite máximo de {$maxProductos} productos de tu plan.");
-                    return $this->back();
-                }
-
+                // Creación de producto sin límites
                 $productoId = $this->productoModel->create($data);
                 Auditoria::registrar('crear_producto', 'productos', $productoId, null, $data, $tenantId);
                 Session::flash('success', 'Producto agregado al catálogo.');
