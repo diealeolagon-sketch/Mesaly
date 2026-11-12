@@ -231,7 +231,7 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
     `subtotal` INT UNSIGNED NOT NULL,
     `costo_envio` INT UNSIGNED NOT NULL DEFAULT 0,
     `total` INT UNSIGNED NOT NULL,
-    `estado` ENUM('generado','en_preparacion','listo','entregado','cancelado') NOT NULL DEFAULT 'generado',
+    `estado` ENUM('recibido','listo','en_camino','entregado','rechazado') NOT NULL DEFAULT 'recibido',
     `ip` VARCHAR(45) NOT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

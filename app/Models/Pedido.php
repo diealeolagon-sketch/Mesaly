@@ -71,7 +71,7 @@ class Pedido extends Model
             ) VALUES (
                 :restaurante_id, :consecutivo, :codigo, :modalidad, :mesa_id, :cliente_nombre,
                 :cliente_telefono, :direccion, :barrio, :notas_entrega, :hora_recogida,
-                :metodo_pago, :subtotal, :costo_envio, :total, 'generado', :ip, NOW(), NOW()
+                :metodo_pago, :subtotal, :costo_envio, :total, 'recibido', :ip, NOW(), NOW()
             )";
 
             $stmtPedido = $pdo->prepare($sqlPedido);
@@ -160,36 +160,36 @@ class Pedido extends Model
     }
 
     public const ESTADOS = [
-        'generado' => [
-            'label' => 'Generado',
+        'recibido' => [
+            'label' => 'Recibido',
             'color' => '#2563EB',
             'bg' => '#EFF6FF',
             'border' => '#BFDBFE',
             'final' => false,
         ],
-        'en_preparacion' => [
-            'label' => 'En Preparación',
+        'listo' => [
+            'label' => 'Listo',
             'color' => '#D97706',
             'bg' => '#FFFBEB',
             'border' => '#FDE68A',
             'final' => false,
         ],
-        'listo' => [
-            'label' => 'Listo',
-            'color' => '#059669',
-            'bg' => '#ECFDF5',
-            'border' => '#A7F3D0',
+        'en_camino' => [
+            'label' => 'En Camino',
+            'color' => '#7C3AED',
+            'bg' => '#F5F3FF',
+            'border' => '#DDD6FE',
             'final' => false,
         ],
         'entregado' => [
             'label' => 'Entregado',
-            'color' => '#475569',
-            'bg' => '#F1F5F9',
-            'border' => '#CBD5E1',
+            'color' => '#059669',
+            'bg' => '#ECFDF5',
+            'border' => '#A7F3D0',
             'final' => true,
         ],
-        'cancelado' => [
-            'label' => 'Cancelado',
+        'rechazado' => [
+            'label' => 'Rechazado',
             'color' => '#DC2626',
             'bg' => '#FEF2F2',
             'border' => '#FECACA',
@@ -237,9 +237,13 @@ class Pedido extends Model
             $params['estado'] = $filtros['estado'];
         }
 
-        if (!empty($filtros['modalidad']) && isset(self::MODALIDADES[$filtros['modalidad']])) {
-            $sql .= " AND p.modalidad = :modalidad";
-            $params['modalidad'] = $filtros['modalidad'];
+        if (!empty($filtros['modalidad'])) {
+            if ($filtros['modalidad'] === 'local') {
+                $sql .= " AND p.modalidad IN ('mesa', 'recoger')";
+            } elseif (isset(self::MODALIDADES[$filtros['modalidad']])) {
+                $sql .= " AND p.modalidad = :modalidad";
+                $params['modalidad'] = $filtros['modalidad'];
+            }
         }
 
         if (!empty($filtros['q'])) {
@@ -284,9 +288,13 @@ class Pedido extends Model
             $params['estado'] = $filtros['estado'];
         }
 
-        if (!empty($filtros['modalidad']) && isset(self::MODALIDADES[$filtros['modalidad']])) {
-            $sql .= " AND p.modalidad = :modalidad";
-            $params['modalidad'] = $filtros['modalidad'];
+        if (!empty($filtros['modalidad'])) {
+            if ($filtros['modalidad'] === 'local') {
+                $sql .= " AND p.modalidad IN ('mesa', 'recoger')";
+            } elseif (isset(self::MODALIDADES[$filtros['modalidad']])) {
+                $sql .= " AND p.modalidad = :modalidad";
+                $params['modalidad'] = $filtros['modalidad'];
+            }
         }
 
         if (!empty($filtros['q'])) {
@@ -403,28 +411,49 @@ class Pedido extends Model
 
         $resultado = [
             'todos' => 0,
-            'generado' => 0,
-            'en_preparacion' => 0,
+            'recibido' => 0,
             'listo' => 0,
+            'en_camino' => 0,
             'entregado' => 0,
-            'cancelado' => 0,
+            'rechazado' => 0,
             'pendientes' => 0,
         ];
 
         foreach ($filas as $est => $cant) {
             $cnt = (int)$cant;
-            $resultado[$est] = $cnt;
+            if (isset($resultado[$est])) {
+                $resultado[$est] += $cnt;
+            } elseif ($est === 'generado' || $est === 'en_preparacion') {
+                $resultado['recibido'] += $cnt;
+            } elseif ($est === 'cancelado') {
+                $resultado['rechazado'] += $cnt;
+            }
             $resultado['todos'] += $cnt;
-            if ($est === 'generado' || $est === 'en_preparacion') {
+            if (in_array($est, ['recibido', 'listo', 'en_camino', 'generado', 'en_preparacion'], true)) {
                 $resultado['pendientes'] += $cnt;
             }
         }
+
+        // Conteos por modalidad para los tabs de salón vs domicilios
+        $stmtMod = $pdo->prepare(
+            "SELECT `modalidad`, COUNT(*) AS total
+             FROM `{$this->table}`
+             WHERE `restaurante_id` = :rid
+             GROUP BY `modalidad`"
+        );
+        $stmtMod->execute(['rid' => $restauranteId]);
+        $filasMod = $stmtMod->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        $resultado['modalidad_domicilio'] = (int)($filasMod['domicilio'] ?? 0);
+        $resultado['modalidad_mesa'] = (int)($filasMod['mesa'] ?? 0);
+        $resultado['modalidad_recoger'] = (int)($filasMod['recoger'] ?? 0);
+        $resultado['modalidad_local'] = $resultado['modalidad_mesa'] + $resultado['modalidad_recoger'];
 
         return $resultado;
     }
 
     /**
-     * Métricas del mes para el restaurante (excluyendo pedidos cancelados)
+     * Métricas del mes para el restaurante (excluyendo pedidos cancelados/rechazados)
      *
      * @return array{ventas_mes: int, pedidos_mes: int, ticket_promedio: int, pendientes: int}
      */
@@ -440,7 +469,7 @@ class Pedido extends Model
              FROM `{$this->table}`
              WHERE `restaurante_id` = :rid 
                AND DATE_FORMAT(`created_at`, '%Y-%m') = :ym
-               AND `estado` != 'cancelado'"
+               AND `estado` NOT IN ('cancelado', 'rechazado')"
         );
         $stmt->execute(['rid' => $restauranteId, 'ym' => $ym]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -452,7 +481,7 @@ class Pedido extends Model
         // Conteo de pedidos pendientes de atención
         $stmtPend = $pdo->prepare(
             "SELECT COUNT(*) FROM `{$this->table}`
-             WHERE `restaurante_id` = :rid AND `estado` IN ('generado', 'en_preparacion')"
+             WHERE `restaurante_id` = :rid AND `estado` IN ('recibido', 'listo', 'en_camino', 'generado', 'en_preparacion')"
         );
         $stmtPend->execute(['rid' => $restauranteId]);
         $pendientes = (int)$stmtPend->fetchColumn();
@@ -482,7 +511,7 @@ class Pedido extends Model
              FROM `{$this->table}`
              WHERE `restaurante_id` = :rid 
                AND `created_at` >= DATE_SUB(CURDATE(), INTERVAL :dias DAY)
-               AND `estado` != 'cancelado'
+               AND `estado` NOT IN ('cancelado', 'rechazado')
              GROUP BY DATE(`created_at`)
              ORDER BY dia ASC"
         );
@@ -528,7 +557,7 @@ class Pedido extends Model
         $stmt = $pdo->prepare(
             "SELECT DAYOFWEEK(`created_at`) AS dia_semana, COUNT(*) AS total
              FROM `{$this->table}`
-             WHERE `restaurante_id` = :rid AND `estado` != 'cancelado'
+             WHERE `restaurante_id` = :rid AND `estado` NOT IN ('cancelado', 'rechazado')
              GROUP BY dia_semana"
         );
         $stmt->execute(['rid' => $restauranteId]);
@@ -575,7 +604,7 @@ class Pedido extends Model
                 SUM(pi.total_linea) AS total_ventas
              FROM `pedido_items` pi
              JOIN `pedidos` p ON pi.pedido_id = p.id
-             WHERE p.restaurante_id = :rid AND p.estado != 'cancelado'
+             WHERE p.restaurante_id = :rid AND p.estado NOT IN ('cancelado', 'rechazado')
              GROUP BY pi.producto_id, pi.nombre_producto
              ORDER BY cantidad_vendida DESC, total_ventas DESC
              LIMIT :limite"

@@ -38,7 +38,8 @@ class PedidoAdminController extends Controller
             return $this->redirect(app_url('/login'));
         }
 
-        // Filtros
+        // Filtros y Vista Operativa (Separación de Domicilios vs Local)
+        $vista = trim((string)$request->query('vista', ''));
         $estado = trim((string)$request->query('estado', ''));
         $modalidad = trim((string)$request->query('modalidad', ''));
         $busqueda = trim((string)$request->query('q', ''));
@@ -46,6 +47,24 @@ class PedidoAdminController extends Controller
         $fechaHasta = trim((string)$request->query('fecha_hasta', ''));
         $pagina = max(1, (int)$request->query('page', 1));
         $porPagina = 15;
+
+        // Si se seleccionó una pestaña de vista, sincronizar modalidad
+        if ($vista === 'domicilios') {
+            $modalidad = 'domicilio';
+        } elseif ($vista === 'local') {
+            $modalidad = 'local';
+        } elseif ($vista === 'todos') {
+            $modalidad = '';
+        } else {
+            // Deducir vista a partir de modalidad
+            if ($modalidad === 'domicilio') {
+                $vista = 'domicilios';
+            } elseif ($modalidad === 'local' || $modalidad === 'mesa' || $modalidad === 'recoger') {
+                $vista = 'local';
+            } else {
+                $vista = 'todos';
+            }
+        }
 
         $filtros = [
             'estado' => $estado,
@@ -63,15 +82,22 @@ class PedidoAdminController extends Controller
         // Enriquecer cada pedido con enlace directo a WhatsApp y datos de visualización
         foreach ($pedidos as &$p) {
             $p['wa_enlace'] = $this->generarEnlaceWhatsAppCliente($p, $restaurante['nombre']);
-            $p['estado_info'] = Pedido::ESTADOS[$p['estado']] ?? Pedido::ESTADOS['generado'];
+            $p['estado_info'] = Pedido::ESTADOS[$p['estado']] ?? Pedido::ESTADOS['recibido'];
             $p['modalidad_label'] = Pedido::MODALIDADES[$p['modalidad']] ?? ucfirst($p['modalidad']);
         }
         unset($p);
+
+        // Separar pedidos en dos listas para vistas de doble tabla ordenada
+        $pedidosDomicilio = array_values(array_filter($pedidos, static fn($p) => $p['modalidad'] === 'domicilio'));
+        $pedidosLocal = array_values(array_filter($pedidos, static fn($p) => $p['modalidad'] !== 'domicilio'));
 
         return $this->render('admin/pedidos/index', [
             'title' => 'Gestión de Pedidos — ' . $restaurante['nombre'],
             'tenant' => $restaurante,
             'pedidos' => $pedidos,
+            'pedidosDomicilio' => $pedidosDomicilio,
+            'pedidosLocal' => $pedidosLocal,
+            'vista' => $vista,
             'filtros' => $filtros,
             'conteos' => $conteos,
             'pagina' => $pagina,
@@ -84,6 +110,7 @@ class PedidoAdminController extends Controller
 
     /**
      * Actualiza el estado del pedido (soporta peticiones normales y AJAX)
+     * Cuando el estado pasa a "en_camino", retorna datos estructurados para disparar popup de aviso por WhatsApp al cliente.
      */
     public function cambiarEstado(Request $request, array $params): Response
     {
@@ -102,6 +129,34 @@ class PedidoAdminController extends Controller
         try {
             $this->pedidoModel->cambiarEstado($id, $tenantId, $nuevoEstado);
 
+            $pedido = $this->pedidoModel->find($id, $tenantId);
+            $avisoWhatsapp = null;
+
+            // Al pasar a 'en_camino', preparar datos para el popup de notificación por WhatsApp
+            if ($nuevoEstado === 'en_camino' && $pedido) {
+                $tel = preg_replace('/[^0-9]/', '', (string)($pedido['cliente_telefono'] ?? ''));
+                if (!empty($tel)) {
+                    if (str_starts_with($tel, '3') && strlen($tel) === 10) {
+                        $tel = '57' . $tel;
+                    }
+                    $clienteNombre = !empty($pedido['cliente_nombre']) ? $pedido['cliente_nombre'] : 'Cliente';
+                    $restaurante = $this->restauranteModel->find($tenantId);
+                    $restauranteNombre = $restaurante['nombre'] ?? 'Mesaly';
+                    $codigo = $pedido['codigo'] ?? "#{$id}";
+                    $mensajeAviso = "Hola {$clienteNombre}, tu pedido #{$codigo} de {$restauranteNombre} ya va en camino a tu dirección con el domiciliario. ¡Pronto llegará!";
+                    $waUrl = "https://wa.me/{$tel}?text=" . rawurlencode($mensajeAviso);
+
+                    $avisoWhatsapp = [
+                        'activo' => true,
+                        'cliente_nombre' => $clienteNombre,
+                        'cliente_telefono' => $tel,
+                        'codigo' => $codigo,
+                        'mensaje' => $mensajeAviso,
+                        'wa_url' => $waUrl,
+                    ];
+                }
+            }
+
             if ($request->isAjax()) {
                 $estadoInfo = Pedido::ESTADOS[$nuevoEstado];
                 return $this->json([
@@ -110,6 +165,8 @@ class PedidoAdminController extends Controller
                     'label' => $estadoInfo['label'],
                     'color' => $estadoInfo['color'],
                     'bg' => $estadoInfo['bg'],
+                    'border' => $estadoInfo['border'] ?? '#CBD5E1',
+                    'aviso_whatsapp' => $avisoWhatsapp,
                 ]);
             }
 
@@ -142,7 +199,7 @@ class PedidoAdminController extends Controller
         $pedido['subtotal_formateado'] = format_cop((int)$pedido['subtotal']);
         $pedido['costo_envio_formateado'] = format_cop((int)$pedido['costo_envio']);
         $pedido['fecha_formateada'] = date('d/m/Y h:i A', strtotime($pedido['created_at']));
-        $pedido['estado_info'] = Pedido::ESTADOS[$pedido['estado']] ?? Pedido::ESTADOS['generado'];
+        $pedido['estado_info'] = Pedido::ESTADOS[$pedido['estado']] ?? Pedido::ESTADOS['recibido'];
         $pedido['modalidad_label'] = Pedido::MODALIDADES[$pedido['modalidad']] ?? ucfirst($pedido['modalidad']);
 
         foreach ($pedido['items'] as &$it) {
@@ -181,11 +238,15 @@ class PedidoAdminController extends Controller
         if ($pedido['estado'] === 'listo') {
             $mensaje .= ($pedido['modalidad'] === 'recoger')
                 ? " ya está listo para que pases a recogerlo."
-                : " ya está listo y va en camino a tu dirección.";
-        } elseif ($pedido['estado'] === 'en_preparacion') {
-            $mensaje .= " ya se encuentra en cocina siendo preparado con mucho gusto.";
+                : " ya se encuentra empacado y listo para salir.";
+        } elseif ($pedido['estado'] === 'en_camino') {
+            $mensaje .= " ya va en camino a tu dirección con nuestro domiciliario. ¡Pronto llegará!";
+        } elseif ($pedido['estado'] === 'entregado') {
+            $mensaje .= ". Tu pedido ha sido entregado exitosamente. ¡Muchas gracias por tu compra!";
+        } elseif ($pedido['estado'] === 'rechazado') {
+            $mensaje .= ". Lamentamos informarte que tu pedido no pudo ser aceptado por la cocina.";
         } else {
-            $mensaje .= ". ¡Muchas gracias por tu compra!";
+            $mensaje .= ". Hemos recibido tu orden y ya está en proceso de atención.";
         }
 
         return "https://wa.me/{$tel}?text=" . rawurlencode($mensaje);

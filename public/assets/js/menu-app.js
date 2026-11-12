@@ -125,8 +125,12 @@
         updateCartUI();
         initCategoryFiltering();
 
-        const initialMod = document.querySelector('input[name="modalidad"]:checked')?.value || (restaurant.acepta_mesa ? 'mesa' : (restaurant.acepta_domicilio ? 'domicilio' : 'recoger'));
-        updateModalityFields(initialMod);
+        if (restaurant.mesa_numero) {
+            updateModalityFields('mesa');
+        } else {
+            const initialMod = document.querySelector('input[name="modalidad"]:checked')?.value || (restaurant.acepta_mesa ? 'mesa' : (restaurant.acepta_domicilio ? 'domicilio' : 'recoger'));
+            updateModalityFields(initialMod);
+        }
     }
 
     // 5. Enlace de Eventos
@@ -192,20 +196,22 @@
             });
         });
 
-        // Chips interactivos de modalidad en cabecera
-        document.querySelectorAll('.btn-chip-modality').forEach(chip => {
-            chip.addEventListener('click', function () {
-                const mod = this.getAttribute('data-modality');
-                const radio = document.querySelector(`input[name="modalidad"][value="${mod}"]`);
-                if (radio) {
-                    radio.checked = true;
-                    document.querySelectorAll('.modality-option').forEach(opt => opt.classList.remove('selected'));
-                    radio.closest('.modality-option')?.classList.add('selected');
-                    updateModalityFields(mod);
-                    updateCartTotals();
-                }
+        // Chips interactivos de modalidad en cabecera (solo si no tiene mesa asignada)
+        if (!restaurant.mesa_numero) {
+            document.querySelectorAll('.btn-chip-modality').forEach(chip => {
+                chip.addEventListener('click', function () {
+                    const mod = this.getAttribute('data-modality');
+                    const radio = document.querySelector(`input[name="modalidad"][value="${mod}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                        document.querySelectorAll('.modality-option').forEach(opt => opt.classList.remove('selected'));
+                        radio.closest('.modality-option')?.classList.add('selected');
+                        updateModalityFields(mod);
+                        updateCartTotals();
+                    }
+                });
             });
-        });
+        }
 
         // Cambios de método de pago
         document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
@@ -650,6 +656,10 @@
     }
 
     function updateModalityFields(modalidad) {
+        if (restaurant.mesa_numero) {
+            modalidad = 'mesa';
+        }
+
         const fieldMesa = document.getElementById('fieldMesa');
         const fieldMesaConfirmada = document.getElementById('fieldMesaConfirmada');
         const fieldTelefono = document.getElementById('fieldTelefono');
@@ -753,7 +763,7 @@
         }
 
         const formData = new FormData(checkoutForm);
-        const modalidad = formData.get('modalidad') || 'mesa';
+        const modalidad = restaurant.mesa_numero ? 'mesa' : (formData.get('modalidad') || 'mesa');
         let clienteNombre = formData.get('cliente_nombre')?.trim();
         const clienteTelefono = formData.get('cliente_telefono')?.trim();
         const subtotal = cart.reduce((sum, it) => sum + it.total_linea, 0);

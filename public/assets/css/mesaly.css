@@ -3730,3 +3730,153 @@ body.error-page {
     color: #0F172A;
 }
 
+/* ==============================================================================
+   Honeypot Trap 100% Oculto (Compatible con CSP estricto)
+   ============================================================================== */
+.honeypot-trap {
+    display: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ==============================================================================
+   Notificación de Mesa Confirmada y Bloqueada
+   ============================================================================== */
+.table-locked-notice {
+    background: #FFF7ED;
+    border: 1.5px solid #F97316;
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.table-locked-notice .locked-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.table-locked-notice .locked-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(249, 115, 22, 0.14);
+    color: #EA580C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.table-locked-notice .locked-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #9A3412;
+    margin: 0;
+    display: block;
+}
+
+.table-locked-notice .locked-desc {
+    font-size: 12.5px;
+    color: #C2410C;
+    margin: 2px 0 0 0;
+    display: block;
+}
+
+.table-locked-notice .locked-badge {
+    background: #EA580C;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+/* ==============================================================================
+   Pestañas y Vistas de Pedidos en Admin (Separación Domicilios vs Salón)
+   ============================================================================== */
+.admin-order-views-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #E2E8F0;
+    padding-bottom: 0;
+    flex-wrap: wrap;
+}
+
+.admin-order-view-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #64748B;
+    border-radius: 10px 10px 0 0;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+
+.admin-order-view-tab:hover {
+    color: #0F172A;
+    background: #F8FAFC;
+}
+
+.admin-order-view-tab.active {
+    color: var(--color-brand);
+    border-bottom-color: var(--color-brand);
+    background: #FFFFFF;
+}
+
+.admin-order-view-tab .tab-badge {
+    background: #E2E8F0;
+    color: #475569;
+    font-size: 11.5px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-weight: 800;
+}
+
+.admin-order-view-tab.active .tab-badge {
+    background: rgba(232, 93, 4, 0.12);
+    color: var(--color-brand);
+}
+
+/* Modal Aviso WhatsApp para Domicilios */
+.modal-aviso-wa-card {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-radius: 14px;
+    padding: 16px;
+    margin: 18px 0;
+}
+
+.modal-aviso-wa-bubble {
+    background: #FFFFFF;
+    border: 1px solid #DCFCE7;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    color: #166534;
+    line-height: 1.5;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+

@@ -23,17 +23,17 @@ class PedidoAdminAndDashboardTest extends TestCase
     public function testPedidoEstadosConfiguracion(): void
     {
         $estados = Pedido::ESTADOS;
-        $this->assertArrayHasKey('generado', $estados);
-        $this->assertArrayHasKey('en_preparacion', $estados);
+        $this->assertArrayHasKey('recibido', $estados);
         $this->assertArrayHasKey('listo', $estados);
+        $this->assertArrayHasKey('en_camino', $estados);
         $this->assertArrayHasKey('entregado', $estados);
-        $this->assertArrayHasKey('cancelado', $estados);
+        $this->assertArrayHasKey('rechazado', $estados);
 
-        $this->assertFalse($estados['generado']['final']);
-        $this->assertFalse($estados['en_preparacion']['final']);
+        $this->assertFalse($estados['recibido']['final']);
         $this->assertFalse($estados['listo']['final']);
+        $this->assertFalse($estados['en_camino']['final']);
         $this->assertTrue($estados['entregado']['final']);
-        $this->assertTrue($estados['cancelado']['final']);
+        $this->assertTrue($estados['rechazado']['final']);
     }
 
     public function testMetricasMesEstructura(): void
@@ -133,7 +133,7 @@ class PedidoAdminAndDashboardTest extends TestCase
         $detalle = $this->pedidoModel->obtenerDetalleCompleto($pedidoId, $tenantId);
         $this->assertNotNull($detalle);
         $this->assertSame('Cliente Test Unit', $detalle['cliente_nombre']);
-        $this->assertSame('generado', $detalle['estado']);
+        $this->assertSame('recibido', $detalle['estado']);
         $this->assertSame(45000, (int)$detalle['total']);
         $this->assertCount(1, $detalle['items']);
         $this->assertSame('Churrasco 400g Test', $detalle['items'][0]['nombre_producto']);
@@ -144,17 +144,17 @@ class PedidoAdminAndDashboardTest extends TestCase
         $detalleAjeno = $this->pedidoModel->obtenerDetalleCompleto($pedidoId, 999);
         $this->assertNull($detalleAjeno);
 
-        // 4. Cambiar estado a 'en_preparacion'
-        $okPrep = $this->pedidoModel->cambiarEstado($pedidoId, $tenantId, 'en_preparacion');
-        $this->assertTrue($okPrep);
-        $detallePrep = $this->pedidoModel->obtenerDetalleCompleto($pedidoId, $tenantId);
-        $this->assertSame('en_preparacion', $detallePrep['estado']);
-
-        // 5. Cambiar estado a 'listo'
+        // 4. Cambiar estado a 'listo'
         $okListo = $this->pedidoModel->cambiarEstado($pedidoId, $tenantId, 'listo');
         $this->assertTrue($okListo);
         $detalleListo = $this->pedidoModel->obtenerDetalleCompleto($pedidoId, $tenantId);
         $this->assertSame('listo', $detalleListo['estado']);
+
+        // 5. Cambiar estado a 'en_camino'
+        $okCamino = $this->pedidoModel->cambiarEstado($pedidoId, $tenantId, 'en_camino');
+        $this->assertTrue($okCamino);
+        $detalleCamino = $this->pedidoModel->obtenerDetalleCompleto($pedidoId, $tenantId);
+        $this->assertSame('en_camino', $detalleCamino['estado']);
 
         // 6. Cambiar estado a 'entregado'
         $okEntregado = $this->pedidoModel->cambiarEstado($pedidoId, $tenantId, 'entregado');
@@ -163,7 +163,7 @@ class PedidoAdminAndDashboardTest extends TestCase
         $this->assertSame('entregado', $detalleEntregado['estado']);
 
         // 7. Aislamiento en cambio de estado: restaurante ajeno no puede modificarlo
-        $okAjeno = $this->pedidoModel->cambiarEstado($pedidoId, 999, 'cancelado');
+        $okAjeno = $this->pedidoModel->cambiarEstado($pedidoId, 999, 'rechazado');
         // El UPDATE afectará 0 filas porque WHERE restaurante_id = 999 no coincide
         $detallePostAjeno = $this->pedidoModel->obtenerDetalleCompleto($pedidoId, $tenantId);
         $this->assertSame('entregado', $detallePostAjeno['estado']);

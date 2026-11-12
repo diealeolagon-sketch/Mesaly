@@ -80,23 +80,30 @@ if ($mesaNumero !== null) {
 
                         <!-- Modalidades activas -->
                         <div class="modalities-chips">
-                            <?php if (!empty($restaurante['acepta_mesa'])): ?>
-                                <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'mesa') ? 'active' : '' ?>" data-modality="mesa" title="Seleccionar Atención en Mesa">
+                            <?php if ($mesaNumero !== null): ?>
+                                <span class="chip-modality active" title="Atención activa en mesa">
                                     <?= icon('cutlery', 13) ?>
-                                    <span>Mesa</span>
-                                </button>
-                            <?php endif; ?>
-                            <?php if (!empty($restaurante['acepta_domicilio'])): ?>
-                                <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'domicilio') ? 'active' : '' ?>" data-modality="domicilio" title="Seleccionar Servicio a Domicilio">
-                                    <?= icon('motorcycle', 13) ?>
-                                    <span>Domicilio</span>
-                                </button>
-                            <?php endif; ?>
-                            <?php if (!empty($restaurante['acepta_recoger'])): ?>
-                                <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'recoger') ? 'active' : '' ?>" data-modality="recoger" title="Seleccionar Para Llevar">
-                                    <?= icon('shopping-bag', 13) ?>
-                                    <span>Recoger</span>
-                                </button>
+                                    <span>Mesa #<?= (int)$mesaNumero ?></span>
+                                </span>
+                            <?php else: ?>
+                                <?php if (!empty($restaurante['acepta_mesa'])): ?>
+                                    <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'mesa') ? 'active' : '' ?>" data-modality="mesa" title="Seleccionar Atención en Mesa">
+                                        <?= icon('cutlery', 13) ?>
+                                        <span>Mesa</span>
+                                    </button>
+                                <?php endif; ?>
+                                <?php if (!empty($restaurante['acepta_domicilio'])): ?>
+                                    <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'domicilio') ? 'active' : '' ?>" data-modality="domicilio" title="Seleccionar Servicio a Domicilio">
+                                        <?= icon('motorcycle', 13) ?>
+                                        <span>Domicilio</span>
+                                    </button>
+                                <?php endif; ?>
+                                <?php if (!empty($restaurante['acepta_recoger'])): ?>
+                                    <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'recoger') ? 'active' : '' ?>" data-modality="recoger" title="Seleccionar Para Llevar">
+                                        <?= icon('shopping-bag', 13) ?>
+                                        <span>Recoger</span>
+                                    </button>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -260,70 +267,75 @@ if ($mesaNumero !== null) {
 
                 <!-- Formulario de Checkout -->
                 <form id="checkoutForm" class="checkout-form">
-                    <!-- Honeypot anti-bots -->
-                    <div style="display: none !important; position: absolute; left: -9999px;">
-                        <input type="text" name="empresa" value="" tabindex="-1" autocomplete="off">
+                    <!-- Honeypot anti-bots (100% oculto con clase CSS compatible con CSP) -->
+                    <div class="honeypot-trap" aria-hidden="true" tabindex="-1">
+                        <input type="text" name="empresa" value="" tabindex="-1" autocomplete="off" class="honeypot-trap">
                         <input type="hidden" name="website" value="">
                     </div>
 
-                    <h3 class="checkout-section-title">¿Cómo deseas recibir tu pedido?</h3>
+                    <?php if ($mesaNumero !== null): ?>
+                        <!-- CASO MESA BLOQUEADA: El comensal tiene mesa asignada (QR activo) -->
+                        <div class="table-locked-notice">
+                            <div class="locked-left">
+                                <span class="locked-icon"><?= icon('cutlery', 20) ?></span>
+                                <div>
+                                    <span class="locked-title">Atención en Mesa #<?= (int)$mesaNumero ?></span>
+                                    <span class="locked-desc">Tus platos se prepararán y servirán directamente en tu mesa.</span>
+                                </div>
+                            </div>
+                            <span class="locked-badge">Mesa Activa</span>
+                            <input type="hidden" name="modalidad" value="mesa">
+                            <input type="hidden" name="mesa_numero" value="<?= (int)$mesaNumero ?>">
+                        </div>
+                    <?php else: ?>
+                        <!-- CASO NAVEGACIÓN GENERAL (El comensal elige cómo desea recibir su pedido) -->
+                        <h3 class="checkout-section-title">¿Cómo deseas recibir tu pedido?</h3>
 
-                    <!-- Selector de Modalidad -->
-                    <div class="modality-selector">
-                        <?php if (!empty($restaurante['acepta_mesa'])): ?>
-                            <label class="modality-option <?= ($modalidadDefault === 'mesa') ? 'selected' : '' ?>">
-                                <input type="radio" name="modalidad" value="mesa" <?= ($modalidadDefault === 'mesa') ? 'checked' : '' ?>>
-                                <span class="modality-card">
-                                    <span class="icon"><?= icon('cutlery', 18) ?></span>
-                                    <span class="name">En Mesa</span>
-                                </span>
-                            </label>
-                        <?php endif; ?>
+                        <!-- Selector de Modalidad -->
+                        <div class="modality-selector">
+                            <?php if (!empty($restaurante['acepta_mesa'])): ?>
+                                <label class="modality-option <?= ($modalidadDefault === 'mesa') ? 'selected' : '' ?>">
+                                    <input type="radio" name="modalidad" value="mesa" <?= ($modalidadDefault === 'mesa') ? 'checked' : '' ?>>
+                                    <span class="modality-card">
+                                        <span class="icon"><?= icon('cutlery', 18) ?></span>
+                                        <span class="name">En Mesa</span>
+                                    </span>
+                                </label>
+                            <?php endif; ?>
 
-                        <?php if (!empty($restaurante['acepta_domicilio'])): ?>
-                            <label class="modality-option <?= ($modalidadDefault === 'domicilio') ? 'selected' : '' ?>">
-                                <input type="radio" name="modalidad" value="domicilio" <?= ($modalidadDefault === 'domicilio') ? 'checked' : '' ?>>
-                                <span class="modality-card">
-                                    <span class="icon"><?= icon('motorcycle', 18) ?></span>
-                                    <span class="name">Domicilio</span>
-                                </span>
-                            </label>
-                        <?php endif; ?>
+                            <?php if (!empty($restaurante['acepta_domicilio'])): ?>
+                                <label class="modality-option <?= ($modalidadDefault === 'domicilio') ? 'selected' : '' ?>">
+                                    <input type="radio" name="modalidad" value="domicilio" <?= ($modalidadDefault === 'domicilio') ? 'checked' : '' ?>>
+                                    <span class="modality-card">
+                                        <span class="icon"><?= icon('motorcycle', 18) ?></span>
+                                        <span class="name">Domicilio</span>
+                                    </span>
+                                </label>
+                            <?php endif; ?>
 
-                        <?php if (!empty($restaurante['acepta_recoger'])): ?>
-                            <label class="modality-option <?= ($modalidadDefault === 'recoger') ? 'selected' : '' ?>">
-                                <input type="radio" name="modalidad" value="recoger" <?= ($modalidadDefault === 'recoger') ? 'checked' : '' ?>>
-                                <span class="modality-card">
-                                    <span class="icon"><?= icon('shopping-bag', 18) ?></span>
-                                    <span class="name">Para Llevar</span>
-                                </span>
-                            </label>
-                        <?php endif; ?>
-                    </div>
+                            <?php if (!empty($restaurante['acepta_recoger'])): ?>
+                                <label class="modality-option <?= ($modalidadDefault === 'recoger') ? 'selected' : '' ?>">
+                                    <input type="radio" name="modalidad" value="recoger" <?= ($modalidadDefault === 'recoger') ? 'checked' : '' ?>>
+                                    <span class="modality-card">
+                                        <span class="icon"><?= icon('shopping-bag', 18) ?></span>
+                                        <span class="name">Para Llevar</span>
+                                    </span>
+                                </label>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Campos dinámicos según modalidad -->
                     <div class="modality-fields" id="modalityFields">
 
-                        <!-- 1. CASO MESA: Mesa Confirmada por QR o Sesión -->
-                        <div id="fieldMesaConfirmada" class="field-group" style="display: <?= ($modalidadDefault === 'mesa' && $mesaNumero !== null) ? 'block' : 'none' ?>;">
-                            <div class="table-confirmed-badge" style="background: rgba(232, 93, 4, 0.08); border: 1.5px solid var(--color-brand); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div style="color: var(--color-brand);"><?= icon('cutlery', 20) ?></div>
-                                    <div>
-                                        <strong style="color: var(--color-brand); font-size: 14.5px; display: block;">Mesa #<?= (int)($mesaNumero ?? 0) ?> Asignada</strong>
-                                        <span style="font-size: 12px; color: var(--color-text-muted);">Tus platos se prepararán y servirán directamente en esta mesa</span>
-                                    </div>
-                                </div>
-                                <span class="badge" style="background: var(--color-brand); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;">QR Activo</span>
+                        <?php if ($mesaNumero === null): ?>
+                            <!-- Ingresar Número de Mesa Manualmente (solo si no escaneó QR de mesa específica) -->
+                            <div class="field-group" id="fieldMesa" style="display: <?= ($modalidadDefault === 'mesa') ? 'block' : 'none' ?>;">
+                                <label for="mesaNumeroInput">Número de Mesa *</label>
+                                <input type="number" id="mesaNumeroInput" name="mesa_numero" class="menu-input" placeholder="Ej: 4" value="" min="1" max="999">
+                                <span class="field-hint">Indica el número que ves en la tarjeta o sticker de tu mesa.</span>
                             </div>
-                        </div>
-
-                        <!-- 2. CASO MESA: Ingresar Número de Mesa Manualmente (si no escaneó QR específico) -->
-                        <div class="field-group" id="fieldMesa" style="display: <?= ($modalidadDefault === 'mesa' && $mesaNumero === null) ? 'block' : 'none' ?>;">
-                            <label for="mesaNumeroInput">Número de Mesa *</label>
-                            <input type="number" id="mesaNumeroInput" name="mesa_numero" class="menu-input" placeholder="Ej: 4" value="<?= $mesaNumero ?? '' ?>" min="1" max="999">
-                            <span class="field-hint">Indica el número que ves en la tarjeta o sticker de tu mesa.</span>
-                        </div>
+                        <?php endif; ?>
 
                         <!-- 3. Campo Nombre del Cliente -->
                         <div class="field-group" id="fieldNombre">
