@@ -2365,9 +2365,28 @@ body.error-page {
     font-weight: 600;
     color: #475569;
     background-color: #F1F5F9;
-    padding: 4px 10px;
+    padding: 4px 12px;
     border-radius: 9999px;
     border: 1px solid #E2E8F0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+    transition: all 120ms ease;
+    text-decoration: none;
+}
+
+.chip-modality:hover {
+    border-color: var(--color-brand, #E85D04);
+    color: var(--color-brand, #E85D04);
+}
+
+.chip-modality.active {
+    background-color: rgba(232, 93, 4, 0.1);
+    color: var(--color-brand, #E85D04);
+    border-color: var(--color-brand, #E85D04);
+    font-weight: 700;
 }
 
 .menu-brand-desc {

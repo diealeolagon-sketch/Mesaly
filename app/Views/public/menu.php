@@ -13,6 +13,22 @@
 
 $tieneBanner = !empty($restaurante['banner_path']);
 $tieneLogo = !empty($restaurante['logo_path']);
+
+// Determinar modalidad activa por defecto:
+// Si escaneó QR o tiene mesa en sesión, siempre 'mesa'.
+// Si no, si el restaurante acepta mesa -> 'mesa'.
+// Si solo acepta domicilio -> 'domicilio'.
+// Si solo acepta recoger -> 'recoger'.
+$modalidadDefault = 'mesa';
+if ($mesaNumero !== null) {
+    $modalidadDefault = 'mesa';
+} elseif (!empty($restaurante['acepta_mesa'])) {
+    $modalidadDefault = 'mesa';
+} elseif (!empty($restaurante['acepta_domicilio'])) {
+    $modalidadDefault = 'domicilio';
+} elseif (!empty($restaurante['acepta_recoger'])) {
+    $modalidadDefault = 'recoger';
+}
 ?>
 
 <div class="menu-container" id="menuApp">
@@ -65,13 +81,22 @@ $tieneLogo = !empty($restaurante['logo_path']);
                         <!-- Modalidades activas -->
                         <div class="modalities-chips">
                             <?php if (!empty($restaurante['acepta_mesa'])): ?>
-                                <span class="chip-modality" title="Atención en Mesa"><?= icon('cutlery', 13) ?> Mesa</span>
+                                <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'mesa') ? 'active' : '' ?>" data-modality="mesa" title="Seleccionar Atención en Mesa">
+                                    <?= icon('cutlery', 13) ?>
+                                    <span>Mesa</span>
+                                </button>
                             <?php endif; ?>
                             <?php if (!empty($restaurante['acepta_domicilio'])): ?>
-                                <span class="chip-modality" title="Servicio a Domicilio"><?= icon('motorcycle', 13) ?> Domicilio</span>
+                                <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'domicilio') ? 'active' : '' ?>" data-modality="domicilio" title="Seleccionar Servicio a Domicilio">
+                                    <?= icon('motorcycle', 13) ?>
+                                    <span>Domicilio</span>
+                                </button>
                             <?php endif; ?>
                             <?php if (!empty($restaurante['acepta_recoger'])): ?>
-                                <span class="chip-modality" title="Para Llevar"><?= icon('shopping-bag', 13) ?> Recoger</span>
+                                <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'recoger') ? 'active' : '' ?>" data-modality="recoger" title="Seleccionar Para Llevar">
+                                    <?= icon('shopping-bag', 13) ?>
+                                    <span>Recoger</span>
+                                </button>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -246,8 +271,8 @@ $tieneLogo = !empty($restaurante['logo_path']);
                     <!-- Selector de Modalidad -->
                     <div class="modality-selector">
                         <?php if (!empty($restaurante['acepta_mesa'])): ?>
-                            <label class="modality-option <?= ($mesaNumero !== null) ? 'selected' : '' ?>">
-                                <input type="radio" name="modalidad" value="mesa" <?= ($mesaNumero !== null) ? 'checked' : '' ?>>
+                            <label class="modality-option <?= ($modalidadDefault === 'mesa') ? 'selected' : '' ?>">
+                                <input type="radio" name="modalidad" value="mesa" <?= ($modalidadDefault === 'mesa') ? 'checked' : '' ?>>
                                 <span class="modality-card">
                                     <span class="icon"><?= icon('cutlery', 18) ?></span>
                                     <span class="name">En Mesa</span>
@@ -256,8 +281,8 @@ $tieneLogo = !empty($restaurante['logo_path']);
                         <?php endif; ?>
 
                         <?php if (!empty($restaurante['acepta_domicilio'])): ?>
-                            <label class="modality-option <?= ($mesaNumero === null && !empty($restaurante['acepta_domicilio'])) ? 'selected' : '' ?>">
-                                <input type="radio" name="modalidad" value="domicilio" <?= ($mesaNumero === null && !empty($restaurante['acepta_domicilio'])) ? 'checked' : '' ?>>
+                            <label class="modality-option <?= ($modalidadDefault === 'domicilio') ? 'selected' : '' ?>">
+                                <input type="radio" name="modalidad" value="domicilio" <?= ($modalidadDefault === 'domicilio') ? 'checked' : '' ?>>
                                 <span class="modality-card">
                                     <span class="icon"><?= icon('motorcycle', 18) ?></span>
                                     <span class="name">Domicilio</span>
@@ -266,8 +291,8 @@ $tieneLogo = !empty($restaurante['logo_path']);
                         <?php endif; ?>
 
                         <?php if (!empty($restaurante['acepta_recoger'])): ?>
-                            <label class="modality-option <?= ($mesaNumero === null && empty($restaurante['acepta_domicilio']) && !empty($restaurante['acepta_recoger'])) ? 'selected' : '' ?>">
-                                <input type="radio" name="modalidad" value="recoger" <?= ($mesaNumero === null && empty($restaurante['acepta_domicilio']) && !empty($restaurante['acepta_recoger'])) ? 'checked' : '' ?>>
+                            <label class="modality-option <?= ($modalidadDefault === 'recoger') ? 'selected' : '' ?>">
+                                <input type="radio" name="modalidad" value="recoger" <?= ($modalidadDefault === 'recoger') ? 'checked' : '' ?>>
                                 <span class="modality-card">
                                     <span class="icon"><?= icon('shopping-bag', 18) ?></span>
                                     <span class="name">Para Llevar</span>
@@ -278,27 +303,47 @@ $tieneLogo = !empty($restaurante['logo_path']);
 
                     <!-- Campos dinámicos según modalidad -->
                     <div class="modality-fields" id="modalityFields">
-                        <!-- Campo Mesa -->
-                        <div class="field-group" id="fieldMesa" style="display: <?= ($mesaNumero !== null) ? 'block' : 'none' ?>;">
+
+                        <!-- 1. CASO MESA: Mesa Confirmada por QR o Sesión -->
+                        <div id="fieldMesaConfirmada" class="field-group" style="display: <?= ($modalidadDefault === 'mesa' && $mesaNumero !== null) ? 'block' : 'none' ?>;">
+                            <div class="table-confirmed-badge" style="background: rgba(232, 93, 4, 0.08); border: 1.5px solid var(--color-brand); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="color: var(--color-brand);"><?= icon('cutlery', 20) ?></div>
+                                    <div>
+                                        <strong style="color: var(--color-brand); font-size: 14.5px; display: block;">Mesa #<?= (int)($mesaNumero ?? 0) ?> Asignada</strong>
+                                        <span style="font-size: 12px; color: var(--color-text-muted);">Tus platos se prepararán y servirán directamente en esta mesa</span>
+                                    </div>
+                                </div>
+                                <span class="badge" style="background: var(--color-brand); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;">QR Activo</span>
+                            </div>
+                        </div>
+
+                        <!-- 2. CASO MESA: Ingresar Número de Mesa Manualmente (si no escaneó QR específico) -->
+                        <div class="field-group" id="fieldMesa" style="display: <?= ($modalidadDefault === 'mesa' && $mesaNumero === null) ? 'block' : 'none' ?>;">
                             <label for="mesaNumeroInput">Número de Mesa *</label>
                             <input type="number" id="mesaNumeroInput" name="mesa_numero" class="menu-input" placeholder="Ej: 4" value="<?= $mesaNumero ?? '' ?>" min="1" max="999">
-                            <span class="field-hint">Número asignado a tu mesa en el restaurante.</span>
+                            <span class="field-hint">Indica el número que ves en la tarjeta o sticker de tu mesa.</span>
                         </div>
 
-                        <!-- Campos Cliente (Nombre y Teléfono) -->
-                        <div class="field-group">
-                            <label for="clienteNombreInput">Tu Nombre *</label>
-                            <input type="text" id="clienteNombreInput" name="cliente_nombre" class="menu-input" placeholder="¿A nombre de quién?" required maxlength="100">
+                        <!-- 3. Campo Nombre del Cliente -->
+                        <div class="field-group" id="fieldNombre">
+                            <label for="clienteNombreInput" id="labelClienteNombre">
+                                <?= ($modalidadDefault === 'mesa') ? 'Tu Nombre (Opcional en mesa)' : 'Tu Nombre Completo *' ?>
+                            </label>
+                            <input type="text" id="clienteNombreInput" name="cliente_nombre" class="menu-input" 
+                                   placeholder="<?= ($modalidadDefault === 'mesa') ? '¿Cómo te llamas? (Opcional)' : '¿A nombre de quién?' ?>" 
+                                   maxlength="100" <?= ($modalidadDefault !== 'mesa') ? 'required' : '' ?>>
                         </div>
 
-                        <div class="field-group" id="fieldTelefono" style="display: <?= ($mesaNumero !== null) ? 'none' : 'block' ?>;">
+                        <!-- 4. Campo Teléfono (Oculto en Mesa, Visible en Domicilio y Recoger) -->
+                        <div class="field-group" id="fieldTelefono" style="display: <?= ($modalidadDefault !== 'mesa') ? 'block' : 'none' ?>;">
                             <label for="clienteTelefonoInput">Teléfono / WhatsApp *</label>
                             <input type="tel" id="clienteTelefonoInput" name="cliente_telefono" class="menu-input" placeholder="Ej: 300 123 4567" maxlength="20">
-                            <span class="field-hint">Para confirmar tu entrega o coordinar la recogida.</span>
+                            <span class="field-hint">Para avisarte cuando tu pedido esté listo o en camino.</span>
                         </div>
 
-                        <!-- Campos exclusivos de Domicilio -->
-                        <div id="fieldsDomicilio" style="display: <?= ($mesaNumero === null && !empty($restaurante['acepta_domicilio'])) ? 'block' : 'none' ?>;">
+                        <!-- 5. Campos Exclusivos de Domicilio (Dirección, Barrio, etc.) -->
+                        <div id="fieldsDomicilio" style="display: <?= ($modalidadDefault === 'domicilio') ? 'block' : 'none' ?>;">
                             <div class="field-group">
                                 <label for="direccionInput">Dirección de Entrega *</label>
                                 <input type="text" id="direccionInput" name="direccion" class="menu-input" placeholder="Ej: Calle 10 # 43-20, Apto 501" maxlength="200">
@@ -310,24 +355,34 @@ $tieneLogo = !empty($restaurante['logo_path']);
                             </div>
 
                             <div class="field-group">
-                                <label for="notasEntregaInput">Notas de Entrega (Opcional)</label>
-                                <input type="text" id="notasEntregaInput" name="notas_entrega" class="menu-input" placeholder="Ej: Timbre 501, dejar en portería..." maxlength="250">
+                                <label for="notasEntregaDomicilioInput">Indicaciones de Entrega (Opcional)</label>
+                                <input type="text" id="notasEntregaDomicilioInput" name="notas_entrega_domicilio" class="menu-input" placeholder="Ej: Timbre 501, dejar en portería..." maxlength="250">
                             </div>
 
                             <?php if (!empty($restaurante['pedido_minimo'])): ?>
                                 <div class="delivery-min-alert" id="deliveryMinAlert">
-                                    ℹ️ Pedido mínimo para domicilio: <strong><?= format_cop((int)$restaurante['pedido_minimo']) ?></strong>
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <?= icon('alert', 15) ?>
+                                        <span>Pedido mínimo para domicilio: <strong><?= format_cop((int)$restaurante['pedido_minimo']) ?></strong></span>
+                                    </div>
                                 </div>
                             <?php endif; ?>
                         </div>
 
-                        <!-- Campos exclusivos de Para Llevar -->
-                        <div id="fieldsRecoger" style="display: none;">
+                        <!-- 6. Campos Exclusivos de Para Llevar (Recoger) -->
+                        <div id="fieldsRecoger" style="display: <?= ($modalidadDefault === 'recoger') ? 'block' : 'none' ?>;">
                             <div class="field-group">
                                 <label for="horaRecogidaInput">Hora Estimada de Recogida</label>
-                                <input type="text" id="horaRecogidaInput" name="hora_recogida" class="menu-input" placeholder="Ej: En 30 minutos / 1:30 PM" maxlength="50">
+                                <input type="text" id="horaRecogidaInput" name="hora_recogida" class="menu-input" placeholder="Ej: En 20 minutos / 1:30 PM" maxlength="50">
                             </div>
                         </div>
+
+                        <!-- 7. Notas para Cocina (para En Mesa y Para Llevar) -->
+                        <div class="field-group" id="fieldNotasCocina" style="display: <?= ($modalidadDefault !== 'domicilio') ? 'block' : 'none' ?>;">
+                            <label for="notasCocinaInput">Notas para la cocina o atención (Opcional)</label>
+                            <input type="text" id="notasCocinaInput" name="notas_cocina" class="menu-input" placeholder="Ej: Sin cebolla, salsas aparte, servilletas extra..." maxlength="250">
+                        </div>
+
                     </div>
 
                     <!-- Métodos de Pago -->

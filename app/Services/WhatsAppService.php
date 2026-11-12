@@ -42,6 +42,9 @@ class WhatsAppService
                 if (!empty($pedido['cliente_nombre'])) {
                     $lineas[] = "*Cliente:* {$pedido['cliente_nombre']}";
                 }
+                if (!empty($pedido['notas_entrega'])) {
+                    $lineas[] = "*Notas cocina:* {$pedido['notas_entrega']}";
+                }
                 break;
 
             case 'domicilio':

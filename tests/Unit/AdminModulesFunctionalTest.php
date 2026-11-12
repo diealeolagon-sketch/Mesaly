@@ -63,6 +63,7 @@ class AdminModulesFunctionalTest extends TestCase
 
     protected function tearDown(): void
     {
+        self::$pdo->exec("UPDATE `restaurantes` SET `recibiendo_pedidos` = 1 WHERE `id` = {$this->tenantId}");
         TenantContext::clear();
         Auth::logout();
         parent::tearDown();

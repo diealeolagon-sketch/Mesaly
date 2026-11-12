@@ -48,6 +48,12 @@ class PublicOrderingAndEdgeCasesTest extends TestCase
         $this->assertNotEmpty($this->productoChurrasco);
     }
 
+    private function makeOrderRequest(array $payload): Request
+    {
+        $uniqueIp = '10.99.' . mt_rand(1, 250) . '.' . mt_rand(1, 250);
+        return new Request('POST', '/la-parrilla-paisa/pedido', $payload, [], [], [], [], $uniqueIp);
+    }
+
     public function testBloqueoPedidoCuandoRestauranteEstaPausado(): void
     {
         // 1. Pausar recepción de pedidos
@@ -66,7 +72,7 @@ class PublicOrderingAndEdgeCasesTest extends TestCase
             ],
         ];
 
-        $request = new Request('POST', '/la-parrilla-paisa/pedido', $payload);
+        $request = $this->makeOrderRequest($payload);
         $response = $this->menuController->crearPedido($request, ['slug' => 'la-parrilla-paisa']);
 
         $this->assertSame(400, $response->getStatusCode());
@@ -88,7 +94,7 @@ class PublicOrderingAndEdgeCasesTest extends TestCase
             'items' => [['producto_id' => $this->productoChurrasco['id'], 'cantidad' => 1]],
         ];
 
-        $request = new Request('POST', '/la-parrilla-paisa/pedido', $payloadSpam);
+        $request = $this->makeOrderRequest($payloadSpam);
         $response = $this->menuController->crearPedido($request, ['slug' => 'la-parrilla-paisa']);
 
         $this->assertSame(400, $response->getStatusCode());
@@ -105,7 +111,7 @@ class PublicOrderingAndEdgeCasesTest extends TestCase
             'items' => [],
         ];
 
-        $request = new Request('POST', '/la-parrilla-paisa/pedido', $payload);
+        $request = $this->makeOrderRequest($payload);
         $response = $this->menuController->crearPedido($request, ['slug' => 'la-parrilla-paisa']);
 
         $this->assertSame(400, $response->getStatusCode());
@@ -128,7 +134,7 @@ class PublicOrderingAndEdgeCasesTest extends TestCase
             ],
         ];
 
-        $request = new Request('POST', '/la-parrilla-paisa/pedido', $payload);
+        $request = $this->makeOrderRequest($payload);
         $response = $this->menuController->crearPedido($request, ['slug' => 'la-parrilla-paisa']);
 
         $this->assertSame(400, $response->getStatusCode());
@@ -174,7 +180,7 @@ class PublicOrderingAndEdgeCasesTest extends TestCase
             ],
         ];
 
-        $request = new Request('POST', '/la-parrilla-paisa/pedido', $payloadHack);
+        $request = $this->makeOrderRequest($payloadHack);
         $response = $this->menuController->crearPedido($request, ['slug' => 'la-parrilla-paisa']);
 
         $this->assertSame(200, $response->getStatusCode());
@@ -210,10 +216,63 @@ class PublicOrderingAndEdgeCasesTest extends TestCase
             ],
         ];
 
-        $request = new Request('POST', '/la-parrilla-paisa/pedido', $payloadSinDir);
+        $request = $this->makeOrderRequest($payloadSinDir);
         $resSinDir = $this->menuController->crearPedido($request, ['slug' => 'la-parrilla-paisa']);
         $this->assertSame(400, $resSinDir->getStatusCode());
         $data = json_decode($resSinDir->getContent(), true);
         $this->assertStringContainsString('dirección de entrega', $data['error']);
+    }
+
+    public function testPedidoEnMesaNoRequiereDireccionNiTelefonoYAutogeneraNombre(): void
+    {
+        $payloadMesa = [
+            'modalidad' => 'mesa',
+            'mesa_numero' => 8,
+            'cliente_nombre' => '', // Vacío deliberadamente
+            'cliente_telefono' => '', // Vacío deliberadamente
+            'direccion' => 'Calle Falsa 123 (debe ignorarse)',
+            'barrio' => 'Barrio Fantasma (debe ignorarse)',
+            'notas_entrega' => 'Bebidas sin hielo por favor',
+            'items' => [
+                [
+                    'producto_id' => $this->productoChurrasco['id'],
+                    'cantidad' => 1,
+                    'opciones_ids' => [(int)$this->productoChurrasco['grupos'][0]['opciones'][0]['id']],
+                ],
+            ],
+        ];
+
+        $request = $this->makeOrderRequest($payloadMesa);
+        $response = $this->menuController->crearPedido($request, ['slug' => 'la-parrilla-paisa']);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $data = json_decode($response->getContent(), true);
+        $this->assertTrue($data['ok']);
+
+        // Consultar registro guardado en la BD
+        $stmt = self::$pdo->prepare("SELECT p.*, m.numero AS mesa_numero_rel FROM `pedidos` p LEFT JOIN `mesas` m ON p.mesa_id = m.id WHERE p.codigo = :cod");
+        $stmt->execute(['cod' => $data['codigo']]);
+        $pedidoDb = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $this->assertNotNull($pedidoDb);
+        $this->assertSame('mesa', $pedidoDb['modalidad']);
+        $this->assertGreaterThan(0, (int)$pedidoDb['mesa_id']);
+        $this->assertSame(8, (int)$pedidoDb['mesa_numero_rel']);
+        // Nombre generado automáticamente
+        $this->assertSame('Mesa 8', $pedidoDb['cliente_nombre']);
+        // Teléfono, dirección y barrio deben ser NULL en mesa
+        $this->assertNull($pedidoDb['cliente_telefono']);
+        $this->assertNull($pedidoDb['direccion']);
+        $this->assertNull($pedidoDb['barrio']);
+        // Notas para la cocina se conservan
+        $this->assertSame('Bebidas sin hielo por favor', $pedidoDb['notas_entrega']);
+
+        // WhatsApp URL no debe contener 'Dirección' ni 'Barrio'
+        $this->assertStringNotContainsString('Direcci', urldecode($data['whatsapp_url']));
+        $this->assertStringContainsString('Mesa #8', urldecode($data['whatsapp_url']));
+
+        // Cleanup
+        self::$pdo->prepare("DELETE FROM `pedido_items` WHERE `pedido_id` = :id")->execute(['id' => $pedidoDb['id']]);
+        self::$pdo->prepare("DELETE FROM `pedidos` WHERE `id` = :id")->execute(['id' => $pedidoDb['id']]);
     }
 }

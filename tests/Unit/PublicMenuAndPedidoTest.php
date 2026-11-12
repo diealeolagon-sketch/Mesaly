@@ -18,6 +18,7 @@ class PublicMenuAndPedidoTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        \App\Core\Model::getPdo()->exec("UPDATE `restaurantes` SET `recibiendo_pedidos` = 1 WHERE `slug` = 'la-parrilla-paisa'");
         $this->restauranteDemo = (new Restaurante())->findBySlug('la-parrilla-paisa');
     }
 

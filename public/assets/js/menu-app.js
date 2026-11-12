@@ -124,6 +124,9 @@
         bindEvents();
         updateCartUI();
         initCategoryFiltering();
+
+        const initialMod = document.querySelector('input[name="modalidad"]:checked')?.value || (restaurant.acepta_mesa ? 'mesa' : (restaurant.acepta_domicilio ? 'domicilio' : 'recoger'));
+        updateModalityFields(initialMod);
     }
 
     // 5. Enlace de Eventos
@@ -186,6 +189,21 @@
                 this.closest('.modality-option')?.classList.add('selected');
                 updateModalityFields(this.value);
                 updateCartTotals();
+            });
+        });
+
+        // Chips interactivos de modalidad en cabecera
+        document.querySelectorAll('.btn-chip-modality').forEach(chip => {
+            chip.addEventListener('click', function () {
+                const mod = this.getAttribute('data-modality');
+                const radio = document.querySelector(`input[name="modalidad"][value="${mod}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    document.querySelectorAll('.modality-option').forEach(opt => opt.classList.remove('selected'));
+                    radio.closest('.modality-option')?.classList.add('selected');
+                    updateModalityFields(mod);
+                    updateCartTotals();
+                }
             });
         });
 
@@ -525,6 +543,9 @@
     // 8. Drawer del Carrito & Checkout
     function openCartDrawer() {
         renderCartDrawerItems();
+
+        const activeMod = document.querySelector('input[name="modalidad"]:checked')?.value || (restaurant.acepta_mesa ? 'mesa' : (restaurant.acepta_domicilio ? 'domicilio' : 'recoger'));
+        updateModalityFields(activeMod);
         updateCartTotals();
 
         cartDrawerBackdrop.style.display = 'flex';
@@ -629,26 +650,68 @@
     }
 
     function updateModalityFields(modalidad) {
+        const fieldMesa = document.getElementById('fieldMesa');
+        const fieldMesaConfirmada = document.getElementById('fieldMesaConfirmada');
+        const fieldTelefono = document.getElementById('fieldTelefono');
+        const fieldsDomicilio = document.getElementById('fieldsDomicilio');
+        const fieldsRecoger = document.getElementById('fieldsRecoger');
+        const fieldNotasCocina = document.getElementById('fieldNotasCocina');
+        const labelClienteNombre = document.getElementById('labelClienteNombre');
+        const clienteNombreInput = document.getElementById('clienteNombreInput');
+
+        // Sincronizar botones de modalidad en la cabecera
+        document.querySelectorAll('.btn-chip-modality').forEach(chip => {
+            if (chip.getAttribute('data-modality') === modalidad) {
+                chip.classList.add('active');
+            } else {
+                chip.classList.remove('active');
+            }
+        });
+
         if (modalidad === 'mesa') {
-            fieldMesa.style.display = 'block';
-            fieldTelefono.style.display = 'none';
-            fieldsDomicilio.style.display = 'none';
-            fieldsRecoger.style.display = 'none';
-            rowCostoEnvio.style.display = 'none';
+            if (fieldMesaConfirmada) fieldMesaConfirmada.style.display = restaurant.mesa_numero ? 'block' : 'none';
+            if (fieldMesa) fieldMesa.style.display = restaurant.mesa_numero ? 'none' : 'block';
+            if (fieldTelefono) fieldTelefono.style.display = 'none';
+            if (fieldsDomicilio) fieldsDomicilio.style.display = 'none';
+            if (fieldsRecoger) fieldsRecoger.style.display = 'none';
+            if (fieldNotasCocina) fieldNotasCocina.style.display = 'block';
+            if (rowCostoEnvio) rowCostoEnvio.style.display = 'none';
+
+            if (labelClienteNombre) labelClienteNombre.textContent = 'Tu Nombre (Opcional en mesa)';
+            if (clienteNombreInput) {
+                clienteNombreInput.placeholder = '¿Cómo te llamas? (Opcional)';
+                clienteNombreInput.removeAttribute('required');
+            }
         } else if (modalidad === 'domicilio') {
-            fieldMesa.style.display = 'none';
-            fieldTelefono.style.display = 'block';
-            fieldsDomicilio.style.display = 'block';
-            fieldsRecoger.style.display = 'none';
-            if (restaurant.costo_envio > 0) {
+            if (fieldMesaConfirmada) fieldMesaConfirmada.style.display = 'none';
+            if (fieldMesa) fieldMesa.style.display = 'none';
+            if (fieldTelefono) fieldTelefono.style.display = 'block';
+            if (fieldsDomicilio) fieldsDomicilio.style.display = 'block';
+            if (fieldsRecoger) fieldsRecoger.style.display = 'none';
+            if (fieldNotasCocina) fieldNotasCocina.style.display = 'none';
+            if (rowCostoEnvio && restaurant.costo_envio > 0) {
                 rowCostoEnvio.style.display = 'flex';
             }
+
+            if (labelClienteNombre) labelClienteNombre.textContent = 'Tu Nombre Completo *';
+            if (clienteNombreInput) {
+                clienteNombreInput.placeholder = '¿A nombre de quién?';
+                clienteNombreInput.setAttribute('required', 'required');
+            }
         } else if (modalidad === 'recoger') {
-            fieldMesa.style.display = 'none';
-            fieldTelefono.style.display = 'block';
-            fieldsDomicilio.style.display = 'none';
-            fieldsRecoger.style.display = 'block';
-            rowCostoEnvio.style.display = 'none';
+            if (fieldMesaConfirmada) fieldMesaConfirmada.style.display = 'none';
+            if (fieldMesa) fieldMesa.style.display = 'none';
+            if (fieldTelefono) fieldTelefono.style.display = 'block';
+            if (fieldsDomicilio) fieldsDomicilio.style.display = 'none';
+            if (fieldsRecoger) fieldsRecoger.style.display = 'block';
+            if (fieldNotasCocina) fieldNotasCocina.style.display = 'block';
+            if (rowCostoEnvio) rowCostoEnvio.style.display = 'none';
+
+            if (labelClienteNombre) labelClienteNombre.textContent = 'Tu Nombre Completo *';
+            if (clienteNombreInput) {
+                clienteNombreInput.placeholder = '¿A nombre de quién?';
+                clienteNombreInput.setAttribute('required', 'required');
+            }
         }
     }
 
@@ -690,23 +753,26 @@
         }
 
         const formData = new FormData(checkoutForm);
-        const modalidad = formData.get('modalidad');
-        const clienteNombre = formData.get('cliente_nombre')?.trim();
+        const modalidad = formData.get('modalidad') || 'mesa';
+        let clienteNombre = formData.get('cliente_nombre')?.trim();
         const clienteTelefono = formData.get('cliente_telefono')?.trim();
         const subtotal = cart.reduce((sum, it) => sum + it.total_linea, 0);
 
-        if (!clienteNombre) {
-            showCheckoutError('Por favor escribe tu nombre completo.');
-            return;
-        }
+        let mesaNum = restaurant.mesa_numero ? parseInt(restaurant.mesa_numero, 10) : parseInt(formData.get('mesa_numero'), 10);
 
         if (modalidad === 'mesa') {
-            const mesaNum = parseInt(formData.get('mesa_numero'), 10);
             if (!mesaNum || mesaNum <= 0) {
-                showCheckoutError('Por favor indica el número de tu mesa.');
+                showCheckoutError('Por favor indica en qué mesa te encuentras.');
                 return;
             }
+            if (!clienteNombre) {
+                clienteNombre = 'Mesa ' + mesaNum;
+            }
         } else if (modalidad === 'domicilio') {
+            if (!clienteNombre) {
+                showCheckoutError('Por favor escribe tu nombre completo.');
+                return;
+            }
             if (!clienteTelefono || clienteTelefono.length < 7) {
                 showCheckoutError('Por favor ingresa un número de teléfono o WhatsApp válido.');
                 return;
@@ -721,21 +787,33 @@
                 return;
             }
         } else if (modalidad === 'recoger') {
+            if (!clienteNombre) {
+                showCheckoutError('Por favor escribe tu nombre completo.');
+                return;
+            }
             if (!clienteTelefono || clienteTelefono.length < 7) {
                 showCheckoutError('Por favor ingresa un número de teléfono o WhatsApp válido.');
                 return;
             }
         }
 
+        // Determinar notas según modalidad
+        let notasEntrega = '';
+        if (modalidad === 'domicilio') {
+            notasEntrega = formData.get('notas_entrega_domicilio') || '';
+        } else {
+            notasEntrega = formData.get('notas_cocina') || '';
+        }
+
         const payload = {
             modalidad: modalidad,
             cliente_nombre: clienteNombre,
-            cliente_telefono: clienteTelefono,
-            mesa_numero: formData.get('mesa_numero'),
-            direccion: formData.get('direccion'),
-            barrio: formData.get('barrio'),
-            notas_entrega: formData.get('notas_entrega'),
-            hora_recogida: formData.get('hora_recogida'),
+            cliente_telefono: (modalidad === 'mesa') ? '' : clienteTelefono,
+            mesa_numero: (modalidad === 'mesa') ? mesaNum : null,
+            direccion: (modalidad === 'domicilio') ? formData.get('direccion') : '',
+            barrio: (modalidad === 'domicilio') ? formData.get('barrio') : '',
+            notas_entrega: notasEntrega,
+            hora_recogida: (modalidad === 'recoger') ? formData.get('hora_recogida') : '',
             metodo_pago: formData.get('metodo_pago') || 'efectivo',
             empresa: formData.get('empresa') || '',
             items: cart.map(it => ({

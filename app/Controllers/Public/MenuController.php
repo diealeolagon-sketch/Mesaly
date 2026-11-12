@@ -425,9 +425,12 @@ class MenuController extends Controller
         // 9. Registrar el pedido en la base de datos
         $mesaId = null;
         if ($mesaNumero > 0) {
-            $mDb = (new \App\Models\Mesa())->findByNumero($restauranteId, $mesaNumero);
+            $mesaModel = new \App\Models\Mesa();
+            $mDb = $mesaModel->findByNumero($restauranteId, $mesaNumero);
             if ($mDb) {
                 $mesaId = (int)$mDb['id'];
+            } else {
+                $mesaId = $mesaModel->crear($restauranteId, $mesaNumero, 'Mesa ' . $mesaNumero);
             }
         }
 
@@ -436,11 +439,11 @@ class MenuController extends Controller
             'mesa_id' => $mesaId,
             'mesa_numero' => $mesaNumero,
             'cliente_nombre' => $clienteNombre,
-            'cliente_telefono' => $clienteTelefono ?: null,
-            'direccion' => trim((string)($input['direccion'] ?? '')) ?: null,
-            'barrio' => trim((string)($input['barrio'] ?? '')) ?: null,
+            'cliente_telefono' => ($modalidad === 'mesa') ? null : ($clienteTelefono ?: null),
+            'direccion' => ($modalidad === 'domicilio') ? (trim((string)($input['direccion'] ?? '')) ?: null) : null,
+            'barrio' => ($modalidad === 'domicilio') ? (trim((string)($input['barrio'] ?? '')) ?: null) : null,
             'notas_entrega' => trim((string)($input['notas_entrega'] ?? '')) ?: null,
-            'hora_recogida' => trim((string)($input['hora_recogida'] ?? '')) ?: null,
+            'hora_recogida' => ($modalidad === 'recoger') ? (trim((string)($input['hora_recogida'] ?? '')) ?: null) : null,
             'metodo_pago' => $metodoPago,
             'subtotal' => $subtotalCalculado,
             'costo_envio' => $costoEnvio,
