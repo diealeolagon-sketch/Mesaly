@@ -120,6 +120,12 @@ class Auth
         ];
     }
 
+    public static function login(array $user): void
+    {
+        unset($user['password_hash']);
+        Session::set('user', $user);
+    }
+
     public static function user(): ?array
     {
         return Session::get('user');
@@ -134,6 +140,15 @@ class Auth
     {
         $u = self::user();
         return $u ? (int)$u['id'] : null;
+    }
+
+    public static function tenantId(): ?int
+    {
+        $u = self::user();
+        if (!$u) {
+            return null;
+        }
+        return isset($u['restaurante_id']) ? (int)$u['restaurante_id'] : null;
     }
 
     public static function role(): ?string

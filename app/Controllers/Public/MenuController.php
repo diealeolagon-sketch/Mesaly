@@ -184,6 +184,8 @@ class MenuController extends Controller
             return $this->json(['ok' => false, 'error' => 'Restaurante no encontrado.'], 404);
         }
 
+        $restauranteId = (int)$restaurante['id'];
+
         // Obtener datos (JSON o POST unificados vía Request)
         $input = $request->all();
         if (empty($input)) {

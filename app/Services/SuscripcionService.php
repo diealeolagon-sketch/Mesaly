@@ -233,10 +233,12 @@ class SuscripcionService
 
             // Auditoría
             Auditoria::registrar(
-                $superAdminId,
-                $restauranteId,
                 'pago_suscripcion_registrado',
-                "Pago #{$pagoId} registrado por " . format_cop($monto) . " COP. Nuevo vencimiento: {$nuevaFechaVenc}."
+                'pagos_suscripcion',
+                $pagoId,
+                ['vencimiento' => $vencActualRaw],
+                ['monto' => $monto, 'vencimiento' => $nuevaFechaVenc],
+                $restauranteId
             );
 
             $pdo->commit();
@@ -297,10 +299,12 @@ class SuscripcionService
 
         $motivoTexto = !empty($motivo) ? " Motivo: {$motivo}." : "";
         Auditoria::registrar(
-            $superAdminId,
-            $restauranteId,
             'vencimiento_extendido',
-            "Se extendieron {$dias} días de gracia/cortesía. Nuevo vencimiento: {$nuevaFechaVenc}.{$motivoTexto}"
+            'restaurantes',
+            $restauranteId,
+            ['vencimiento' => $vencActualRaw],
+            ['vencimiento' => $nuevaFechaVenc, 'dias' => $dias, 'motivo' => $motivo],
+            $restauranteId
         );
 
         return $nuevaFechaVenc;
@@ -325,10 +329,12 @@ class SuscripcionService
 
         $accion = $nuevoEstado ? "negocio_{$nuevoEstado}" : "negocio_reactivado";
         Auditoria::registrar(
-            $superAdminId,
-            $restauranteId,
             $accion,
-            "Estado manual actualizado a: " . ($nuevoEstado ?? 'activo')
+            'restaurantes',
+            $restauranteId,
+            null,
+            ['estado_manual' => $nuevoEstado ?? 'activo'],
+            $restauranteId
         );
     }
 

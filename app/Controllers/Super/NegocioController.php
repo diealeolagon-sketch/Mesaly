@@ -183,10 +183,12 @@ class NegocioController extends Controller
             ]);
 
             Auditoria::registrar(
-                Auth::id(),
-                $restauranteId,
                 'crear_negocio',
-                "Negocio '{$nombre}' creado con precio acordado de " . format_cop($precio) . " COP ({$ciclo}). Vence: {$fechaVencimiento}."
+                'restaurantes',
+                $restauranteId,
+                null,
+                ['nombre' => $nombre, 'precio' => $precio, 'ciclo' => $ciclo, 'vence' => $fechaVencimiento],
+                $restauranteId
             );
 
             Model::commit();
@@ -290,10 +292,12 @@ class NegocioController extends Controller
         ]);
 
         Auditoria::registrar(
-            Auth::id(),
-            $id,
             'editar_negocio',
-            "Datos y precio acordado actualizados para {$nombre}."
+            'restaurantes',
+            $id,
+            $negocio,
+            ['nombre' => $nombre, 'precio' => $precio, 'ciclo' => $ciclo],
+            $id
         );
 
         Session::flash('success', 'Negocio actualizado exitosamente.');
@@ -320,10 +324,12 @@ class NegocioController extends Controller
         ]);
 
         Auditoria::registrar(
-            Auth::id(),
-            $id,
             'reset_password_admin',
-            "Contraseña temporal generada para el admin {$admin['email']}."
+            'usuarios',
+            (int)$admin['id'],
+            null,
+            ['email' => $admin['email']],
+            $id
         );
 
         return $this->render('super/negocios/credenciales', [
@@ -354,7 +360,7 @@ class NegocioController extends Controller
                 'periodos' => (int)$request->post('periodos', 1),
                 'referencia' => (string)$request->post('referencia', ''),
                 'nota' => (string)$request->post('nota', ''),
-            ], Auth::id());
+            ], (int)(Auth::id() ?? 1));
 
             Session::flash('success', "¡Pago registrado exitosamente! Nuevo vencimiento: " . date('d/m/Y', strtotime($res['nueva_fecha_vencimiento'])) . ".");
         } catch (\Throwable $e) {
@@ -374,7 +380,7 @@ class NegocioController extends Controller
         $motivo = trim((string)$request->post('motivo', ''));
 
         try {
-            $nuevoVenc = SuscripcionService::extenderDias($id, $dias, $motivo ?: null, Auth::id());
+            $nuevoVenc = SuscripcionService::extenderDias($id, $dias, $motivo ?: null, (int)(Auth::id() ?? 1));
             Session::flash('success', "Se extendieron {$dias} días de cortesía. Nuevo vencimiento: " . date('d/m/Y', strtotime($nuevoVenc)) . ".");
         } catch (\Throwable $e) {
             Session::flash('error', "Error al extender días: " . $e->getMessage());
@@ -392,7 +398,7 @@ class NegocioController extends Controller
         $nuevoEstado = trim((string)$request->post('estado', ''));
 
         try {
-            SuscripcionService::cambiarEstadoManual($id, $nuevoEstado ?: null, Auth::id());
+            SuscripcionService::cambiarEstadoManual($id, $nuevoEstado ?: null, (int)(Auth::id() ?? 1));
             $msg = $nuevoEstado ? "Negocio marcado como {$nuevoEstado}." : "Negocio reactivado exitosamente.";
             Session::flash('success', $msg);
         } catch (\Throwable $e) {
@@ -419,10 +425,12 @@ class NegocioController extends Controller
         Session::set('impersonating_tenant_name', $negocio['nombre']);
 
         Auditoria::registrar(
-            Auth::id(),
-            $id,
             'soporte_ver_como',
-            "Super Admin ingresó en modo 'Ver como' a {$negocio['nombre']}."
+            'restaurantes',
+            $id,
+            null,
+            ['nombre' => $negocio['nombre']],
+            $id
         );
 
         Session::flash('success', "Modo soporte activado: ahora estás viendo el panel de {$negocio['nombre']}.");
@@ -440,10 +448,12 @@ class NegocioController extends Controller
 
         if ($id) {
             Auditoria::registrar(
-                Auth::id(),
-                (int)$id,
                 'soporte_salir_ver_como',
-                "Super Admin salió del modo 'Ver como'."
+                'restaurantes',
+                (int)$id,
+                null,
+                null,
+                (int)$id
             );
         }
 
