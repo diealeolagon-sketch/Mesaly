@@ -12,6 +12,7 @@ use App\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Controllers\Admin\DisponibilidadController;
 use App\Controllers\Admin\MesaController;
 use App\Controllers\Admin\ModificadorController;
+use App\Controllers\Admin\PedidoAdminController;
 use App\Controllers\AuthController;
 use App\Controllers\Public\MenuController;
 use App\Controllers\Super\NegocioController;
@@ -78,6 +79,12 @@ $adminPostMiddlewares = [new AuthMiddleware(), new TenantMiddleware(), new Suscr
 
 $router->get('/admin/suscripcion-vencida', [AdminDashboardController::class, 'suscripcionVencida'], $adminBaseMiddlewares);
 $router->get('/admin', [AdminDashboardController::class, 'index'], $adminMiddlewares);
+$router->post('/admin/toggle-recibiendo-pedidos', [AdminDashboardController::class, 'toggleRecibiendoPedidos'], $adminPostMiddlewares);
+
+// Pedidos en Vivo y Operación (Fase 3)
+$router->get('/admin/pedidos', [PedidoAdminController::class, 'index'], $adminMiddlewares);
+$router->post('/admin/pedidos/{id}/estado', [PedidoAdminController::class, 'cambiarEstado'], $adminPostMiddlewares);
+$router->get('/admin/pedidos/{id}/detalle-json', [PedidoAdminController::class, 'detalleJson'], $adminMiddlewares);
 
 // Configuración
 $router->get('/admin/configuracion', [ConfigController::class, 'show'], $adminMiddlewares);

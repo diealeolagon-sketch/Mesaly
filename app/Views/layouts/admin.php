@@ -47,6 +47,10 @@
                     <?= icon('dashboard', 16) ?>
                     <span>Resumen</span>
                 </a>
+                <a href="<?= e(app_url('/admin/pedidos')) ?>" class="nav-link-item <?= str_contains($currentUri, '/pedidos') ? 'active' : '' ?>">
+                    <?= icon('cart', 16) ?>
+                    <span>Pedidos</span>
+                </a>
                 <a href="<?= e(app_url('/admin/catalogo')) ?>" class="nav-link-item <?= str_contains($currentUri, '/catalogo') ? 'active' : '' ?>">
                     <?= icon('catalog', 16) ?>
                     <span>Catálogo</span>
@@ -106,6 +110,7 @@
         <?= $content ?>
     </main>
 
+    <script nonce="<?= e($cspNonce) ?>" src="<?= e(asset_url('/assets/vendor/chartjs/chart.umd.js')) ?>"></script>
     <script nonce="<?= e($cspNonce) ?>" src="<?= e(asset_url('/assets/js/admin.js')) ?>"></script>
 </body>
 </html>
