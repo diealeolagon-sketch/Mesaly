@@ -237,54 +237,64 @@
     </div>
 
     <!-- Resumen de Infraestructura & Suscripción -->
-    <div class="card" style="padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
+    <div class="dashboard-restaurant-status-card">
         <div>
-            <h2 style="font-size: 15px; font-weight: 700; color: var(--color-text-main); margin: 0 0 4px 0;">
-                Estado del Restaurante
-            </h2>
-            <span style="font-size: 12.5px; color: var(--color-text-muted);">
-                Capacidad y suscripción activa
-            </span>
+            <div class="dashboard-restaurant-status-header">
+                <h2 class="dashboard-restaurant-status-title">
+                    Estado del Restaurante
+                </h2>
+                <span class="dashboard-restaurant-status-sub">
+                    Capacidad y suscripción activa
+                </span>
+            </div>
 
-            <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--color-border-subtle);">
-                    <span style="font-size: 13px; color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 6px;">
+            <div class="dashboard-stats-list">
+                <div class="dashboard-stat-row">
+                    <span class="dashboard-stat-label">
                         <?= icon('catalog', 14) ?> Categorías en carta
                     </span>
-                    <strong style="font-size: 13.5px; color: var(--color-text-main);"><?= (int)$stats['categorias'] ?></strong>
+                    <strong class="dashboard-stat-value"><?= (int)$stats['categorias'] ?></strong>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--color-border-subtle);">
-                    <span style="font-size: 13px; color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 6px;">
+                <div class="dashboard-stat-row">
+                    <span class="dashboard-stat-label">
                         <?= icon('store', 14) ?> Platos y bebidas
                     </span>
-                    <strong style="font-size: 13.5px; color: var(--color-text-main);"><?= (int)$stats['productos'] ?></strong>
+                    <strong class="dashboard-stat-value"><?= (int)$stats['productos'] ?></strong>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--color-border-subtle);">
-                    <span style="font-size: 13px; color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 6px;">
+                <div class="dashboard-stat-row">
+                    <span class="dashboard-stat-label">
                         <?= icon('cutlery', 14) ?> Mesas con código QR
                     </span>
-                    <strong style="font-size: 13.5px; color: var(--color-text-main);"><?= (int)$stats['mesas'] ?></strong>
+                    <strong class="dashboard-stat-value"><?= (int)$stats['mesas'] ?></strong>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--color-border-subtle);">
-                    <span style="font-size: 13px; color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 6px;">
+                <div class="dashboard-stat-row">
+                    <span class="dashboard-stat-label">
                         <?= icon('modifiers', 14) ?> Grupos de opciones
                     </span>
-                    <strong style="font-size: 13.5px; color: var(--color-text-main);"><?= (int)$stats['grupos'] ?></strong>
+                    <strong class="dashboard-stat-value"><?= (int)$stats['grupos'] ?></strong>
                 </div>
             </div>
         </div>
 
-        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center;">
+        <div class="dashboard-subscription-box">
             <div>
-                <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; color: var(--color-text-subtle); display: block;">Suscripción</span>
-                <span style="font-size: 12px; color: var(--color-text-muted);">
+                <span class="dashboard-subscription-label">Suscripción</span>
+                <span class="dashboard-subscription-date">
                     <?= !empty($tenant['fecha_vencimiento']) ? 'Vence: ' . date('d/m/Y', strtotime($tenant['fecha_vencimiento'])) : 'Sin vencimiento' ?>
                 </span>
             </div>
-            <span class="badge-pill" style="font-size: 11.5px; padding: 3px 10px; color: <?= e($estadoSuscripcion['color']) ?>; background: <?= e($estadoSuscripcion['bg_color']) ?>;">
+            <?php
+            $subClass = 'active';
+            if (str_contains(strtolower($estadoSuscripcion['label'] ?? ''), 'vencid')) {
+                $subClass = 'danger';
+            } elseif (str_contains(strtolower($estadoSuscripcion['label'] ?? ''), 'por vencer')) {
+                $subClass = 'warning';
+            }
+            ?>
+            <span class="badge-status-sub <?= $subClass ?>">
                 <?= e($estadoSuscripcion['label']) ?>
             </span>
         </div>

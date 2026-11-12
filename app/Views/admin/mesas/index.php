@@ -32,7 +32,7 @@
 <div class="card" style="padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, #FFFFFF 0%, #FAFBFD 100%);">
     <div style="display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap;">
         <div style="display: flex; gap: 20px; align-items: center; flex: 1; min-width: 280px;">
-            <div style="width: 100px; height: 100px; background: #FFFFFF; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 6px; box-shadow: var(--shadow-sm); flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+            <div class="qr-general-box">
                 <?= $qrGeneralSvg ?>
             </div>
 
@@ -78,6 +78,29 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- GENERADOR RÁPIDO DE CÓDIGOS QR PARA MESAS -->
+<div class="mesa-quick-batch-card">
+    <div class="mesa-quick-batch-info">
+        <div class="mesa-quick-batch-icon">
+            <?= icon('sparkles', 22) ?>
+        </div>
+        <div>
+            <h3 class="mesa-quick-batch-title">¿Cuántas mesas tiene tu restaurante?</h3>
+            <p class="mesa-quick-batch-subtitle">Indica el número total de mesas y generaremos todos sus códigos QR en un solo clic (del 1 al total).</p>
+        </div>
+    </div>
+    <form method="POST" action="<?= e(app_url('/admin/mesas/lote')) ?>" class="mesa-quick-batch-form">
+        <?= csrf_field() ?>
+        <input type="hidden" name="desde" value="1">
+        <label for="lote_hasta_quick" style="font-size: 13px; font-weight: 700; color: #9A3412;">Total Mesas:</label>
+        <input type="number" id="lote_hasta_quick" name="hasta" class="mesa-quick-batch-input" min="1" max="100" value="<?= max(10, (int)$totalMesas) ?>" required>
+        <button type="submit" class="btn btn-primary" style="background: #EA580C; border-color: #EA580C; font-weight: 700; white-space: nowrap;">
+            <?= icon('qrcode', 15) ?>
+            <span>Generar Códigos QR</span>
+        </button>
+    </form>
 </div>
 
 <!-- 2. GRILLA DE MESAS CON QR -->
@@ -142,7 +165,7 @@
 
                         <!-- Código QR Centrado -->
                         <div style="background: #FFFFFF; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 12px; margin: 12px 0; text-align: center; box-shadow: var(--shadow-sm);">
-                            <div style="width: 140px; height: 140px; margin: 0 auto;">
+                            <div class="mesa-qr-container">
                                 <?= $mesa['qr_svg'] ?>
                             </div>
                             <div style="margin-top: 8px;">
@@ -340,13 +363,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function abrir(modal) {
         if (!modal) return;
+        modal.classList.add('is-open');
         modal.style.display = 'flex';
         const input = modal.querySelector('input[type="number"]');
         if (input) setTimeout(() => input.focus(), 60);
     }
 
     function cerrar(modal) {
-        if (modal) modal.style.display = 'none';
+        if (modal) {
+            modal.classList.remove('is-open');
+            modal.style.display = 'none';
+        }
     }
 
     document.getElementById('btnAbrirModalCrear')?.addEventListener('click', () => abrir(modalCrear));

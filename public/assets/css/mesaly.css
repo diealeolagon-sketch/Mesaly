@@ -704,7 +704,8 @@ body.admin-body {
 }
 
 /* Modals */
-.modal-backdrop {
+.modal-backdrop,
+.modal-backdrop-modern {
     display: none;
     position: fixed;
     inset: 0;
@@ -715,16 +716,23 @@ body.admin-body {
     justify-content: center;
     z-index: 9999;
     padding: 20px;
+    box-sizing: border-box;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.22s ease, visibility 0.22s ease;
 }
 
 .modal-backdrop.is-open,
-.modal-backdrop.is-active {
+.modal-backdrop.is-active,
+.modal-backdrop-modern.is-open,
+.modal-backdrop-modern.is-active {
     display: flex !important;
     opacity: 1 !important;
     visibility: visible !important;
+}
+
+.is-hidden {
+    display: none !important;
 }
 
 .modal-dialog {
@@ -2187,9 +2195,9 @@ body.error-page {
 
 .menu-brand-header {
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 18px;
-    margin-top: -46px;
+    margin-top: 0;
     position: relative;
     z-index: 2;
 }
@@ -2203,6 +2211,7 @@ body.error-page {
     object-fit: cover;
     background-color: #FFFFFF;
     flex-shrink: 0;
+    margin-top: -46px;
 }
 
 .menu-logo-placeholder {
@@ -2219,11 +2228,13 @@ body.error-page {
     font-size: 32px;
     font-weight: 800;
     flex-shrink: 0;
+    margin-top: -46px;
 }
 
 .menu-brand-info {
     flex: 1;
     min-width: 0;
+    padding-top: 10px;
     padding-bottom: 4px;
 }
 
@@ -3592,6 +3603,7 @@ body.error-page {
 }
 
 .checkout-error-msg {
+    display: none;
     background-color: #FEF2F2;
     border: 1px solid #FECACA;
     color: #B91C1C;
@@ -3600,6 +3612,18 @@ body.error-page {
     font-size: 13.5px;
     font-weight: 700;
     margin-bottom: 16px;
+}
+
+.checkout-error-msg.is-visible {
+    display: block !important;
+}
+
+.row-costo-envio {
+    display: none;
+}
+
+.row-costo-envio.is-visible {
+    display: flex !important;
 }
 
 .btn-submit-order {
@@ -3976,6 +4000,577 @@ body.error-page {
     padding: 0 0 0 6px;
     display: inline-flex;
     align-items: center;
+}
+
+/* ==============================================================================
+   Brand Identity & Polish: Cart Drawer
+   ============================================================================== */
+.cart-drawer-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.cart-drawer-brand-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1.5px solid #E2E8F0;
+    object-fit: cover;
+    background-color: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.cart-drawer-brand-logo-placeholder {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--menu-primary, #E85D04), #c04900);
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cart-drawer-brand-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.cart-drawer-brand-name {
+    font-size: 11px;
+    font-weight: 800;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cart-drawer-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.cart-drawer-badge-count {
+    background: #F1F5F9;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    border: 1px solid #E2E8F0;
+}
+
+/* Item Action & Remove Button */
+.cart-item-action-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-cart-remove {
+    background: transparent;
+    border: 1px solid #E2E8F0;
+    color: #94A3B8;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 140ms ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.btn-cart-remove:hover {
+    background: #FEF2F2;
+    border-color: #FECACA;
+    color: #EF4444;
+}
+
+/* ==============================================================================
+   Admin Pedidos: Order Detail Modal & WhatsApp Notice Classes (CSP-safe)
+   ============================================================================== */
+.modal-aviso-wa-dialog {
+    width: 100%;
+    max-width: 480px;
+    padding: 24px;
+    box-shadow: var(--shadow-modal);
+    animation: modalSlideUp 160ms var(--ease-fluid);
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+}
+
+.modal-aviso-wa-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.modal-aviso-wa-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-aviso-wa-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #EFF6FF;
+    color: #2563EB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.modal-aviso-wa-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+.modal-aviso-wa-sub {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.modal-aviso-wa-text {
+    font-size: 13.5px;
+    color: var(--color-text-main);
+    margin: 0 0 14px 0;
+    line-height: 1.45;
+}
+
+.modal-aviso-wa-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+
+.btn-wa-notify {
+    background: #25D366 !important;
+    border-color: #25D366 !important;
+    color: #FFFFFF !important;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.order-modal-dialog {
+    width: 100%;
+    max-width: 640px;
+    padding: 26px;
+    box-shadow: var(--shadow-modal);
+    animation: modalSlideUp 160ms var(--ease-fluid);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    box-sizing: border-box;
+}
+
+.order-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.order-detail-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.order-detail-code-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.order-detail-code {
+    font-size: 19px;
+    font-weight: 800;
+    font-family: monospace;
+    color: var(--color-brand);
+    margin: 0;
+}
+
+.order-detail-date {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.order-detail-content-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.order-detail-customer-box {
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.order-detail-field-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.order-detail-field-col.full-col {
+    grid-column: span 2;
+}
+
+.order-detail-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+    display: block;
+}
+
+.order-detail-val-strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.order-detail-val-muted {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.order-detail-notes-box {
+    font-size: 13px;
+    color: var(--color-text-main);
+    margin: 3px 0 0 0;
+    background: #FFFFFF;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    line-height: 1.4;
+}
+
+.order-detail-table-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.order-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.order-detail-table thead {
+    background: var(--color-bg-subtle);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.order-detail-table th {
+    padding: 10px 14px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.order-detail-table th.col-left {
+    text-align: left;
+}
+
+.order-detail-table th.col-right {
+    text-align: right;
+}
+
+.order-detail-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    vertical-align: top;
+}
+
+.order-detail-table tr:last-child td {
+    border-bottom: none;
+}
+
+.order-detail-totals-box {
+    background: #FAFAFC;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.order-detail-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.order-detail-total-row.grand-row {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    border-top: 1px dashed var(--color-border-subtle);
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.order-detail-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ==============================================================================
+   Admin Mesas: Batch Generator & Constrained QRs
+   ============================================================================== */
+.mesa-quick-batch-card {
+    background: linear-gradient(135deg, #FFF7ED 0%, #FFFBEB 100%);
+    border: 1.5px solid #FDBA74;
+    border-radius: var(--radius-lg);
+    padding: 18px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.mesa-quick-batch-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mesa-quick-batch-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #F97316;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mesa-quick-batch-title {
+    font-size: 15.5px;
+    font-weight: 800;
+    color: #9A3412;
+    margin: 0 0 2px 0;
+}
+
+.mesa-quick-batch-subtitle {
+    font-size: 12.5px;
+    color: #C2410C;
+    margin: 0;
+}
+
+.mesa-quick-batch-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mesa-quick-batch-input {
+    width: 90px;
+    padding: 8px 12px;
+    border: 1.5px solid #FDBA74;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0F172A;
+    text-align: center;
+    background: #FFFFFF;
+}
+
+.mesa-qr-container {
+    width: 130px;
+    height: 130px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+}
+
+.mesa-qr-container svg {
+    max-width: 120px !important;
+    max-height: 120px !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+.qr-general-box {
+    width: 90px;
+    height: 90px;
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 6px;
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-general-box svg {
+    max-width: 78px !important;
+    max-height: 78px !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+/* ==============================================================================
+   Admin Dashboard: Estado del Restaurante (CSP-safe)
+   ============================================================================== */
+.dashboard-restaurant-status-card {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.dashboard-restaurant-status-header {
+    margin-bottom: 14px;
+}
+
+.dashboard-restaurant-status-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin: 0 0 4px 0;
+}
+
+.dashboard-restaurant-status-sub {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.dashboard-stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.dashboard-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.dashboard-stat-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.dashboard-stat-label {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dashboard-stat-value {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.dashboard-subscription-box {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-subscription-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-text-subtle);
+    display: block;
+}
+
+.dashboard-subscription-date {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.badge-status-sub {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    display: inline-block;
+}
+
+.badge-status-sub.active {
+    color: #065F46;
+    background: #ECFDF5;
+}
+
+.badge-status-sub.warning {
+    color: #92400E;
+    background: #FEF3C7;
+}
+
+.badge-status-sub.danger {
+    color: #991B1B;
+    background: #FEE2E2;
 }
 
 

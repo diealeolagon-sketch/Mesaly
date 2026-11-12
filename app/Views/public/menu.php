@@ -139,10 +139,6 @@ if (!function_exists('renderProductCard')) {
                                     <?= icon('cutlery', 13) ?>
                                     <span>Mesa #<?= (int)$mesaNumero ?></span>
                                 </span>
-                                <a href="<?= e(app_url('/' . $restaurante['slug'] . '?salir_mesa=1')) ?>" class="chip-modality" style="text-decoration: none;" title="Cambiar a pedido a domicilio o para llevar">
-                                    <?= icon('motorcycle', 13) ?>
-                                    <span>Pedir a Domicilio</span>
-                                </a>
                             <?php else: ?>
                                 <span class="chip-modality active" title="Servicio a Domicilio">
                                     <?= icon('motorcycle', 13) ?>
@@ -156,22 +152,6 @@ if (!function_exists('renderProductCard')) {
 
             <?php if (!empty($restaurante['descripcion'])): ?>
                 <p class="menu-brand-desc"><?= e($restaurante['descripcion']) ?></p>
-            <?php endif; ?>
-
-            <!-- Detección de Mesa Activa -->
-            <?php if ($mesaNumero !== null): ?>
-                <div class="menu-table-banner">
-                    <div class="table-info">
-                        <span class="table-icon"><?= icon('cutlery', 20) ?></span>
-                        <div>
-                            <strong>Estás ordenando para la Mesa #<?= e((string)$mesaNumero) ?></strong>
-                            <small>Tus pedidos se asociarán directamente a esta mesa</small>
-                        </div>
-                    </div>
-                    <form action="<?= e(app_url('/' . $restaurante['slug'] . '/mesa/limpiar')) ?>" method="POST">
-                        <button type="submit" class="btn-unlink-table" title="Desvincular mesa">No estoy en mesa</button>
-                    </form>
-                </div>
             <?php endif; ?>
         </div>
     </header>
@@ -296,11 +276,23 @@ if (!function_exists('renderProductCard')) {
     <div class="modal-backdrop" id="cartDrawerBackdrop" style="display: none;">
         <div class="cart-drawer-sheet" id="cartDrawerSheet">
             <div class="cart-drawer-header">
-                <div>
-                    <h2 class="cart-drawer-title">Tu Pedido</h2>
-                    <span class="cart-drawer-subtitle" id="cartItemsCountText">0 ítems</span>
+                <div class="cart-drawer-header-brand">
+                    <?php if ($tieneLogo): ?>
+                        <img src="<?= e(app_url($restaurante['logo_path'])) ?>" alt="<?= e($restaurante['nombre']) ?>" class="cart-drawer-brand-logo">
+                    <?php else: ?>
+                        <div class="cart-drawer-brand-logo-placeholder">
+                            <?= e(strtoupper(substr($restaurante['nombre'], 0, 2))) ?>
+                        </div>
+                    <?php endif; ?>
+                    <div class="cart-drawer-brand-text">
+                        <span class="cart-drawer-brand-name"><?= e($restaurante['nombre']) ?></span>
+                        <h2 class="cart-drawer-title">Tu Pedido</h2>
+                    </div>
                 </div>
-                <button type="button" class="modal-close-btn" id="btnCloseCartDrawer" aria-label="Cerrar">&times;</button>
+                <div class="cart-drawer-header-actions">
+                    <span class="cart-drawer-badge-count" id="cartItemsCountText">0 ítems</span>
+                    <button type="button" class="modal-close-btn" id="btnCloseCartDrawer" aria-label="Cerrar">&times;</button>
+                </div>
             </div>
 
             <div class="cart-drawer-body">
@@ -327,12 +319,7 @@ if (!function_exists('renderProductCard')) {
                                     <span class="locked-desc">Tus platos se prepararán y servirán directamente en tu mesa.</span>
                                 </div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                <span class="locked-badge">Mesa Activa</span>
-                                <a href="<?= e(app_url('/' . $restaurante['slug'] . '?salir_mesa=1')) ?>" class="btn-change-to-delivery" title="Cambiar a pedido para Domicilio">
-                                    Pedir a Domicilio
-                                </a>
-                            </div>
+                            <span class="locked-badge">Mesa Activa</span>
                             <input type="hidden" name="modalidad" value="mesa">
                             <input type="hidden" name="mesa_numero" value="<?= (int)$mesaNumero ?>">
                         </div>
@@ -427,7 +414,7 @@ if (!function_exists('renderProductCard')) {
                             <span>Subtotal</span>
                             <span id="checkoutSubtotal">$ 0</span>
                         </div>
-                        <div class="total-row" id="rowCostoEnvio" style="display: none;">
+                        <div class="total-row row-costo-envio" id="rowCostoEnvio">
                             <span>Costo de Envío</span>
                             <span id="checkoutCostoEnvio"><?= format_cop((int)($restaurante['costo_envio'] ?? 0)) ?></span>
                         </div>
@@ -438,7 +425,7 @@ if (!function_exists('renderProductCard')) {
                     </div>
 
                     <!-- Mensajes de Error de Validación -->
-                    <div class="checkout-error-msg" id="checkoutErrorMsg" style="display: none;"></div>
+                    <div class="checkout-error-msg" id="checkoutErrorMsg"></div>
 
                     <!-- Botón Enviar a WhatsApp -->
                     <button type="submit" class="btn-submit-order" id="btnSubmitOrder">

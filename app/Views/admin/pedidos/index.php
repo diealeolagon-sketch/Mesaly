@@ -567,26 +567,27 @@
 <?php endif; ?>
 
 <!-- ═══ MODAL: AVISAR AL CLIENTE POR WHATSAPP (ESTADO EN CAMINO) ═══ -->
-<div class="modal-backdrop-modern" id="modalAvisoWhatsApp" style="display: none;">
-    <div class="card" style="width: 100%; max-width: 480px; padding: 24px; box-shadow: var(--shadow-modal); animation: modalSlideUp 160ms var(--ease-fluid);">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 36px; height: 36px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center;">
+<!-- ═══ MODAL: AVISO WHATSAPP CUANDO SALE EN CAMINO ═══ -->
+<div class="modal-backdrop-modern" id="modalAvisoWhatsApp">
+    <div class="modal-aviso-wa-dialog">
+        <div class="modal-aviso-wa-header">
+            <div class="modal-aviso-wa-brand">
+                <div class="modal-aviso-wa-icon">
                     <?= icon('motorcycle', 18) ?>
                 </div>
                 <div>
-                    <h3 style="font-size: 17px; font-weight: 800; color: var(--color-text-main); margin: 0;">
+                    <h3 class="modal-aviso-wa-title">
                         ¡Pedido en Camino!
                     </h3>
-                    <span style="font-size: 12px; color: var(--color-text-muted);" id="avisoWaSubtitulo">
+                    <span class="modal-aviso-wa-sub" id="avisoWaSubtitulo">
                         Avisar al cliente por WhatsApp
                     </span>
                 </div>
             </div>
-            <button type="button" class="btn-close-modal" id="btnCerrarModalAvisoWa" style="background: none; border: none; font-size: 22px; color: var(--color-text-muted); cursor: pointer; line-height: 1;">&times;</button>
+            <button type="button" class="btn-close-modal" id="btnCerrarModalAvisoWa" aria-label="Cerrar">&times;</button>
         </div>
 
-        <p style="font-size: 13.5px; color: var(--color-text-main); margin: 0 0 12px 0; line-height: 1.45;">
+        <p class="modal-aviso-wa-text">
             El pedido <strong id="avisoWaCodigo">#0000</strong> de <strong id="avisoWaCliente">Cliente</strong> salió a despacho. ¿Deseas avisarle con el mensaje precargado?
         </p>
 
@@ -599,11 +600,11 @@
             </div>
         </div>
 
-        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap;">
+        <div class="modal-aviso-wa-footer">
             <button type="button" class="btn btn-secondary" id="btnCancelarAvisoWa">
                 Continuar sin avisar
             </button>
-            <a href="#" id="btnAbrirAvisoWa" target="_blank" rel="noopener" class="btn btn-primary" style="background: #25D366; border-color: #25D366; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <a href="#" id="btnAbrirAvisoWa" target="_blank" rel="noopener" class="btn btn-primary btn-wa-notify">
                 <?= icon('whatsapp', 16) ?>
                 <span>Abrir WhatsApp y Notificar</span>
             </a>
@@ -612,49 +613,49 @@
 </div>
 
 <!-- ═══ MODAL: DETALLE COMPLETO DEL PEDIDO ═══ -->
-<div class="modal-backdrop-modern" id="modalDetallePedido" style="display: none;">
-    <div class="card" style="width: 100%; max-width: 620px; padding: 28px; box-shadow: var(--shadow-modal); animation: modalSlideUp 160ms var(--ease-fluid); max-height: 90vh; overflow-y: auto;">
+<div class="modal-backdrop-modern" id="modalDetallePedido">
+    <div class="order-modal-dialog">
         
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--color-border-subtle);">
-            <div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <h3 style="font-size: 19px; font-weight: 800; font-family: monospace; color: var(--color-brand); margin: 0;" id="detCodigo">
+        <div class="order-detail-header">
+            <div class="order-detail-header-left">
+                <div class="order-detail-code-row">
+                    <h3 class="order-detail-code" id="detCodigo">
                         #PED-0000
                     </h3>
-                    <span id="detEstadoBadge" class="badge" style="padding: 4px 10px; border-radius: var(--radius-full); font-size: 12px; font-weight: 700;">
+                    <span id="detEstadoBadge" class="badge">
                         Recibido
                     </span>
                 </div>
-                <span style="font-size: 12.5px; color: var(--color-text-muted); display: block; margin-top: 4px;" id="detFecha">
+                <span class="order-detail-date" id="detFecha">
                     01/01/2026 12:00 PM
                 </span>
             </div>
-            <button type="button" class="btn-close-modal" id="btnCerrarModalDetalle" style="background: none; border: none; font-size: 24px; color: var(--color-text-muted); cursor: pointer; line-height: 1;">&times;</button>
+            <button type="button" class="btn-close-modal" id="btnCerrarModalDetalle" aria-label="Cerrar">&times;</button>
         </div>
 
         <div id="detLoading" style="text-align: center; padding: 40px; color: var(--color-text-muted);">
             Cargando detalle del pedido...
         </div>
 
-        <div id="detContent" style="display: none; display: flex; flex-direction: column; gap: 20px;">
+        <div id="detContent" class="order-detail-content-wrap is-hidden">
             
             <!-- Datos del Cliente y Entrega -->
-            <div style="background: var(--color-bg-subtle); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-                <div>
-                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-subtle); display: block;">Cliente</span>
-                    <strong style="font-size: 14px; color: var(--color-text-main);" id="detClienteNombre">—</strong>
-                    <div id="detClienteTelWrap" style="font-size: 12.5px; color: var(--color-text-muted); margin-top: 2px;">—</div>
+            <div class="order-detail-customer-box">
+                <div class="order-detail-field-col">
+                    <span class="order-detail-label">Cliente</span>
+                    <strong class="order-detail-val-strong" id="detClienteNombre">—</strong>
+                    <div id="detClienteTelWrap" class="order-detail-val-muted">—</div>
                 </div>
 
-                <div>
-                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-subtle); display: block;">Modalidad</span>
-                    <strong style="font-size: 14px; color: var(--color-text-main);" id="detModalidad">—</strong>
-                    <div id="detModalidadExtra" style="font-size: 12px; color: var(--color-text-muted); margin-top: 2px;">—</div>
+                <div class="order-detail-field-col">
+                    <span class="order-detail-label">Modalidad</span>
+                    <strong class="order-detail-val-strong" id="detModalidad">—</strong>
+                    <div id="detModalidadExtra" class="order-detail-val-muted">—</div>
                 </div>
 
-                <div style="grid-column: span 2;" id="detNotasWrap">
-                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-subtle); display: block;">Instrucciones / Notas de Entrega</span>
-                    <p style="font-size: 13px; color: var(--color-text-main); margin: 3px 0 0 0; background: #FFF; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);" id="detNotas">
+                <div class="order-detail-field-col full-col" id="detNotasWrap">
+                    <span class="order-detail-label">Instrucciones / Notas de Entrega</span>
+                    <p class="order-detail-notes-box" id="detNotas">
                         —
                     </p>
                 </div>
@@ -665,12 +666,12 @@
                 <h4 style="font-size: 14px; font-weight: 700; color: var(--color-text-main); margin: 0 0 10px 0;">
                     Productos Ordenados
                 </h4>
-                <div style="border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                        <thead style="background: var(--color-bg-subtle); border-bottom: 1px solid var(--color-border);">
+                <div class="order-detail-table-card">
+                    <table class="order-detail-table">
+                        <thead>
                             <tr>
-                                <th style="padding: 10px 14px; text-align: left; font-weight: 600; color: var(--color-text-muted);">Cant · Producto</th>
-                                <th style="padding: 10px 14px; text-align: right; font-weight: 600; color: var(--color-text-muted);">Total</th>
+                                <th class="col-left">Cant · Producto</th>
+                                <th class="col-right">Total</th>
                             </tr>
                         </thead>
                         <tbody id="detItemsTbody">
@@ -681,28 +682,28 @@
             </div>
 
             <!-- Resumen Financiero -->
-            <div style="background: #FAFAFC; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; gap: 8px;">
-                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--color-text-muted);">
+            <div class="order-detail-totals-box">
+                <div class="order-detail-total-row">
                     <span>Subtotal:</span>
                     <strong style="color: var(--color-text-main);" id="detSubtotal">$ 0</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--color-text-muted);" id="detEnvioRow">
+                <div class="order-detail-total-row" id="detEnvioRow">
                     <span>Costo de Envío:</span>
                     <strong style="color: var(--color-text-main);" id="detEnvio">$ 0</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 800; color: var(--color-text-main); border-top: 1px dashed var(--color-border-subtle); padding-top: 8px; margin-top: 4px;">
+                <div class="order-detail-total-row grand-row">
                     <span>Total General:</span>
                     <span style="color: #059669;" id="detTotal">$ 0</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-subtle); margin-top: 2px;">
-                    <span>Método de pago acordado:</span>
+                <div class="order-detail-total-row">
+                    <span style="font-size: 12px; color: var(--color-text-subtle);">Método de pago acordado:</span>
                     <span style="text-transform: capitalize; font-weight: 600; color: var(--color-text-muted);" id="detMetodoPago">Efectivo</span>
                 </div>
             </div>
 
             <!-- Botones de Acción en el Modal -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 10px;">
-                <a href="#" id="detBtnWa" target="_blank" rel="noopener" class="btn btn-primary" style="background: #25D366; border-color: #25D366; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <div class="order-detail-actions-row">
+                <a href="#" id="detBtnWa" target="_blank" rel="noopener" class="btn btn-primary btn-wa-notify">
                     <?= icon('whatsapp', 15) ?>
                     <span>Escribir por WhatsApp</span>
                 </a>
@@ -775,10 +776,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const btnWa = document.getElementById('btnAbrirAvisoWa');
         btnWa.href = aviso.wa_url;
 
+        modalAvisoWa.classList.add('is-open');
         modalAvisoWa.style.display = 'flex';
     }
 
     function cerrarModalAvisoWhatsApp() {
+        modalAvisoWa.classList.remove('is-open');
         modalAvisoWa.style.display = 'none';
     }
 
@@ -796,24 +799,27 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.btn-ver-detalle').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const id = this.getAttribute('data-id');
+            modal.classList.add('is-open');
             modal.style.display = 'flex';
+            loading.classList.remove('is-hidden');
             loading.style.display = 'block';
-            content.style.display = 'none';
+            content.classList.add('is-hidden');
 
             fetch(baseUrl + '/admin/pedidos/' + id + '/detalle-json', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(r => r.json())
             .then(data => {
+                loading.classList.add('is-hidden');
                 loading.style.display = 'none';
                 if (!data.success || !data.pedido) {
                     alert(data.error || 'Error al obtener pedido');
-                    modal.style.display = 'none';
+                    cerrarDetalle();
                     return;
                 }
 
                 const p = data.pedido;
-                content.style.display = 'flex';
+                content.classList.remove('is-hidden');
 
                 // Cabecera
                 document.getElementById('detCodigo').innerText = '#' + p.codigo;
@@ -918,6 +924,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Cerrar Modal Detalle
     function cerrarDetalle() {
+        modal.classList.remove('is-open');
         modal.style.display = 'none';
     }
     document.getElementById('btnCerrarModalDetalle')?.addEventListener('click', cerrarDetalle);
