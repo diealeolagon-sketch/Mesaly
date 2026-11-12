@@ -275,4 +275,32 @@ class PublicOrderingAndEdgeCasesTest extends TestCase
         self::$pdo->prepare("DELETE FROM `pedido_items` WHERE `pedido_id` = :id")->execute(['id' => $pedidoDb['id']]);
         self::$pdo->prepare("DELETE FROM `pedidos` WHERE `id` = :id")->execute(['id' => $pedidoDb['id']]);
     }
+
+    public function testEnlaceNormalSinMesaPermiteDomicilioYSalirMesa(): void
+    {
+        // 1. Simular que el usuario tenía una mesa previa en sesión
+        $_SESSION['mesaly_mesa_' . $this->restauranteId] = [
+            'numero' => 4,
+            'expires_at' => time() + 3600,
+        ];
+
+        // 2. Al entrar al enlace normal SIN parámetro ?mesa, la sesión de mesa debe limpiarse
+        $reqNormal = new Request('GET', '/la-parrilla-paisa');
+        $respNormal = $this->menuController->show($reqNormal, ['slug' => 'la-parrilla-paisa']);
+        $this->assertSame(200, $respNormal->getStatusCode());
+        $this->assertArrayNotHasKey('mesaly_mesa_' . $this->restauranteId, $_SESSION);
+
+        // 3. Al entrar explícitamente con ?mesa=2 se activa la mesa
+        $reqMesa = new Request('GET', '/la-parrilla-paisa', [], ['mesa' => 2]);
+        $respMesa = $this->menuController->show($reqMesa, ['slug' => 'la-parrilla-paisa']);
+        $this->assertSame(200, $respMesa->getStatusCode());
+        $this->assertArrayHasKey('mesaly_mesa_' . $this->restauranteId, $_SESSION);
+        $this->assertSame(2, $_SESSION['mesaly_mesa_' . $this->restauranteId]['numero']);
+
+        // 4. Al solicitar salir de mesa (?salir_mesa=1) se limpia
+        $reqSalir = new Request('GET', '/la-parrilla-paisa', [], ['salir_mesa' => '1']);
+        $respSalir = $this->menuController->show($reqSalir, ['slug' => 'la-parrilla-paisa']);
+        $this->assertSame(200, $respSalir->getStatusCode());
+        $this->assertArrayNotHasKey('mesaly_mesa_' . $this->restauranteId, $_SESSION);
+    }
 }

@@ -46,13 +46,20 @@ class MenuController extends Controller
         $restauranteId = (int)$restaurante['id'];
         TenantContext::setTenant($restaurante);
 
-        // Verificar mesa desde parámetro ?mesa=N o sesión (expira en 4 horas)
+        // Detección de Mesa:
+        // - Si se solicita salir de mesa (?salir_mesa=1): se limpia la sesión y queda en modo general.
+        // - Si viene explícitamente ?mesa=N en la URL: se activa la mesa indicada.
+        // - Si NO viene ?mesa en la URL: es el enlace público normal (para domicilios y redes sociales),
+        //   por lo que se limpia cualquier residuo previo de mesa para permitir pedir a domicilio con libertad.
         $mesaNumero = null;
         $sessionKey = 'mesaly_mesa_' . $restauranteId;
         $mesaParam = (int)$request->get('mesa', 0);
         $mesaModel = new \App\Models\Mesa();
 
-        if ($mesaParam > 0) {
+        if ($request->query('salir_mesa') !== null) {
+            unset($_SESSION[$sessionKey]);
+            $mesaNumero = null;
+        } elseif ($mesaParam > 0) {
             $mesaDb = $mesaModel->findByNumero($restauranteId, $mesaParam);
             if ($mesaDb && !empty($mesaDb['activa'])) {
                 $mesaNumero = $mesaParam;
@@ -62,12 +69,10 @@ class MenuController extends Controller
                     'expires_at' => time() + (4 * 3600), // 4 horas
                 ];
             }
-        } elseif (!empty($_SESSION[$sessionKey]) && is_array($_SESSION[$sessionKey])) {
-            if (time() <= (int)($_SESSION[$sessionKey]['expires_at'] ?? 0)) {
-                $mesaNumero = (int)$_SESSION[$sessionKey]['numero'];
-            } else {
-                unset($_SESSION[$sessionKey]);
-            }
+        } else {
+            // Enlace general sin mesa (ej: /la-parrilla-paisa)
+            unset($_SESSION[$sessionKey]);
+            $mesaNumero = null;
         }
 
         // Consultar horarios y estado de apertura
@@ -148,8 +153,8 @@ class MenuController extends Controller
             ];
         }
 
-        // Redirigir a la URL limpia del restaurante
-        header('Location: ' . app_url('/' . $slug));
+        // Redirigir al menú indicando la mesa asignada en la URL
+        header('Location: ' . app_url('/' . $slug . '?mesa=' . $numero));
         exit;
     }
 

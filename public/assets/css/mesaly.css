@@ -3806,6 +3806,27 @@ body.error-page {
     white-space: nowrap;
 }
 
+.btn-change-to-delivery {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #EA580C;
+    background: #FFFFFF;
+    border: 1px solid #FDBA74;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-change-to-delivery:hover {
+    background: #FFF7ED;
+    border-color: #EA580C;
+}
+
 /* ==============================================================================
    Pestañas y Vistas de Pedidos en Admin (Separación Domicilios vs Salón)
    ============================================================================== */

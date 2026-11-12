@@ -29,6 +29,73 @@ if ($mesaNumero !== null) {
 } elseif (!empty($restaurante['acepta_recoger'])) {
     $modalidadDefault = 'recoger';
 }
+
+if (!function_exists('renderProductCard')) {
+    function renderProductCard(array $prod): string
+    {
+        $disponible = !empty($prod['disponible']);
+        $tieneImagen = !empty($prod['imagen_path']);
+        $tieneModificadores = !empty($prod['grupos']);
+
+        ob_start();
+        ?>
+        <div class="menu-product-card <?= !$disponible ? 'is-out-of-stock' : '' ?>" 
+             data-id="<?= (int)$prod['id'] ?>">
+            
+            <div class="product-card-thumb">
+                <?php if ($tieneImagen): ?>
+                    <img src="<?= e(app_url($prod['imagen_path'])) ?>" alt="<?= e($prod['nombre']) ?>" loading="lazy">
+                <?php else: ?>
+                    <div class="product-card-thumb-fallback">
+                        <span><?= icon('cutlery', 24) ?></span>
+                    </div>
+                <?php endif; ?>
+
+                <div class="product-card-badges">
+                    <?php if (!$disponible): ?>
+                        <span class="badge-out">Agotado</span>
+                    <?php else: ?>
+                        <?php if (!empty($prod['destacado'])): ?>
+                            <span class="badge-featured"><?= icon('sparkles', 11) ?> Recomendado</span>
+                        <?php endif; ?>
+                        <?php if ($tieneModificadores): ?>
+                            <span class="badge-customizable"><?= icon('tag', 11) ?> Opciones</span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="product-card-content">
+                <div class="product-card-header">
+                    <h3 class="product-title"><?= e($prod['nombre']) ?></h3>
+                </div>
+
+                <?php if (!empty($prod['descripcion'])): ?>
+                    <p class="product-description"><?= e($prod['descripcion']) ?></p>
+                <?php endif; ?>
+
+                <div class="product-card-footer">
+                    <div class="product-price-box">
+                        <span class="product-price"><?= format_cop((int)$prod['precio']) ?></span>
+                    </div>
+
+                    <?php if ($disponible): ?>
+                        <button type="button" class="btn-add-product" data-id="<?= (int)$prod['id'] ?>">
+                            <span class="btn-plus-icon">+</span>
+                            <span><?= $tieneModificadores ? 'Personalizar' : 'Pedir' ?></span>
+                        </button>
+                    <?php else: ?>
+                        <button type="button" class="btn-add-product disabled" disabled>
+                            <span>Agotado</span>
+                        </button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+}
 ?>
 
 <div class="menu-container" id="menuApp">
@@ -85,6 +152,10 @@ if ($mesaNumero !== null) {
                                     <?= icon('cutlery', 13) ?>
                                     <span>Mesa #<?= (int)$mesaNumero ?></span>
                                 </span>
+                                <a href="<?= e(app_url('/' . $restaurante['slug'] . '?salir_mesa=1')) ?>" class="chip-modality" style="text-decoration: none;" title="Cambiar a pedido a domicilio o para llevar">
+                                    <?= icon('motorcycle', 13) ?>
+                                    <span>Pedir a Domicilio</span>
+                                </a>
                             <?php else: ?>
                                 <?php if (!empty($restaurante['acepta_mesa'])): ?>
                                     <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'mesa') ? 'active' : '' ?>" data-modality="mesa" title="Seleccionar Atención en Mesa">
@@ -283,7 +354,12 @@ if ($mesaNumero !== null) {
                                     <span class="locked-desc">Tus platos se prepararán y servirán directamente en tu mesa.</span>
                                 </div>
                             </div>
-                            <span class="locked-badge">Mesa Activa</span>
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span class="locked-badge">Mesa Activa</span>
+                                <a href="<?= e(app_url('/' . $restaurante['slug'] . '?salir_mesa=1')) ?>" class="btn-change-to-delivery" title="Cambiar a pedido para Domicilio">
+                                    Pedir a Domicilio
+                                </a>
+                            </div>
                             <input type="hidden" name="modalidad" value="mesa">
                             <input type="hidden" name="mesa_numero" value="<?= (int)$mesaNumero ?>">
                         </div>
@@ -506,72 +582,3 @@ if ($mesaNumero !== null) {
 <!-- Script del Menú Interactivo de Mesaly -->
 <script nonce="<?= e($cspNonce) ?>" src="<?= e(asset_url('/assets/js/menu-app.js')) ?>"></script>
 
-<?php
-/**
- * Función auxiliar para renderizar cada tarjeta de producto
- */
-function renderProductCard(array $prod): string
-{
-    $disponible = !empty($prod['disponible']);
-    $tieneImagen = !empty($prod['imagen_path']);
-    $tieneModificadores = !empty($prod['grupos']);
-
-    ob_start();
-    ?>
-    <div class="menu-product-card <?= !$disponible ? 'is-out-of-stock' : '' ?>" 
-         data-id="<?= (int)$prod['id'] ?>">
-        
-        <div class="product-card-thumb">
-            <?php if ($tieneImagen): ?>
-                <img src="<?= e(app_url($prod['imagen_path'])) ?>" alt="<?= e($prod['nombre']) ?>" loading="lazy">
-            <?php else: ?>
-                <div class="product-card-thumb-fallback">
-                    <span><?= icon('cutlery', 24) ?></span>
-                </div>
-            <?php endif; ?>
-
-            <div class="product-card-badges">
-                <?php if (!$disponible): ?>
-                    <span class="badge-out">Agotado</span>
-                <?php else: ?>
-                    <?php if (!empty($prod['destacado'])): ?>
-                        <span class="badge-featured"><?= icon('sparkles', 11) ?> Recomendado</span>
-                    <?php endif; ?>
-                    <?php if ($tieneModificadores): ?>
-                        <span class="badge-customizable"><?= icon('tag', 11) ?> Opciones</span>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="product-card-content">
-            <div class="product-card-header">
-                <h3 class="product-title"><?= e($prod['nombre']) ?></h3>
-            </div>
-
-            <?php if (!empty($prod['descripcion'])): ?>
-                <p class="product-description"><?= e($prod['descripcion']) ?></p>
-            <?php endif; ?>
-
-            <div class="product-card-footer">
-                <div class="product-price-box">
-                    <span class="product-price"><?= format_cop((int)$prod['precio']) ?></span>
-                </div>
-
-                <?php if ($disponible): ?>
-                    <button type="button" class="btn-add-product" data-id="<?= (int)$prod['id'] ?>">
-                        <span class="btn-plus-icon">+</span>
-                        <span><?= $tieneModificadores ? 'Personalizar' : 'Pedir' ?></span>
-                    </button>
-                <?php else: ?>
-                    <button type="button" class="btn-add-product disabled" disabled>
-                        <span>Agotado</span>
-                    </button>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
-?>
