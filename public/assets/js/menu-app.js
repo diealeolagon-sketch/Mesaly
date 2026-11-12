@@ -125,12 +125,8 @@
         updateCartUI();
         initCategoryFiltering();
 
-        if (restaurant.mesa_numero) {
-            updateModalityFields('mesa');
-        } else {
-            const initialMod = document.querySelector('input[name="modalidad"]:checked')?.value || (restaurant.acepta_mesa ? 'mesa' : (restaurant.acepta_domicilio ? 'domicilio' : 'recoger'));
-            updateModalityFields(initialMod);
-        }
+        const initialMod = restaurant.mesa_numero ? 'mesa' : 'domicilio';
+        updateModalityFields(initialMod);
     }
 
     // 5. Enlace de Eventos
@@ -514,10 +510,8 @@
         closeProductModal();
         updateCartUI();
 
-        // Abre el Drawer de Checkout inmediatamente para revisar y pedir
-        setTimeout(() => {
-            openCartDrawer();
-        }, 150);
+        // Feedback visual con micro-animación fluida sin interrumpir la navegación del cliente
+        mostrarAnimacionItemAgregado(activeProduct.nombre);
     }
 
     function saveCart() {
@@ -546,11 +540,67 @@
         }
     }
 
+    let toastTimeout = null;
+
+    function mostrarAnimacionItemAgregado(nombreProducto) {
+        // 1. Animación Bump en el botón flotante del carrito
+        if (floatingCartBar) {
+            floatingCartBar.classList.remove('cart-bar-bump');
+            void floatingCartBar.offsetWidth; // Forzar reflujo
+            floatingCartBar.classList.add('cart-bar-bump');
+        }
+
+        // 2. Animación Pop en los contadores numéricos
+        if (cartBadgeCount) {
+            cartBadgeCount.classList.remove('cart-badge-pop');
+            void cartBadgeCount.offsetWidth;
+            cartBadgeCount.classList.add('cart-badge-pop');
+        }
+        if (headerCartBadge) {
+            headerCartBadge.classList.remove('cart-badge-pop');
+            void headerCartBadge.offsetWidth;
+            headerCartBadge.classList.add('cart-badge-pop');
+        }
+
+        // 3. Notificación tipo Toast no invasiva
+        mostrarToastAgregado(nombreProducto);
+    }
+
+    function mostrarToastAgregado(nombre) {
+        let toast = document.getElementById('toastAddedNotification');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toastAddedNotification';
+            toast.className = 'toast-added-notification';
+            toast.innerHTML = `
+                <span class="toast-added-icon">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="toast-added-text"></span>
+                <button type="button" class="toast-btn-ver" id="btnToastVerPedido">Ver pedido &rarr;</button>
+            `;
+            document.body.appendChild(toast);
+            toast.querySelector('#btnToastVerPedido')?.addEventListener('click', openCartDrawer);
+        }
+
+        const textEl = toast.querySelector('.toast-added-text');
+        if (textEl) {
+            textEl.textContent = `¡${nombre} agregado!`;
+        }
+
+        toast.classList.add('is-visible');
+
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove('is-visible');
+        }, 2200);
+    }
+
     // 8. Drawer del Carrito & Checkout
     function openCartDrawer() {
         renderCartDrawerItems();
 
-        const activeMod = document.querySelector('input[name="modalidad"]:checked')?.value || (restaurant.acepta_mesa ? 'mesa' : (restaurant.acepta_domicilio ? 'domicilio' : 'recoger'));
+        const activeMod = restaurant.mesa_numero ? 'mesa' : 'domicilio';
         updateModalityFields(activeMod);
         updateCartTotals();
 
@@ -656,34 +706,17 @@
     }
 
     function updateModalityFields(modalidad) {
-        if (restaurant.mesa_numero) {
-            modalidad = 'mesa';
-        }
+        modalidad = restaurant.mesa_numero ? 'mesa' : 'domicilio';
 
-        const fieldMesa = document.getElementById('fieldMesa');
-        const fieldMesaConfirmada = document.getElementById('fieldMesaConfirmada');
         const fieldTelefono = document.getElementById('fieldTelefono');
         const fieldsDomicilio = document.getElementById('fieldsDomicilio');
-        const fieldsRecoger = document.getElementById('fieldsRecoger');
         const fieldNotasCocina = document.getElementById('fieldNotasCocina');
         const labelClienteNombre = document.getElementById('labelClienteNombre');
         const clienteNombreInput = document.getElementById('clienteNombreInput');
 
-        // Sincronizar botones de modalidad en la cabecera
-        document.querySelectorAll('.btn-chip-modality').forEach(chip => {
-            if (chip.getAttribute('data-modality') === modalidad) {
-                chip.classList.add('active');
-            } else {
-                chip.classList.remove('active');
-            }
-        });
-
         if (modalidad === 'mesa') {
-            if (fieldMesaConfirmada) fieldMesaConfirmada.style.display = restaurant.mesa_numero ? 'block' : 'none';
-            if (fieldMesa) fieldMesa.style.display = restaurant.mesa_numero ? 'none' : 'block';
             if (fieldTelefono) fieldTelefono.style.display = 'none';
             if (fieldsDomicilio) fieldsDomicilio.style.display = 'none';
-            if (fieldsRecoger) fieldsRecoger.style.display = 'none';
             if (fieldNotasCocina) fieldNotasCocina.style.display = 'block';
             if (rowCostoEnvio) rowCostoEnvio.style.display = 'none';
 
@@ -692,30 +725,14 @@
                 clienteNombreInput.placeholder = '¿Cómo te llamas? (Opcional)';
                 clienteNombreInput.removeAttribute('required');
             }
-        } else if (modalidad === 'domicilio') {
-            if (fieldMesaConfirmada) fieldMesaConfirmada.style.display = 'none';
-            if (fieldMesa) fieldMesa.style.display = 'none';
+        } else {
+            // Domicilio
             if (fieldTelefono) fieldTelefono.style.display = 'block';
             if (fieldsDomicilio) fieldsDomicilio.style.display = 'block';
-            if (fieldsRecoger) fieldsRecoger.style.display = 'none';
             if (fieldNotasCocina) fieldNotasCocina.style.display = 'none';
             if (rowCostoEnvio && restaurant.costo_envio > 0) {
                 rowCostoEnvio.style.display = 'flex';
             }
-
-            if (labelClienteNombre) labelClienteNombre.textContent = 'Tu Nombre Completo *';
-            if (clienteNombreInput) {
-                clienteNombreInput.placeholder = '¿A nombre de quién?';
-                clienteNombreInput.setAttribute('required', 'required');
-            }
-        } else if (modalidad === 'recoger') {
-            if (fieldMesaConfirmada) fieldMesaConfirmada.style.display = 'none';
-            if (fieldMesa) fieldMesa.style.display = 'none';
-            if (fieldTelefono) fieldTelefono.style.display = 'block';
-            if (fieldsDomicilio) fieldsDomicilio.style.display = 'none';
-            if (fieldsRecoger) fieldsRecoger.style.display = 'block';
-            if (fieldNotasCocina) fieldNotasCocina.style.display = 'block';
-            if (rowCostoEnvio) rowCostoEnvio.style.display = 'none';
 
             if (labelClienteNombre) labelClienteNombre.textContent = 'Tu Nombre Completo *';
             if (clienteNombreInput) {
@@ -727,20 +744,20 @@
 
     function updateCartTotals() {
         const subtotal = cart.reduce((sum, it) => sum + it.total_linea, 0);
-        const modalidad = document.querySelector('input[name="modalidad"]:checked')?.value || 'mesa';
+        const modalidad = restaurant.mesa_numero ? 'mesa' : 'domicilio';
 
         let costoEnvio = 0;
         if (modalidad === 'domicilio' && restaurant.costo_envio > 0) {
             costoEnvio = restaurant.costo_envio;
-            rowCostoEnvio.style.display = 'flex';
-            checkoutCostoEnvio.textContent = formatCop(costoEnvio);
+            if (rowCostoEnvio) rowCostoEnvio.style.display = 'flex';
+            if (checkoutCostoEnvio) checkoutCostoEnvio.textContent = formatCop(costoEnvio);
         } else {
-            rowCostoEnvio.style.display = 'none';
+            if (rowCostoEnvio) rowCostoEnvio.style.display = 'none';
         }
 
         const grandTotal = subtotal + costoEnvio;
-        checkoutSubtotal.textContent = formatCop(subtotal);
-        checkoutGrandTotal.textContent = formatCop(grandTotal);
+        if (checkoutSubtotal) checkoutSubtotal.textContent = formatCop(subtotal);
+        if (checkoutGrandTotal) checkoutGrandTotal.textContent = formatCop(grandTotal);
 
         const minAlert = document.getElementById('deliveryMinAlert');
         if (minAlert && modalidad === 'domicilio') {
@@ -763,12 +780,12 @@
         }
 
         const formData = new FormData(checkoutForm);
-        const modalidad = restaurant.mesa_numero ? 'mesa' : (formData.get('modalidad') || 'mesa');
+        const modalidad = restaurant.mesa_numero ? 'mesa' : 'domicilio';
         let clienteNombre = formData.get('cliente_nombre')?.trim();
         const clienteTelefono = formData.get('cliente_telefono')?.trim();
         const subtotal = cart.reduce((sum, it) => sum + it.total_linea, 0);
 
-        let mesaNum = restaurant.mesa_numero ? parseInt(restaurant.mesa_numero, 10) : parseInt(formData.get('mesa_numero'), 10);
+        let mesaNum = restaurant.mesa_numero ? parseInt(restaurant.mesa_numero, 10) : null;
 
         if (modalidad === 'mesa') {
             if (!mesaNum || mesaNum <= 0) {
@@ -778,7 +795,8 @@
             if (!clienteNombre) {
                 clienteNombre = 'Mesa ' + mesaNum;
             }
-        } else if (modalidad === 'domicilio') {
+        } else {
+            // Domicilio
             if (!clienteNombre) {
                 showCheckoutError('Por favor escribe tu nombre completo.');
                 return;
@@ -794,15 +812,6 @@
             }
             if (restaurant.pedido_minimo > 0 && subtotal < restaurant.pedido_minimo) {
                 showCheckoutError(`El pedido mínimo para domicilio es de ${formatCop(restaurant.pedido_minimo)}.`);
-                return;
-            }
-        } else if (modalidad === 'recoger') {
-            if (!clienteNombre) {
-                showCheckoutError('Por favor escribe tu nombre completo.');
-                return;
-            }
-            if (!clienteTelefono || clienteTelefono.length < 7) {
-                showCheckoutError('Por favor ingresa un número de teléfono o WhatsApp válido.');
                 return;
             }
         }

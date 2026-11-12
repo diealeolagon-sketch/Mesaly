@@ -14,21 +14,8 @@
 $tieneBanner = !empty($restaurante['banner_path']);
 $tieneLogo = !empty($restaurante['logo_path']);
 
-// Determinar modalidad activa por defecto:
-// Si escaneó QR o tiene mesa en sesión, siempre 'mesa'.
-// Si no, si el restaurante acepta mesa -> 'mesa'.
-// Si solo acepta domicilio -> 'domicilio'.
-// Si solo acepta recoger -> 'recoger'.
-$modalidadDefault = 'mesa';
-if ($mesaNumero !== null) {
-    $modalidadDefault = 'mesa';
-} elseif (!empty($restaurante['acepta_mesa'])) {
-    $modalidadDefault = 'mesa';
-} elseif (!empty($restaurante['acepta_domicilio'])) {
-    $modalidadDefault = 'domicilio';
-} elseif (!empty($restaurante['acepta_recoger'])) {
-    $modalidadDefault = 'recoger';
-}
+// Modalidad activa: Si tiene mesa es 'mesa', si no, siempre 'domicilio'.
+$modalidadDefault = ($mesaNumero !== null) ? 'mesa' : 'domicilio';
 
 if (!function_exists('renderProductCard')) {
     function renderProductCard(array $prod): string
@@ -157,24 +144,10 @@ if (!function_exists('renderProductCard')) {
                                     <span>Pedir a Domicilio</span>
                                 </a>
                             <?php else: ?>
-                                <?php if (!empty($restaurante['acepta_mesa'])): ?>
-                                    <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'mesa') ? 'active' : '' ?>" data-modality="mesa" title="Seleccionar Atención en Mesa">
-                                        <?= icon('cutlery', 13) ?>
-                                        <span>Mesa</span>
-                                    </button>
-                                <?php endif; ?>
-                                <?php if (!empty($restaurante['acepta_domicilio'])): ?>
-                                    <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'domicilio') ? 'active' : '' ?>" data-modality="domicilio" title="Seleccionar Servicio a Domicilio">
-                                        <?= icon('motorcycle', 13) ?>
-                                        <span>Domicilio</span>
-                                    </button>
-                                <?php endif; ?>
-                                <?php if (!empty($restaurante['acepta_recoger'])): ?>
-                                    <button type="button" class="chip-modality btn-chip-modality <?= ($modalidadDefault === 'recoger') ? 'active' : '' ?>" data-modality="recoger" title="Seleccionar Para Llevar">
-                                        <?= icon('shopping-bag', 13) ?>
-                                        <span>Recoger</span>
-                                    </button>
-                                <?php endif; ?>
+                                <span class="chip-modality active" title="Servicio a Domicilio">
+                                    <?= icon('motorcycle', 13) ?>
+                                    <span>Servicio a Domicilio</span>
+                                </span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -345,7 +318,7 @@ if (!function_exists('renderProductCard')) {
                     </div>
 
                     <?php if ($mesaNumero !== null): ?>
-                        <!-- CASO MESA BLOQUEADA: El comensal tiene mesa asignada (QR activo) -->
+                        <!-- CASO 1: ORDEN EN MESA ASIGNADA (QR ACTIVO) -->
                         <div class="table-locked-notice">
                             <div class="locked-left">
                                 <span class="locked-icon"><?= icon('cutlery', 20) ?></span>
@@ -363,78 +336,37 @@ if (!function_exists('renderProductCard')) {
                             <input type="hidden" name="modalidad" value="mesa">
                             <input type="hidden" name="mesa_numero" value="<?= (int)$mesaNumero ?>">
                         </div>
+
+                        <div class="field-group">
+                            <label for="clienteNombreInput">Tu Nombre (Opcional en mesa)</label>
+                            <input type="text" id="clienteNombreInput" name="cliente_nombre" class="menu-input" placeholder="¿Cómo te llamas? (Opcional)" maxlength="100">
+                        </div>
+
+                        <div class="field-group">
+                            <label for="notasCocinaInput">Notas para la cocina o atención (Opcional)</label>
+                            <input type="text" id="notasCocinaInput" name="notas_cocina" class="menu-input" placeholder="Ej: Sin cebolla, salsas aparte, servilletas..." maxlength="250">
+                        </div>
+
                     <?php else: ?>
-                        <!-- CASO NAVEGACIÓN GENERAL (El comensal elige cómo desea recibir su pedido) -->
-                        <h3 class="checkout-section-title">¿Cómo deseas recibir tu pedido?</h3>
+                        <!-- CASO 2: ENLACE NORMAL DEL RESTAURANTE (DOMICILIO DIRECTO) -->
+                        <h3 class="checkout-section-title">Datos para tu Entrega a Domicilio</h3>
+                        <input type="hidden" name="modalidad" value="domicilio">
 
-                        <!-- Selector de Modalidad -->
-                        <div class="modality-selector">
-                            <?php if (!empty($restaurante['acepta_mesa'])): ?>
-                                <label class="modality-option <?= ($modalidadDefault === 'mesa') ? 'selected' : '' ?>">
-                                    <input type="radio" name="modalidad" value="mesa" <?= ($modalidadDefault === 'mesa') ? 'checked' : '' ?>>
-                                    <span class="modality-card">
-                                        <span class="icon"><?= icon('cutlery', 18) ?></span>
-                                        <span class="name">En Mesa</span>
-                                    </span>
-                                </label>
-                            <?php endif; ?>
-
-                            <?php if (!empty($restaurante['acepta_domicilio'])): ?>
-                                <label class="modality-option <?= ($modalidadDefault === 'domicilio') ? 'selected' : '' ?>">
-                                    <input type="radio" name="modalidad" value="domicilio" <?= ($modalidadDefault === 'domicilio') ? 'checked' : '' ?>>
-                                    <span class="modality-card">
-                                        <span class="icon"><?= icon('motorcycle', 18) ?></span>
-                                        <span class="name">Domicilio</span>
-                                    </span>
-                                </label>
-                            <?php endif; ?>
-
-                            <?php if (!empty($restaurante['acepta_recoger'])): ?>
-                                <label class="modality-option <?= ($modalidadDefault === 'recoger') ? 'selected' : '' ?>">
-                                    <input type="radio" name="modalidad" value="recoger" <?= ($modalidadDefault === 'recoger') ? 'checked' : '' ?>>
-                                    <span class="modality-card">
-                                        <span class="icon"><?= icon('shopping-bag', 18) ?></span>
-                                        <span class="name">Para Llevar</span>
-                                    </span>
-                                </label>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <!-- Campos dinámicos según modalidad -->
-                    <div class="modality-fields" id="modalityFields">
-
-                        <?php if ($mesaNumero === null): ?>
-                            <!-- Ingresar Número de Mesa Manualmente (solo si no escaneó QR de mesa específica) -->
-                            <div class="field-group" id="fieldMesa" style="display: <?= ($modalidadDefault === 'mesa') ? 'block' : 'none' ?>;">
-                                <label for="mesaNumeroInput">Número de Mesa *</label>
-                                <input type="number" id="mesaNumeroInput" name="mesa_numero" class="menu-input" placeholder="Ej: 4" value="" min="1" max="999">
-                                <span class="field-hint">Indica el número que ves en la tarjeta o sticker de tu mesa.</span>
-                            </div>
-                        <?php endif; ?>
-
-                        <!-- 3. Campo Nombre del Cliente -->
-                        <div class="field-group" id="fieldNombre">
-                            <label for="clienteNombreInput" id="labelClienteNombre">
-                                <?= ($modalidadDefault === 'mesa') ? 'Tu Nombre (Opcional en mesa)' : 'Tu Nombre Completo *' ?>
-                            </label>
-                            <input type="text" id="clienteNombreInput" name="cliente_nombre" class="menu-input" 
-                                   placeholder="<?= ($modalidadDefault === 'mesa') ? '¿Cómo te llamas? (Opcional)' : '¿A nombre de quién?' ?>" 
-                                   maxlength="100" <?= ($modalidadDefault !== 'mesa') ? 'required' : '' ?>>
+                        <div class="field-group">
+                            <label for="clienteNombreInput">Tu Nombre Completo *</label>
+                            <input type="text" id="clienteNombreInput" name="cliente_nombre" class="menu-input" placeholder="¿A nombre de quién?" maxlength="100" required>
                         </div>
 
-                        <!-- 4. Campo Teléfono (Oculto en Mesa, Visible en Domicilio y Recoger) -->
-                        <div class="field-group" id="fieldTelefono" style="display: <?= ($modalidadDefault !== 'mesa') ? 'block' : 'none' ?>;">
+                        <div class="field-group" id="fieldTelefono">
                             <label for="clienteTelefonoInput">Teléfono / WhatsApp *</label>
-                            <input type="tel" id="clienteTelefonoInput" name="cliente_telefono" class="menu-input" placeholder="Ej: 300 123 4567" maxlength="20">
+                            <input type="tel" id="clienteTelefonoInput" name="cliente_telefono" class="menu-input" placeholder="Ej: 300 123 4567" maxlength="20" required>
                             <span class="field-hint">Para avisarte cuando tu pedido esté listo o en camino.</span>
                         </div>
 
-                        <!-- 5. Campos Exclusivos de Domicilio (Dirección, Barrio, etc.) -->
-                        <div id="fieldsDomicilio" style="display: <?= ($modalidadDefault === 'domicilio') ? 'block' : 'none' ?>;">
+                        <div id="fieldsDomicilio">
                             <div class="field-group">
                                 <label for="direccionInput">Dirección de Entrega *</label>
-                                <input type="text" id="direccionInput" name="direccion" class="menu-input" placeholder="Ej: Calle 10 # 43-20, Apto 501" maxlength="200">
+                                <input type="text" id="direccionInput" name="direccion" class="menu-input" placeholder="Ej: Calle 10 # 43-20, Apto 501" maxlength="200" required>
                             </div>
 
                             <div class="field-group">
@@ -443,8 +375,8 @@ if (!function_exists('renderProductCard')) {
                             </div>
 
                             <div class="field-group">
-                                <label for="notasEntregaDomicilioInput">Indicaciones de Entrega (Opcional)</label>
-                                <input type="text" id="notasEntregaDomicilioInput" name="notas_entrega_domicilio" class="menu-input" placeholder="Ej: Timbre 501, dejar en portería..." maxlength="250">
+                                <label for="notasEntregaDomicilioInput">Indicaciones de Entrega o Recogida (Opcional)</label>
+                                <input type="text" id="notasEntregaDomicilioInput" name="notas_entrega_domicilio" class="menu-input" placeholder="Ej: Timbre 501, dejar en portería, o pasar a recoger..." maxlength="250">
                             </div>
 
                             <?php if (!empty($restaurante['pedido_minimo'])): ?>
@@ -456,22 +388,7 @@ if (!function_exists('renderProductCard')) {
                                 </div>
                             <?php endif; ?>
                         </div>
-
-                        <!-- 6. Campos Exclusivos de Para Llevar (Recoger) -->
-                        <div id="fieldsRecoger" style="display: <?= ($modalidadDefault === 'recoger') ? 'block' : 'none' ?>;">
-                            <div class="field-group">
-                                <label for="horaRecogidaInput">Hora Estimada de Recogida</label>
-                                <input type="text" id="horaRecogidaInput" name="hora_recogida" class="menu-input" placeholder="Ej: En 20 minutos / 1:30 PM" maxlength="50">
-                            </div>
-                        </div>
-
-                        <!-- 7. Notas para Cocina (para En Mesa y Para Llevar) -->
-                        <div class="field-group" id="fieldNotasCocina" style="display: <?= ($modalidadDefault !== 'domicilio') ? 'block' : 'none' ?>;">
-                            <label for="notasCocinaInput">Notas para la cocina o atención (Opcional)</label>
-                            <input type="text" id="notasCocinaInput" name="notas_cocina" class="menu-input" placeholder="Ej: Sin cebolla, salsas aparte, servilletas extra..." maxlength="250">
-                        </div>
-
-                    </div>
+                    <?php endif; ?>
 
                     <!-- Métodos de Pago -->
                     <?php if (!empty($metodosPago)): ?>
