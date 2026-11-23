@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Background Gradient: Deep Royal Cobalt Blue like SaleSkip -->
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#243EDB"/>
+      <stop offset="40%" stop-color="#1B2EB8"/>
+      <stop offset="80%" stop-color="#14218A"/>
+      <stop offset="100%" stop-color="#0E1763"/>
+    </linearGradient>
+
+    <!-- Ambient Cyan Glow top-right -->
+    <radialGradient id="cyanGlow" cx="85%" cy="15%" r="65%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.35"/>
+      <stop offset="45%" stop-color="#2563EB" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#1D4ED8" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bottom Soft Ambient Glow -->
+    <radialGradient id="indigoGlow" cx="15%" cy="85%" r="55%">
+      <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#1E1B4B" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Wave Gradients like Blueback -->
+    <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#1D4ED8" stop-opacity="0.08"/>
+    </linearGradient>
+
+    <linearGradient id="waveGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#2563EB" stop-opacity="0.12"/>
+    </linearGradient>
+
+    <linearGradient id="waveGrad3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#1E40AF" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Blue Canvas -->
+  <rect width="1200" height="1200" fill="url(#skyGrad)"/>
+  <rect width="1200" height="1200" fill="url(#cyanGlow)"/>
+  <rect width="1200" height="1200" fill="url(#indigoGlow)"/>
+
+  <!-- Organic Fluid Waves (Blueback style) in the background -->
+  <path d="M-100,520 C280,380 500,740 880,560 C1080,460 1200,620 1350,540 L1350,1300 L-100,1300 Z" fill="url(#waveGrad1)"/>
+  <path d="M-150,720 C240,600 480,940 820,780 C1100,650 1220,860 1380,760 L1380,1300 L-150,1300 Z" fill="url(#waveGrad2)"/>
+  <path d="M-100,940 C320,840 620,1120 980,960 C1160,880 1280,1020 1350,960 L1350,1300 L-100,1300 Z" fill="url(#waveGrad3)"/>
+
+  <!-- Concentric Geometric Contours (SaleSkip wireframe arcs) -->
+  <g transform="translate(760, 420) rotate(16)" fill="none" stroke="#FFFFFF" stroke-linecap="round">
+    <rect x="-240" y="-240" width="480" height="480" rx="90" stroke-width="1.5" stroke-opacity="0.14"/>
+    <rect x="-320" y="-320" width="640" height="640" rx="120" stroke-width="1.5" stroke-opacity="0.11"/>
+    <rect x="-400" y="-400" width="800" height="800" rx="150" stroke-width="1.5" stroke-opacity="0.08"/>
+    <rect x="-480" y="-480" width="960" height="960" rx="180" stroke-width="1.5" stroke-opacity="0.05"/>
+    <rect x="-560" y="-560" width="1120" height="1120" rx="210" stroke-width="1.5" stroke-opacity="0.03"/>
+  </g>
+
+  <!-- Secondary subtle geometric circle radar accents -->
+  <g fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1.5">
+    <circle cx="200" cy="980" r="160"/>
+    <circle cx="200" cy="980" r="260"/>
+    <circle cx="200" cy="980" r="360"/>
+  </g>
+</svg>

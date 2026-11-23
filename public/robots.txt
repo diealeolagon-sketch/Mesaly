@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /superadmin/
+Disallow: /pedidos/crear
+Disallow: /login
+Disallow: /logout
+Allow: /

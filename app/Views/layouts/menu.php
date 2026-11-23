@@ -18,28 +18,92 @@
     <?php if (!empty($restaurante['logo_path'])): ?>
         <link rel="icon" type="image/webp" href="<?= e(app_url($restaurante['logo_path'])) ?>">
     <?php else: ?>
-        <link rel="icon" type="image/svg+xml" href="<?= e(app_url('/assets/img/logo-icon.svg')) ?>">
+        <link rel="icon" type="image/svg+xml" href="<?= e(asset_url('/assets/img/logo-icon.svg')) ?>">
     <?php endif; ?>
 
     <!-- Fuentes Autohospedadas Locales (Sin CDN externo, compatible con CSP) -->
+    <?php
+    $fuenteSeleccionada = $restaurante['fuente'] ?? 'Plus Jakarta Sans';
+    
+    $preloadMap = [
+        'Plus Jakarta Sans'  => '/assets/fonts/plus_jakarta_sans_700_normal.woff2',
+        'Inter'              => '/assets/fonts/inter_600_normal.woff2',
+        'Poppins'            => '/assets/fonts/poppins_700_normal.woff2',
+        'Outfit'             => '/assets/fonts/outfit_600_normal.woff2',
+        'DM Sans'            => '/assets/fonts/dm_sans_700_normal.woff2',
+        'Montserrat'         => '/assets/fonts/montserrat_700_normal.woff2',
+        'Oswald'             => '/assets/fonts/oswald_700_normal.woff2',
+        'Fraunces'           => '/assets/fonts/fraunces_700_normal.woff2',
+        'Lora'               => '/assets/fonts/lora_700_normal.woff2',
+        'Playfair'           => '/assets/fonts/playfair_display_700_normal.woff2',
+        'Playfair Display'   => '/assets/fonts/playfair_display_700_normal.woff2',
+        'Cormorant Garamond' => '/assets/fonts/cormorant_garamond_700_normal.woff2',
+    ];
+    $preloadFont = $preloadMap[$fuenteSeleccionada] ?? '/assets/fonts/plus_jakarta_sans_700_normal.woff2';
+    ?>
     <link rel="preload" href="<?= e(app_url('/assets/fonts/inter_400_normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="<?= e(app_url('/assets/fonts/outfit_600_normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="<?= e(app_url($preloadFont)) ?>" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="<?= e(asset_url('/assets/css/tokens.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('/assets/css/fonts.css')) ?>">
 
     <!-- CSS de Mesaly con versionado automático -->
     <link rel="stylesheet" href="<?= e(asset_url('/assets/css/mesaly.css')) ?>">
 
     <?php
-    $fuente = $restaurante['fuente'] ?? 'Moderna';
-    if (in_array($fuente, ['Inter', 'Poppins', 'Outfit', 'Roboto'], true)) {
-        $fuente = 'Moderna';
-    } elseif (in_array($fuente, ['Playfair', 'Playfair Display'], true)) {
-        $fuente = 'Elegante';
-    } elseif ($fuente === 'System') {
-        $fuente = 'Sistema';
-    }
-
-    $pares = [
+    $mapaFuentes = [
+        'Plus Jakarta Sans' => [
+            'heading' => "'Plus Jakarta Sans', sans-serif",
+            'body' => "'Plus Jakarta Sans', sans-serif",
+        ],
+        'Inter' => [
+            'heading' => "'Inter', sans-serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Poppins' => [
+            'heading' => "'Poppins', sans-serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Outfit' => [
+            'heading' => "'Outfit', sans-serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'DM Sans' => [
+            'heading' => "'DM Sans', sans-serif",
+            'body' => "'DM Sans', sans-serif",
+        ],
+        'Montserrat' => [
+            'heading' => "'Montserrat', sans-serif",
+            'body' => "'Montserrat', sans-serif",
+        ],
+        'Oswald' => [
+            'heading' => "'Oswald', sans-serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Fraunces' => [
+            'heading' => "'Fraunces', serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Lora' => [
+            'heading' => "'Lora', serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Playfair' => [
+            'heading' => "'Playfair Display', serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Playfair Display' => [
+            'heading' => "'Playfair Display', serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'Cormorant Garamond' => [
+            'heading' => "'Cormorant Garamond', serif",
+            'body' => "'Inter', sans-serif",
+        ],
+        'System' => [
+            'heading' => "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            'body' => "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        ],
+        // Mapeos heredados de compatibilidad
         'Moderna' => [
             'heading' => "'Outfit', sans-serif",
             'body' => "'Inter', sans-serif",
@@ -61,7 +125,7 @@
             'body' => "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         ],
     ];
-    $parSeleccionado = $pares[$fuente] ?? $pares['Moderna'];
+    $parSeleccionado = $mapaFuentes[$fuenteSeleccionada] ?? $mapaFuentes['Plus Jakarta Sans'];
     ?>
 
     <!-- Variables Dinámicas de Marca del Restaurante con Nonce CSP -->

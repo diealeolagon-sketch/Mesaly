@@ -6,11 +6,13 @@ namespace App\Controllers\Admin;
 
 use App\Core\Auth;
 use App\Core\Controller;
+use App\Core\Model;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Session;
 use App\Models\Pedido;
 use App\Models\Restaurante;
+use App\Services\HorarioService;
 
 class PedidoAdminController extends Controller
 {
@@ -45,6 +47,10 @@ class PedidoAdminController extends Controller
         $busqueda = trim((string)$request->query('q', ''));
         $fechaDesde = trim((string)$request->query('fecha_desde', ''));
         $fechaHasta = trim((string)$request->query('fecha_hasta', ''));
+        $jornada = trim((string)$request->query('jornada', 'actual'));
+        if (!in_array($jornada, ['actual', 'ayer', 'todas'], true)) {
+            $jornada = 'actual';
+        }
         $pagina = max(1, (int)$request->query('page', 1));
         $porPagina = 15;
 
@@ -66,17 +72,21 @@ class PedidoAdminController extends Controller
             }
         }
 
+        // Pedidos en Vivo: Exclusivo y enfocado en la jornada operativa actual (Hoy)
+        $rangoJornada = HorarioService::obtenerRangoJornada($tenantId, 'actual');
+
         $filtros = [
             'estado' => $estado,
             'modalidad' => $modalidad,
             'q' => $busqueda,
-            'fecha_desde' => $fechaDesde,
-            'fecha_hasta' => $fechaHasta,
+            'datetime_desde' => $rangoJornada['desde'],
+            'datetime_hasta' => $rangoJornada['hasta'],
+            'mantener_pendientes' => true,
         ];
 
         $pedidos = $this->pedidoModel->listarPorRestaurante($tenantId, $filtros, $pagina, $porPagina);
         $totalPedidos = $this->pedidoModel->contarPorRestaurante($tenantId, $filtros);
-        $conteos = $this->pedidoModel->conteosPorEstado($tenantId);
+        $conteos = $this->pedidoModel->conteosPorEstado($tenantId, $filtros);
         $totalPaginas = max(1, (int)ceil($totalPedidos / $porPagina));
 
         // Enriquecer cada pedido con enlace directo a WhatsApp y datos de visualización
@@ -92,12 +102,13 @@ class PedidoAdminController extends Controller
         $pedidosLocal = array_values(array_filter($pedidos, static fn($p) => $p['modalidad'] !== 'domicilio'));
 
         return $this->render('admin/pedidos/index', [
-            'title' => 'Gestión de Pedidos — ' . $restaurante['nombre'],
+            'title' => 'Gestión de Pedidos en Vivo — ' . $restaurante['nombre'],
             'tenant' => $restaurante,
             'pedidos' => $pedidos,
             'pedidosDomicilio' => $pedidosDomicilio,
             'pedidosLocal' => $pedidosLocal,
             'vista' => $vista,
+            'rangoJornada' => $rangoJornada,
             'filtros' => $filtros,
             'conteos' => $conteos,
             'pagina' => $pagina,
@@ -159,6 +170,7 @@ class PedidoAdminController extends Controller
 
             if ($request->isAjax()) {
                 $estadoInfo = Pedido::ESTADOS[$nuevoEstado];
+                $conteos = $this->pedidoModel->conteosPorEstado($tenantId);
                 return $this->json([
                     'success' => true,
                     'estado' => $nuevoEstado,
@@ -167,6 +179,7 @@ class PedidoAdminController extends Controller
                     'bg' => $estadoInfo['bg'],
                     'border' => $estadoInfo['border'] ?? '#CBD5E1',
                     'aviso_whatsapp' => $avisoWhatsapp,
+                    'conteos' => $conteos,
                 ]);
             }
 
@@ -219,6 +232,68 @@ class PedidoAdminController extends Controller
     }
 
     /**
+     * Redirige hacia la vista de pedidos abriendo directamente el modal de la comanda indicada
+     */
+    public function verComanda(Request $request, array $params): Response
+    {
+        $id = (int)($params['id'] ?? 0);
+        return $this->redirect(app_url('/admin/pedidos?pedido=' . $id));
+    }
+
+    /**
+     * Libera una mesa asociada a una comanda en curso
+     */
+    public function liberarMesa(Request $request, array $params): Response
+    {
+        $tenantId = Auth::tenantId();
+        if (!$tenantId) {
+            return $this->redirect(app_url('/login'));
+        }
+
+        $id = (int)($params['id'] ?? 0);
+        $pedido = $this->pedidoModel->find($id, $tenantId);
+        if ($pedido && !empty($pedido['mesa_id'])) {
+            $this->pedidoModel->liberarMesaPorId((int)$pedido['mesa_id'], $tenantId);
+        } else {
+            $this->pedidoModel->liberarMesa($id, $tenantId);
+        }
+
+        if ($request->isAjax()) {
+            return $this->json([
+                'success' => true,
+                'mensaje' => 'Mesa liberada exitosamente. Ahora aparece como disponible.',
+            ]);
+        }
+
+        Session::flash('success', 'Mesa liberada exitosamente.');
+        return $this->back();
+    }
+
+    /**
+     * Libera una mesa directamente por su ID de mesa
+     */
+    public function liberarMesaPorId(Request $request, array $params): Response
+    {
+        $tenantId = Auth::tenantId();
+        if (!$tenantId) {
+            return $this->redirect(app_url('/login'));
+        }
+
+        $mesaId = (int)($params['id'] ?? 0);
+        $this->pedidoModel->liberarMesaPorId($mesaId, $tenantId);
+
+        if ($request->isAjax()) {
+            return $this->json([
+                'success' => true,
+                'mensaje' => 'Mesa liberada y marcada como disponible.',
+            ]);
+        }
+
+        Session::flash('success', 'Mesa liberada exitosamente.');
+        return $this->back();
+    }
+
+    /**
      * Construye enlace estructurado a WhatsApp para contactar al cliente sobre su orden
      */
     private function generarEnlaceWhatsAppCliente(array $pedido, string $nombreRestaurante): ?string
@@ -250,5 +325,119 @@ class PedidoAdminController extends Controller
         }
 
         return "https://wa.me/{$tel}?text=" . rawurlencode($mensaje);
+    }
+
+    /**
+     * Polling liviano para notificaciones en vivo y campanita de alertas
+     * Retorna si hay nuevos pedidos desde since_id, conteos actuales y el max_id
+     */
+    public function pollNuevos(Request $request): Response
+    {
+        $tenantId = Auth::tenantId();
+        if (!$tenantId) {
+            return $this->json(['success' => false, 'error' => 'No autorizado'], 401);
+        }
+
+        $sinceId = (int)$request->get('since_id', 0);
+
+        try {
+            $pdo = Model::getPdo();
+
+            // ID más alto actual
+            $stmtMax = $pdo->prepare("SELECT COALESCE(MAX(id), 0) FROM pedidos WHERE restaurante_id = :rid");
+            $stmtMax->execute(['rid' => $tenantId]);
+            $maxId = (int)$stmtMax->fetchColumn();
+
+            // Pedidos nuevos desde sinceId
+            $nuevosPedidos = [];
+            if ($sinceId > 0 && $maxId > $sinceId) {
+                $stmtNuevos = $pdo->prepare(
+                    "SELECT p.id, p.consecutivo, p.codigo, p.cliente_nombre, p.modalidad, p.total, p.estado, p.created_at, p.mesa_id,
+                            m.numero AS mesa_numero
+                     FROM pedidos p
+                     LEFT JOIN mesas m ON m.id = p.mesa_id
+                     WHERE p.restaurante_id = :rid AND p.id > :since 
+                     ORDER BY p.id DESC"
+                );
+                $stmtNuevos->execute(['rid' => $tenantId, 'since' => $sinceId]);
+                $nuevosPedidos = $stmtNuevos->fetchAll(\PDO::FETCH_ASSOC);
+            }
+
+            // Conteos de la jornada en vivo (Hoy) para sincronizar las insignias en tiempo real
+            $rangoHoy = HorarioService::obtenerRangoJornada($tenantId, 'actual');
+            $filtrosPoll = [
+                'datetime_desde' => $rangoHoy['desde'],
+                'datetime_hasta' => $rangoHoy['hasta'],
+                'mantener_pendientes' => true,
+            ];
+            $conteos = $this->pedidoModel->conteosPorEstado($tenantId, $filtrosPoll);
+            $metricasMes = $this->pedidoModel->metricasMes($tenantId);
+            $metricasHoy = $this->pedidoModel->metricasHoy($tenantId);
+            $mesasEnVivo = $this->pedidoModel->mesasEstadoEnVivo($tenantId);
+            $comandasActivas = $this->pedidoModel->listarComandasActivas($tenantId, 6);
+            $restaurante = $this->restauranteModel->find($tenantId);
+            $slug = $restaurante['slug'] ?? '';
+            $csrfToken = csrf_token();
+
+            return $this->json([
+                'success' => true,
+                'max_id' => $maxId,
+                'nuevos_count' => count($nuevosPedidos),
+                'nuevos_pedidos' => $nuevosPedidos,
+                'conteos' => $conteos,
+                'csrf_token' => $csrfToken,
+                'metricas_hoy' => [
+                    'ventas_hoy' => format_cop((int)$metricasHoy['ventas_hoy']),
+                    'pedidos_hoy' => (int)$metricasHoy['pedidos_hoy'],
+                    'ticket_promedio_hoy' => format_cop((int)$metricasHoy['ticket_promedio_hoy']),
+                    'mesas_ocupadas' => (int)$metricasHoy['mesas_ocupadas'],
+                    'total_mesas' => (int)$metricasHoy['total_mesas'],
+                    'pendientes' => (int)$metricasHoy['pendientes'],
+                ],
+                'metricas_mes' => [
+                    'ventas_mes' => format_cop((int)$metricasMes['ventas_mes']),
+                    'pedidos_mes' => (int)$metricasMes['pedidos_mes'],
+                    'ticket_promedio' => format_cop((int)$metricasMes['ticket_promedio']),
+                    'pendientes' => (int)$metricasMes['pendientes'],
+                ],
+                'mesas' => array_map(function ($m) use ($slug) {
+                    return [
+                        'id' => (int)$m['id'],
+                        'numero' => (string)$m['numero'],
+                        'nombre' => $m['nombre'],
+                        'ocupada' => (bool)$m['ocupada'],
+                        'pedido_id' => !empty($m['pedido_id']) ? (int)$m['pedido_id'] : null,
+                        'consecutivo' => !empty($m['consecutivo']) ? (int)$m['consecutivo'] : null,
+                        'codigo' => $m['codigo'],
+                        'total_mesa' => (int)$m['total_mesa'],
+                        'total_formateado' => format_cop((int)$m['total_mesa']),
+                        'estado_pedido' => $m['estado_pedido'],
+                        'tiempo_min' => isset($m['tiempo_min']) ? (int)$m['tiempo_min'] : null,
+                        'url_qr' => app_url('/' . $slug . '?mesa=' . urlencode($m['numero'])),
+                        'url_comanda' => !empty($m['pedido_id']) ? app_url('/admin/pedidos?pedido=' . $m['pedido_id']) : null,
+                        'url_liberar' => app_url('/admin/mesas/' . $m['id'] . '/liberar'),
+                    ];
+                }, $mesasEnVivo),
+                'comandas_activas' => array_map(function ($c) {
+                    $min = (int)($c['minutos_transcurridos'] ?? 0);
+                    return [
+                        'id' => (int)$c['id'],
+                        'codigo' => $c['codigo'],
+                        'consecutivo' => $c['consecutivo'] ?? $c['codigo'],
+                        'modalidad' => $c['modalidad'],
+                        'mesa_nombre' => $c['mesa_nombre'] ?? $c['mesa_numero'] ?? null,
+                        'cliente_nombre' => $c['cliente_nombre'] ?? 'Cliente',
+                        'total_items' => (int)($c['total_items'] ?? 1),
+                        'estado' => $c['estado'],
+                        'estado_formateado' => ucfirst(str_replace('_', ' ', (string)$c['estado'])),
+                        'minutos_transcurridos' => $min,
+                        'tiempo_texto' => $min === 0 ? 'Justo ahora' : 'Hace ' . $min . ' min',
+                        'url_comanda' => app_url('/admin/pedidos?pedido=' . $c['id']),
+                    ];
+                }, $comandasActivas),
+            ]);
+        } catch (\Throwable $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
     }
 }

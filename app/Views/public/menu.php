@@ -87,7 +87,7 @@ if (!function_exists('renderProductCard')) {
 
 <div class="menu-container" id="menuApp">
 
-    <!-- 1. HERO HEADER DEL RESTAURANTE -->
+    <!-- 1. HERO HEADER DEL RESTAURANTE (ESTILO MODERNO MESALY) -->
     <header class="menu-hero <?= $tieneBanner ? 'has-banner' : 'no-banner' ?>">
         <div class="menu-hero-banner <?= $tieneBanner ? '' : 'default-gradient' ?>">
             <?php if ($tieneBanner): ?>
@@ -97,25 +97,20 @@ if (!function_exists('renderProductCard')) {
 
         <div class="menu-hero-content">
             <div class="menu-brand-header">
-                <?php if ($tieneLogo): ?>
-                    <img src="<?= e(app_url($restaurante['logo_path'])) ?>" alt="<?= e($restaurante['nombre']) ?>" class="menu-logo">
-                <?php else: ?>
-                    <div class="menu-logo-placeholder">
-                        <?= e(strtoupper(substr($restaurante['nombre'], 0, 2))) ?>
-                    </div>
-                <?php endif; ?>
+                <div class="menu-brand-avatar-box">
+                    <?php if ($tieneLogo): ?>
+                        <img src="<?= e(app_url($restaurante['logo_path'])) ?>" alt="<?= e($restaurante['nombre']) ?>" class="menu-logo">
+                    <?php else: ?>
+                        <div class="menu-logo-placeholder">
+                            <?= e(strtoupper(substr($restaurante['nombre'], 0, 2))) ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <div class="menu-brand-info">
-                    <div class="menu-brand-top-row">
-                        <h1 class="menu-brand-title"><?= e($restaurante['nombre']) ?></h1>
-                        <button type="button" class="menu-header-cart-btn" id="btnHeaderCart" title="Ver mi pedido">
-                            <span class="header-cart-icon"><?= icon('cart', 18) ?></span>
-                            <span class="header-cart-label">Mi Pedido</span>
-                            <span class="header-cart-badge" id="headerCartBadge">0</span>
-                        </button>
-                    </div>
-                    
-                    <div class="menu-status-row">
+                    <h1 class="menu-brand-title"><?= e($restaurante['nombre']) ?></h1>
+
+                    <div class="menu-status-badges">
                         <?php if (!empty($restaurante['recibiendo_pedidos'])): ?>
                             <?php if ($estadoHorario['abierto']): ?>
                                 <span class="badge-status open">
@@ -132,21 +127,25 @@ if (!function_exists('renderProductCard')) {
                             </span>
                         <?php endif; ?>
 
-                        <!-- Modalidades activas -->
-                        <div class="modalities-chips">
-                            <?php if ($mesaNumero !== null): ?>
-                                <span class="chip-modality active" title="Atención activa en mesa">
-                                    <?= icon('cutlery', 13) ?>
-                                    <span>Mesa #<?= (int)$mesaNumero ?></span>
-                                </span>
-                            <?php else: ?>
-                                <span class="chip-modality active" title="Servicio a Domicilio">
-                                    <?= icon('motorcycle', 13) ?>
-                                    <span>Servicio a Domicilio</span>
-                                </span>
-                            <?php endif; ?>
-                        </div>
+                        <?php if ($mesaNumero !== null): ?>
+                            <span class="chip-modality chip-mesa" title="Atención activa en mesa">
+                                <?= icon('cutlery', 13) ?>
+                                <span>Mesa #<?= (int)$mesaNumero ?></span>
+                            </span>
+                        <?php else: ?>
+                            <span class="chip-modality chip-domicilio" title="Servicio a Domicilio">
+                                <?= icon('motorcycle', 13) ?>
+                                <span>Servicio a Domicilio</span>
+                            </span>
+                        <?php endif; ?>
                     </div>
+                </div>
+
+                <div class="menu-brand-cart-box">
+                    <button type="button" class="menu-header-cart-btn" id="btnHeaderCart" title="Ver mi pedido" aria-label="Ver mi pedido">
+                        <span class="header-cart-icon"><?= icon('cart', 20) ?></span>
+                        <span class="header-cart-badge" id="headerCartBadge">0</span>
+                    </button>
                 </div>
             </div>
 
@@ -165,14 +164,13 @@ if (!function_exists('renderProductCard')) {
 
             <?php if (!empty($destacados)): ?>
                 <button type="button" class="category-nav-pill" data-cat="cat-destacados">
-                    <?= icon('sparkles', 13) ?> Populares (<?= count($destacados) ?>)
+                    <?= icon('sparkles', 13) ?> Populares
                 </button>
             <?php endif; ?>
 
             <?php foreach ($categorias as $cat): ?>
-                <?php $cant = count($productosPorCategoria[$cat['id']] ?? []); ?>
                 <button type="button" class="category-nav-pill" data-cat="cat-<?= $cat['id'] ?>">
-                    <?= e($cat['nombre']) ?> (<?= $cant ?>)
+                    <?= e($cat['nombre']) ?>
                 </button>
             <?php endforeach; ?>
         </div>
@@ -290,13 +288,12 @@ if (!function_exists('renderProductCard')) {
                     </div>
                 </div>
                 <div class="cart-drawer-header-actions">
-                    <span class="cart-drawer-badge-count" id="cartItemsCountText">0 ítems</span>
                     <button type="button" class="modal-close-btn" id="btnCloseCartDrawer" aria-label="Cerrar">&times;</button>
                 </div>
             </div>
 
             <div class="cart-drawer-body">
-                <!-- Lista de ítems en el carrito -->
+                <!-- Lista de ítems en el carrito con imagen de producto -->
                 <div class="cart-items-list" id="cartItemsContainer">
                     <!-- Dinámico -->
                 </div>
@@ -310,7 +307,7 @@ if (!function_exists('renderProductCard')) {
                     </div>
 
                     <?php if ($mesaNumero !== null): ?>
-                        <!-- CASO 1: ORDEN EN MESA ASIGNADA (QR ACTIVO) -->
+                        <!-- CASO 1: ORDEN EN MESA ASIGNADA POR QR -->
                         <div class="table-locked-notice">
                             <div class="locked-left">
                                 <span class="locked-icon"><?= icon('cutlery', 20) ?></span>
@@ -320,8 +317,8 @@ if (!function_exists('renderProductCard')) {
                                 </div>
                             </div>
                             <span class="locked-badge">Mesa Activa</span>
-                            <input type="hidden" name="modalidad" value="mesa">
-                            <input type="hidden" name="mesa_numero" value="<?= (int)$mesaNumero ?>">
+                            <input type="hidden" name="modalidad" value="mesa" id="inputModalidad">
+                            <input type="hidden" name="mesa_numero" value="<?= (int)$mesaNumero ?>" id="inputMesaNumero">
                         </div>
 
                         <div class="field-group">
@@ -329,15 +326,15 @@ if (!function_exists('renderProductCard')) {
                             <input type="text" id="clienteNombreInput" name="cliente_nombre" class="menu-input" placeholder="¿Cómo te llamas? (Opcional)" maxlength="100">
                         </div>
 
-                        <div class="field-group">
+                        <div class="field-group" id="fieldNotasCocina">
                             <label for="notasCocinaInput">Notas para la cocina o atención (Opcional)</label>
                             <input type="text" id="notasCocinaInput" name="notas_cocina" class="menu-input" placeholder="Ej: Sin cebolla, salsas aparte, servilletas..." maxlength="250">
                         </div>
 
                     <?php else: ?>
-                        <!-- CASO 2: ENLACE NORMAL DEL RESTAURANTE (DOMICILIO DIRECTO) -->
+                        <!-- CASO 2: ENLACE PÚBLICO GENERAL (DOMICILIO DIRECTO) -->
                         <h3 class="checkout-section-title">Datos para tu Entrega a Domicilio</h3>
-                        <input type="hidden" name="modalidad" value="domicilio">
+                        <input type="hidden" name="modalidad" value="domicilio" id="inputModalidad">
 
                         <div class="field-group">
                             <label for="clienteNombreInput">Tu Nombre Completo *</label>
@@ -358,12 +355,12 @@ if (!function_exists('renderProductCard')) {
 
                             <div class="field-group">
                                 <label for="barrioInput">Barrio / Sector</label>
-                                <input type="text" id="barrioInput" name="barrio" class="menu-input" placeholder="Ej: El Poblado, Laureles..." maxlength="100">
+                                <input type="text" id="barrioInput" name="barrio" class="menu-input" placeholder="Ej: El Poblado, Laureles, Centro..." maxlength="100">
                             </div>
 
                             <div class="field-group">
-                                <label for="notasEntregaDomicilioInput">Indicaciones de Entrega o Recogida (Opcional)</label>
-                                <input type="text" id="notasEntregaDomicilioInput" name="notas_entrega_domicilio" class="menu-input" placeholder="Ej: Timbre 501, dejar en portería, o pasar a recoger..." maxlength="250">
+                                <label for="notasEntregaDomicilioInput">Indicaciones de Entrega (Opcional)</label>
+                                <input type="text" id="notasEntregaDomicilioInput" name="notas_entrega_domicilio" class="menu-input" placeholder="Ej: Timbre 501, dejar en portería, casa esquinera..." maxlength="250">
                             </div>
 
                             <?php if (!empty($restaurante['pedido_minimo'])): ?>
@@ -375,37 +372,6 @@ if (!function_exists('renderProductCard')) {
                                 </div>
                             <?php endif; ?>
                         </div>
-                    <?php endif; ?>
-
-                    <!-- Métodos de Pago -->
-                    <?php if (!empty($metodosPago)): ?>
-                        <h3 class="checkout-section-title">Método de Pago Informado</h3>
-                        <div class="payment-methods-grid">
-                            <?php
-                            $metodosInfo = [
-                                'efectivo' => ['icon' => icon('cash', 18), 'nombre' => 'Efectivo'],
-                                'transferencia' => ['icon' => icon('smartphone', 18), 'nombre' => 'Transferencia / Nequi / Daviplata'],
-                                'datafono' => ['icon' => icon('credit-card', 18), 'nombre' => 'Datáfono (Contra entrega)'],
-                            ];
-                            ?>
-                            <?php foreach ($metodosPago as $idx => $m): ?>
-                                <?php $info = $metodosInfo[$m] ?? ['icon' => icon('credit-card', 18), 'nombre' => ucfirst($m)]; ?>
-                                <label class="payment-method-option <?= $idx === 0 ? 'selected' : '' ?>">
-                                    <input type="radio" name="metodo_pago" value="<?= e($m) ?>" <?= $idx === 0 ? 'checked' : '' ?>>
-                                    <span class="payment-card">
-                                        <span class="icon"><?= $info['icon'] ?></span>
-                                        <span class="name"><?= $info['nombre'] ?></span>
-                                    </span>
-                                </label>
-                            <?php endforeach; ?>
-                        </div>
-
-                        <?php if (!empty($restaurante['info_pago_texto'])): ?>
-                            <div class="payment-instructions-box" id="paymentInstructions">
-                                <span class="instructions-icon"><?= icon('alert', 16) ?></span>
-                                <div><?= nl2br(e($restaurante['info_pago_texto'])) ?></div>
-                            </div>
-                        <?php endif; ?>
                     <?php endif; ?>
 
                     <!-- Desglose de Totales -->
@@ -427,10 +393,10 @@ if (!function_exists('renderProductCard')) {
                     <!-- Mensajes de Error de Validación -->
                     <div class="checkout-error-msg" id="checkoutErrorMsg"></div>
 
-                    <!-- Botón Enviar a WhatsApp -->
-                    <button type="submit" class="btn-submit-order" id="btnSubmitOrder">
-                        <span class="btn-wa-icon"><?= icon('whatsapp', 18) ?></span>
-                        <span id="submitOrderBtnText">Enviar Pedido por WhatsApp</span>
+                    <!-- Botón Enviar Pedido -->
+                    <button type="submit" class="btn-submit-order <?= ($mesaNumero !== null) ? 'btn-submit-cocina' : '' ?>" id="btnSubmitOrder">
+                        <span class="btn-wa-icon" id="btnSubmitIcon"><?= ($mesaNumero !== null) ? icon('cutlery', 18) : icon('whatsapp', 18) ?></span>
+                        <span id="submitOrderBtnText"><?= ($mesaNumero !== null) ? 'Enviar Pedido a Cocina' : 'Enviar Pedido por WhatsApp' ?></span>
                     </button>
 
                     <button type="button" class="btn-continue-shopping" id="btnContinueShopping">
@@ -441,19 +407,32 @@ if (!function_exists('renderProductCard')) {
         </div>
     </div>
 
-    <!-- 7. MODAL DE CONFIRMACIÓN / ÉXITO -->
-    <div class="modal-backdrop" id="successModalBackdrop" style="display: none;">
-        <div class="success-modal-sheet">
-            <div class="success-icon-bubble"><?= icon('check', 28) ?></div>
-            <h2 class="success-title">¡Pedido Generado!</h2>
-            <p class="success-code">Código: <strong id="successOrderCode">PAR-0000</strong></p>
-            <p class="success-desc">
-                Tu pedido ha sido preparado para enviarse a WhatsApp. Si no se abrió automáticamente, presiona el botón a continuación:
+    <!-- 7. MODAL DE CONFIRMACIÓN / ÉXITO (DIFERENCIADO MESA vs DOMICILIO) -->
+    <div class="modal-backdrop" id="successModalBackdrop">
+        <div class="success-modal-sheet" id="successModalSheet">
+            <div class="success-icon-bubble" id="successIconBubble"><?= icon('check', 28) ?></div>
+            
+            <h2 class="success-title" id="successTitle">¡Comanda en Cocina!</h2>
+            
+            <div class="success-code-badge" id="successCodeBadge">
+                <span class="code-label" id="successCodeLabel">Código de Comanda</span>
+                <strong class="code-value" id="successOrderCode">#0000</strong>
+            </div>
+
+            <p class="success-desc" id="successDesc">
+                Tu pedido ha sido recibido y está siendo preparado por el equipo de cocina.
             </p>
-            <a href="#" id="successWaLink" class="btn-open-wa" target="_blank" rel="noopener">
-                Abrir WhatsApp Ahora &rarr;
-            </a>
-            <button type="button" class="btn-close-success" id="btnCloseSuccessModal">Cerrar y volver al Menú</button>
+
+            <div class="success-actions" id="successActions">
+                <a href="#" id="successWaLink" class="btn-open-wa" target="_blank" rel="noopener">
+                    <span class="wa-icon"><?= icon('whatsapp', 18) ?></span>
+                    <span id="successWaBtnText">Confirmar Pedido en WhatsApp</span>
+                </a>
+                
+                <button type="button" class="btn-close-success" id="btnCloseSuccessModal">
+                    Volver a la Carta
+                </button>
+            </div>
         </div>
     </div>
 

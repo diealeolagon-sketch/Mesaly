@@ -622,7 +622,9 @@
 
     function renderCartDrawerItems() {
         const totalItems = cart.reduce((sum, it) => sum + it.cantidad, 0);
-        cartItemsCountText.textContent = `${totalItems} ${totalItems === 1 ? 'ítem' : 'ítems'}`;
+        if (cartItemsCountText) {
+            cartItemsCountText.textContent = `${totalItems} ${totalItems === 1 ? 'plato' : 'platos'}`;
+        }
 
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = `
@@ -639,41 +641,61 @@
         let html = '';
 
         cart.forEach((item, index) => {
+            const rawImg = item.imagen_path || (catalogMap.get(item.producto_id)?.imagen_path) || '';
+            const imgUrl = rawImg
+                ? (rawImg.startsWith('http') ? rawImg : (restaurant.base_url.replace(/\/+$/, '') + '/' + rawImg.replace(/^\/+/, '')))
+                : '';
+
+            const thumbHtml = imgUrl
+                ? `<img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.nombre_producto)}" class="cart-item-thumb" loading="lazy">`
+                : `<div class="cart-item-thumb-fallback"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>`;
+
             html += `
                 <div class="cart-item-row" data-index="${index}">
-                    <div class="cart-item-details">
-                        <div class="cart-item-title">${escapeHtml(item.nombre_producto)}</div>
-                        <div class="cart-item-unit-price">${formatCop(item.precio_unitario)} c/u</div>
-                        
-                        ${item.opciones && item.opciones.length > 0 ? `
-                            <div class="cart-item-modifiers">
-                                ${item.opciones.map(opc => `
-                                    <div class="cart-modifier-badge">
-                                        <span>• ${escapeHtml(opc.nombre_grupo)}: <strong>${escapeHtml(opc.nombre_opcion)}</strong></span>
-                                        ${opc.precio_extra > 0 ? `<small class="extra-cost">(+${formatCop(opc.precio_extra)})</small>` : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : ''}
-
-                        ${item.nota ? `
-                            <div class="cart-item-note">
-                                "${escapeHtml(item.nota)}"
-                            </div>
-                        ` : ''}
+                    <!-- Fila 1: Miniatura + Nombre y Precio c/u + Eliminar -->
+                    <div class="cart-item-top">
+                        <div class="cart-item-thumb-box">
+                            ${thumbHtml}
+                        </div>
+                        <div class="cart-item-main-info">
+                            <h4 class="cart-item-title">${escapeHtml(item.nombre_producto)}</h4>
+                            <div class="cart-item-unit-price">${formatCop(item.precio_unitario)} c/u</div>
+                        </div>
+                        <button type="button" class="btn-cart-remove" data-index="${index}" title="Eliminar plato del pedido" aria-label="Eliminar plato del pedido">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        </button>
                     </div>
 
-                    <div class="cart-item-actions">
-                        <div class="cart-item-action-top">
-                            <span class="cart-item-total">${formatCop(item.total_linea)}</span>
-                            <button type="button" class="btn-cart-remove" data-index="${index}" title="Eliminar plato del pedido" aria-label="Eliminar plato del pedido">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                            </button>
+                    <!-- Fila 2: Adiciones a Ancho Completo (Sin comprimir) -->
+                    ${item.opciones && item.opciones.length > 0 ? `
+                        <div class="cart-item-modifiers-full">
+                            ${item.opciones.map(opc => `
+                                <div class="cart-modifier-chip">
+                                    <div class="chip-text-wrap">
+                                        <span class="chip-group-label">${escapeHtml(opc.nombre_grupo)}:</span>
+                                        <strong class="chip-opt-value">${escapeHtml(opc.nombre_opcion)}</strong>
+                                    </div>
+                                    ${opc.precio_extra > 0 ? `<span class="chip-extra-price">+${formatCop(opc.precio_extra).replace(/\s+/g, '&nbsp;')}</span>` : ''}
+                                </div>
+                            `).join('')}
                         </div>
+                    ` : ''}
+
+                    ${item.nota ? `
+                        <div class="cart-item-note-full">
+                            <span class="cart-note-label">Nota:</span> "${escapeHtml(item.nota)}"
+                        </div>
+                    ` : ''}
+
+                    <!-- Fila 3: Cantidad y Subtotal del plato -->
+                    <div class="cart-item-bottom">
                         <div class="cart-item-stepper">
                             <button type="button" class="btn-cart-qty" data-action="decrease" data-index="${index}" aria-label="Disminuir cantidad">−</button>
                             <span class="cart-qty-value">${item.cantidad}</span>
                             <button type="button" class="btn-cart-qty" data-action="increase" data-index="${index}" aria-label="Aumentar cantidad">+</button>
+                        </div>
+                        <div class="cart-item-line-total">
+                            <span class="line-total-amount">${formatCop(item.total_linea)}</span>
                         </div>
                     </div>
                 </div>
@@ -730,8 +752,7 @@
         const fieldTelefono = document.getElementById('fieldTelefono');
         const fieldsDomicilio = document.getElementById('fieldsDomicilio');
         const fieldNotasCocina = document.getElementById('fieldNotasCocina');
-        const labelClienteNombre = document.getElementById('labelClienteNombre');
-        const clienteNombreInput = document.getElementById('clienteNombreInput');
+        const submitOrderBtnText = document.getElementById('submitOrderBtnText');
 
         if (modalidad === 'mesa') {
             if (fieldTelefono) fieldTelefono.style.display = 'none';
@@ -739,10 +760,8 @@
             if (fieldNotasCocina) fieldNotasCocina.style.display = 'block';
             if (rowCostoEnvio) rowCostoEnvio.style.display = 'none';
 
-            if (labelClienteNombre) labelClienteNombre.textContent = 'Tu Nombre (Opcional en mesa)';
-            if (clienteNombreInput) {
-                clienteNombreInput.placeholder = '¿Cómo te llamas? (Opcional)';
-                clienteNombreInput.removeAttribute('required');
+            if (submitOrderBtnText) {
+                submitOrderBtnText.textContent = 'Enviar Pedido a Cocina';
             }
         } else {
             // Domicilio
@@ -753,10 +772,8 @@
                 rowCostoEnvio.style.display = 'flex';
             }
 
-            if (labelClienteNombre) labelClienteNombre.textContent = 'Tu Nombre Completo *';
-            if (clienteNombreInput) {
-                clienteNombreInput.placeholder = '¿A nombre de quién?';
-                clienteNombreInput.setAttribute('required', 'required');
+            if (submitOrderBtnText) {
+                submitOrderBtnText.textContent = 'Enviar Pedido por WhatsApp';
             }
         }
     }
@@ -788,7 +805,7 @@
         }
     }
 
-    // 9. Envío del Pedido a WhatsApp
+    // 9. Envío del Pedido a WhatsApp o Cocina
     async function handleCheckoutSubmit(e) {
         e.preventDefault();
         checkoutErrorMsg.classList.remove('is-visible');
@@ -800,12 +817,17 @@
         }
 
         const formData = new FormData(checkoutForm);
-        const modalidad = restaurant.mesa_numero ? 'mesa' : 'domicilio';
+        const modalidad = restaurant.mesa_numero ? 'mesa' : (document.getElementById('inputModalidad')?.value || 'domicilio');
         let clienteNombre = formData.get('cliente_nombre')?.trim();
         const clienteTelefono = formData.get('cliente_telefono')?.trim();
         const subtotal = cart.reduce((sum, it) => sum + it.total_linea, 0);
 
         let mesaNum = restaurant.mesa_numero ? parseInt(restaurant.mesa_numero, 10) : null;
+
+        if (modalidad === 'mesa') {
+            const val = formData.get('mesa_numero');
+            mesaNum = val ? parseInt(val, 10) : null;
+        }
 
         if (modalidad === 'mesa') {
             if (!mesaNum || mesaNum <= 0) {
@@ -864,7 +886,10 @@
         };
 
         btnSubmitOrder.disabled = true;
-        submitOrderBtnText.textContent = 'Enviando a WhatsApp...';
+        const submitOrderBtnText = document.getElementById('submitOrderBtnText');
+        if (submitOrderBtnText) {
+            submitOrderBtnText.textContent = (modalidad === 'mesa') ? 'Enviando a Cocina...' : 'Enviando a WhatsApp...';
+        }
 
         try {
             const res = await fetch(restaurant.endpoint_pedido, {
@@ -882,7 +907,9 @@
             if (!res.ok || !data.ok) {
                 showCheckoutError(data.error || 'Ocurrió un error al procesar tu pedido.');
                 btnSubmitOrder.disabled = false;
-                submitOrderBtnText.textContent = 'Enviar Pedido por WhatsApp';
+                if (submitOrderBtnText) {
+                    submitOrderBtnText.textContent = (modalidad === 'mesa') ? 'Enviar Pedido a Cocina' : 'Enviar Pedido por WhatsApp';
+                }
                 return;
             }
 
@@ -892,23 +919,73 @@
             updateCartUI();
             closeCartDrawer();
 
+            const isMesa = (data.modalidad === 'mesa' || modalidad === 'mesa');
+
+            // Configurar elementos del Modal de Éxito
+            const successTitle = document.getElementById('successTitle');
+            const successCodeLabel = document.getElementById('successCodeLabel');
+            const successDesc = document.getElementById('successDesc');
+            const successWaBtnText = document.getElementById('successWaBtnText');
+            const successOrderCode = document.getElementById('successOrderCode');
+            const successWaLink = document.getElementById('successWaLink');
+
+            if (successOrderCode) {
+                successOrderCode.textContent = '#' + (data.codigo || '0000');
+            }
+            if (successWaLink) {
+                successWaLink.href = data.whatsapp_url;
+            }
+
+            if (isMesa) {
+                // MODALIDAD EN MESA:
+                // NO redirigir automáticamente a WhatsApp.
+                // Mostrar confirmación de cocina y botón opcional de WhatsApp.
+                const mesaTexto = data.mesa_numero ? `Mesa #${data.mesa_numero}` : 'tu mesa';
+                if (successTitle) successTitle.textContent = '¡Comanda Enviada a Cocina!';
+                if (successCodeLabel) successCodeLabel.textContent = `Atención en ${mesaTexto}`;
+                if (successDesc) {
+                    successDesc.innerHTML = `Tu pedido <strong>#${data.codigo}</strong> ya está registrado y el equipo de cocina ha comenzado su preparación directa para <strong>${mesaTexto}</strong>. No es necesario salir de aquí; te llevaremos tus platos tan pronto estén listos.`;
+                }
+                if (successWaBtnText) {
+                    successWaBtnText.textContent = 'Enviar copia a WhatsApp (Opcional)';
+                }
+                if (successWaLink) {
+                    successWaLink.className = 'btn-open-wa btn-wa-secondary';
+                }
+            } else {
+                // MODALIDAD DOMICILIO:
+                // Indicar preparación profesional y redirigir a WhatsApp para confirmar
+                if (successTitle) successTitle.textContent = '¡Pedido Registrado con Éxito!';
+                if (successCodeLabel) successCodeLabel.textContent = 'Número de Pedido';
+                if (successDesc) {
+                    successDesc.innerHTML = `Tu pedido <strong>#${data.codigo}</strong> ha sido preparado de manera profesional por el equipo. A continuación te redirigimos a WhatsApp para confirmar tus datos de entrega y despacho.`;
+                }
+                if (successWaBtnText) {
+                    successWaBtnText.textContent = 'Confirmar Pedido en WhatsApp Ahora →';
+                }
+                if (successWaLink) {
+                    successWaLink.className = 'btn-open-wa btn-wa-primary';
+                }
+
+                // Redirección para confirmar entrega a domicilio
+                setTimeout(() => {
+                    window.location.href = data.whatsapp_url;
+                }, 1400);
+            }
+
             // Mostrar modal de éxito
-            successOrderCode.textContent = data.codigo;
-            successWaLink.href = data.whatsapp_url;
             successModalBackdrop.style.display = 'flex';
             void successModalBackdrop.offsetWidth;
             successModalBackdrop.classList.add('is-active');
-
-            setTimeout(() => {
-                window.location.href = data.whatsapp_url;
-            }, 600);
 
         } catch (err) {
             console.error(err);
             showCheckoutError('No se pudo conectar con el servidor. Revisa tu conexión a internet.');
         } finally {
             btnSubmitOrder.disabled = false;
-            submitOrderBtnText.textContent = 'Enviar Pedido por WhatsApp';
+            if (submitOrderBtnText) {
+                submitOrderBtnText.textContent = (modalidad === 'mesa') ? 'Enviar Pedido a Cocina' : 'Enviar Pedido por WhatsApp';
+            }
         }
     }
 

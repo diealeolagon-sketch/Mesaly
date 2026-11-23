@@ -76,19 +76,17 @@ class ConfigController extends Controller
         $colorSecundario = trim((string)$request->post('color_secundario'));
         $colorFondo = trim((string)$request->post('color_fondo'));
         $colorTexto = trim((string)$request->post('color_texto'));
-        $fuente = trim((string)$request->post('fuente', 'Inter'));
+        $fuente = trim((string)$request->post('fuente', 'Plus Jakarta Sans'));
         $whatsapp = preg_replace('/\D/', '', (string)$request->post('whatsapp'));
         $recibiendoPedidos = (bool)$request->post('recibiendo_pedidos');
         $aceptaMesa = (bool)$request->post('acepta_mesa');
         $aceptaDomicilio = (bool)$request->post('acepta_domicilio');
-        $aceptaRecoger = (bool)$request->post('acepta_recoger');
         $costoEnvio = max(0, (int)$request->post('costo_envio', 0));
         $pedidoMinimo = max(0, (int)$request->post('pedido_minimo', 0));
-        $infoPagoTexto = trim((string)$request->post('info_pago_texto'));
 
-        // Al menos una modalidad debe estar activa (Sección 6.3)
-        if (!$aceptaMesa && !$aceptaDomicilio && !$aceptaRecoger) {
-            Session::flash('error', 'Debes mantener activa al menos una modalidad de pedido (Mesa, Domicilio o Para recoger).');
+        // Al menos una modalidad debe estar activa (Mesa o Domicilio)
+        if (!$aceptaMesa && !$aceptaDomicilio) {
+            Session::flash('error', 'Debes mantener activa al menos una modalidad de pedido (Mesa o Domicilio).');
             return $this->back();
         }
 
@@ -148,15 +146,29 @@ class ConfigController extends Controller
             'color_secundario' => $colorSecundario,
             'color_fondo' => $colorFondo,
             'color_texto' => $colorTexto,
-            'fuente' => in_array($fuente, ['Inter', 'Poppins', 'Roboto', 'Outfit', 'Playfair', 'System'], true) ? $fuente : 'Inter',
+            'fuente' => in_array($fuente, [
+                'Plus Jakarta Sans',
+                'Inter',
+                'Poppins',
+                'Outfit',
+                'DM Sans',
+                'Montserrat',
+                'Oswald',
+                'Fraunces',
+                'Lora',
+                'Playfair Display',
+                'Playfair',
+                'Cormorant Garamond',
+                'System'
+            ], true) ? $fuente : 'Plus Jakarta Sans',
             'whatsapp' => $whatsapp,
             'recibiendo_pedidos' => $recibiendoPedidos ? 1 : 0,
             'acepta_mesa' => $aceptaMesa ? 1 : 0,
             'acepta_domicilio' => $aceptaDomicilio ? 1 : 0,
-            'acepta_recoger' => $aceptaRecoger ? 1 : 0,
+            'acepta_recoger' => 0,
             'costo_envio' => $costoEnvio,
             'pedido_minimo' => $pedidoMinimo,
-            'info_pago_texto' => $infoPagoTexto,
+            'info_pago_texto' => '',
             'logo_path' => $logoPath,
             'banner_path' => $bannerPath,
         ];
@@ -164,10 +176,6 @@ class ConfigController extends Controller
         Model::beginTransaction();
         try {
             $this->restauranteModel->update($tenantId, $dataUpdate);
-
-            // Sincronizar métodos de pago informativos
-            $metodosSeleccionados = (array)$request->post('metodos_pago', []);
-            $this->metodoPagoModel->syncMetodos($metodosSeleccionados);
 
             // Sincronizar horarios
             $diasPost = (array)$request->post('dias', []);

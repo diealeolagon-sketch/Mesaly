@@ -1,36 +1,36 @@
-<div class="content-header" style="margin-bottom: 24px;">
+<div class="content-header mb-5">
     <div>
-        <h1 class="page-title" style="font-size: 24px; margin-bottom: 4px;">
+        <h1 class="page-title text-2xl mb-1">
             <?= e($tenant['nombre']) ?>
         </h1>
-        <p class="page-subtitle" style="font-size: 14px; color: var(--color-text-muted); margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+        <p class="page-subtitle text-base text-muted m-0 flex items-center gap-2 flex-wrap">
             <span>Menú digital:</span>
-            <a href="<?= e(app_url('/' . $tenant['slug'])) ?>" target="_blank" rel="noopener" style="color: var(--color-brand); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            <a href="<?= e(app_url('/' . $tenant['slug'])) ?>" target="_blank" rel="noopener" class="text-brand fw-600 flex items-center gap-1">
                 <span><?= e(app_url('/' . $tenant['slug'])) ?></span>
                 <?= icon('external-link', 12) ?>
             </a>
         </p>
     </div>
 
-    <div class="content-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+    <div class="content-actions flex items-center gap-2 flex-wrap">
         <!-- Botón rápido de estado: Abrir / Pausar pedidos -->
-        <form method="POST" action="<?= e(app_url('/admin/toggle-recibiendo-pedidos')) ?>" style="margin: 0; display: inline-flex; align-items: center; gap: 8px;">
+        <form method="POST" action="<?= e(app_url('/admin/toggle-recibiendo-pedidos')) ?>" class="m-0 inline-flex items-center gap-2">
             <?= csrf_field() ?>
             <?php if (!empty($tenant['recibiendo_pedidos'])): ?>
                 <span class="badge-pill success">
-                    <span style="width: 7px; height: 7px; background: #059669; border-radius: 50%; display: inline-block;"></span>
+                    <span class="dot-indicator dot-indicator-success"></span>
                     <span>Recibiendo pedidos</span>
                 </span>
-                <button type="submit" class="btn btn-secondary btn-sm" style="font-weight: 600;" title="Pausar la recepción de pedidos en el menú digital">
+                <button type="submit" class="btn btn-secondary btn-sm fw-600" title="Pausar la recepción de pedidos en el menú digital">
                     <?= icon('clock', 13) ?>
                     <span>Pausar</span>
                 </button>
             <?php else: ?>
                 <span class="badge-pill danger">
-                    <span style="width: 7px; height: 7px; background: #DC2626; border-radius: 50%; display: inline-block;"></span>
+                    <span class="dot-indicator dot-indicator-danger"></span>
                     <span>Recepción pausada</span>
                 </span>
-                <button type="submit" class="btn btn-primary btn-sm" style="font-weight: 600;" title="Activar pedidos en el menú digital">
+                <button type="submit" class="btn btn-primary btn-sm fw-600" title="Activar pedidos en el menú digital">
                     <?= icon('check', 13) ?>
                     <span>Abrir carta</span>
                 </button>
@@ -38,12 +38,12 @@
         </form>
 
         <!-- Botón directo al módulo de pedidos -->
-        <a href="<?= e(app_url('/admin/pedidos')) ?>" class="btn btn-primary btn-sm" style="font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+        <a href="<?= e(app_url('/admin/pedidos')) ?>" class="btn btn-primary btn-sm fw-600 inline-flex items-center gap-2">
             <?= icon('cart', 15) ?>
             <span>Ver Pedidos</span>
-            <?php if (!empty($metricasMes['pendientes']) && $metricasMes['pendientes'] > 0): ?>
-                <span style="background: #FFFFFF; color: var(--color-brand); font-size: 11px; font-weight: 800; border-radius: 999px; padding: 1px 7px; margin-left: 2px;">
-                    <?= (int)$metricasMes['pendientes'] ?>
+            <?php if (!empty($metricasHoy['pendientes']) && $metricasHoy['pendientes'] > 0): ?>
+                <span class="badge-counter">
+                    <?= (int)$metricasHoy['pendientes'] ?>
                 </span>
             <?php endif; ?>
         </a>
@@ -51,14 +51,14 @@
 </div>
 
 <?php if (!empty($estadoSuscripcion['en_gracia'])): ?>
-    <div class="alert alert-warning" style="margin-bottom: 24px; display: flex; align-items: center; gap: 12px; background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 14px 18px; border-radius: var(--radius-md);">
+    <div class="alert alert-warning mb-5">
         <?= icon('alert', 20) ?>
         <div>
             <strong>Período de Gracia Activo:</strong> Tu suscripción venció el <strong><?= !empty($tenant['fecha_vencimiento']) ? date('d/m/Y', strtotime($tenant['fecha_vencimiento'])) : 'recientemente' ?></strong>. Tienes <strong><?= (int)($estadoSuscripcion['dias_gracia_restantes'] ?? 0) ?> días</strong> restantes para enviar el soporte de pago antes de la suspensión automática del servicio.
         </div>
     </div>
 <?php elseif (!empty($estadoSuscripcion['por_vencer'])): ?>
-    <div class="alert alert-info" style="margin-bottom: 24px; display: flex; align-items: center; gap: 12px; background: #e8f4fd; border: 1px solid #b8daff; color: #004085; padding: 14px 18px; border-radius: var(--radius-md);">
+    <div class="alert alert-info mb-5">
         <?= icon('alert', 20) ?>
         <div>
             <strong>Recordatorio de Pago:</strong> Tu suscripción vencerá el <strong><?= date('d/m/Y', strtotime($tenant['fecha_vencimiento'])) ?></strong> (<?= (int)$estadoSuscripcion['dias_restantes'] === 0 ? 'hoy' : 'en ' . (int)$estadoSuscripcion['dias_restantes'] . ' días' ?>). Realiza la transferencia a tiempo para mantener tu catálogo activo.
@@ -66,256 +66,264 @@
     </div>
 <?php endif; ?>
 
-<!-- 1. TARJETAS DE KPIS FINANCIEROS Y OPERATIVOS -->
-<div class="kpi-grid" style="margin-bottom: 24px;">
-    <!-- Ventas del Mes -->
+<!-- 1. TARJETAS DE KPIS OPERATIVOS DE HOY (SUPER RÁPIDO & TIEMPO REAL) -->
+<div class="kpi-grid mb-5">
+    <!-- Ventas de Hoy -->
     <div class="kpi-card">
         <div class="kpi-label">
-            <span>Ventas del Mes</span>
-            <div style="color: #059669;"><?= icon('coin', 18) ?></div>
+            <span>Ventas de Hoy</span>
+            <div class="kpi-icon-success"><?= icon('coin', 18) ?></div>
         </div>
-        <div class="kpi-value" style="color: #059669;">
-            <?= format_cop((int)($metricasMes['ventas_mes'] ?? 0)) ?>
+        <div class="kpi-value text-success" data-metric-hoy="ventas_hoy">
+            <?= format_cop((int)($metricasHoy['ventas_hoy'] ?? 0)) ?>
         </div>
-        <div class="kpi-subtext">Mes en curso (excluye cancelados)</div>
+        <div class="kpi-subtext">Caja acumulada del día (pedidos no cancelados)</div>
     </div>
 
-    <!-- Pedidos del Mes -->
+    <!-- Pedidos de Hoy -->
     <div class="kpi-card">
         <div class="kpi-label">
-            <span>Pedidos del Mes</span>
-            <div style="color: var(--color-brand);"><?= icon('cart', 18) ?></div>
+            <span>Pedidos de Hoy</span>
+            <div class="kpi-icon-brand"><?= icon('cart', 18) ?></div>
+        </div>
+        <div class="kpi-value" data-metric-hoy="pedidos_hoy">
+            <?= (int)($metricasHoy['pedidos_hoy'] ?? 0) ?>
+        </div>
+        <div class="kpi-subtext">Comandas procesadas en la jornada</div>
+    </div>
+
+    <!-- Ticket Promedio Hoy -->
+    <div class="kpi-card">
+        <div class="kpi-label">
+            <span>Ticket Promedio Hoy</span>
+            <div class="kpi-icon-muted"><?= icon('chart', 18) ?></div>
+        </div>
+        <div class="kpi-value" data-metric-hoy="ticket_promedio_hoy">
+            <?= format_cop((int)($metricasHoy['ticket_promedio_hoy'] ?? 0)) ?>
+        </div>
+        <div class="kpi-subtext">Consumo promedio por comanda de hoy</div>
+    </div>
+
+    <!-- Mesas Ocupadas Ahora -->
+    <div class="kpi-card <?= !empty($metricasHoy['mesas_ocupadas']) && $metricasHoy['mesas_ocupadas'] > 0 ? 'kpi-card--warning' : '' ?>">
+        <div class="kpi-label">
+            <span>Mesas Ocupadas</span>
+            <div class="kpi-icon-brand"><?= icon('cutlery', 18) ?></div>
         </div>
         <div class="kpi-value">
-            <?= (int)($metricasMes['pedidos_mes'] ?? 0) ?>
-        </div>
-        <div class="kpi-subtext">Comandas recibidas y procesadas</div>
-    </div>
-
-    <!-- Ticket Promedio -->
-    <div class="kpi-card">
-        <div class="kpi-label">
-            <span>Ticket Promedio</span>
-            <div style="color: var(--color-text-secondary);"><?= icon('chart', 18) ?></div>
-        </div>
-        <div class="kpi-value">
-            <?= format_cop((int)($metricasMes['ticket_promedio'] ?? 0)) ?>
-        </div>
-        <div class="kpi-subtext">Consumo promedio por comanda</div>
-    </div>
-
-    <!-- Pedidos Pendientes -->
-    <div class="kpi-card" style="<?= !empty($metricasMes['pendientes']) && $metricasMes['pendientes'] > 0 ? 'border-color: #FCD34D; background: #FFFDF5;' : '' ?>">
-        <div class="kpi-label">
-            <span>En Preparación / Por Atender</span>
-            <div style="color: <?= !empty($metricasMes['pendientes']) && $metricasMes['pendientes'] > 0 ? '#D97706' : 'var(--color-text-muted)' ?>;">
-                <?= icon('clock', 18) ?>
-            </div>
-        </div>
-        <div class="kpi-value" style="color: <?= !empty($metricasMes['pendientes']) && $metricasMes['pendientes'] > 0 ? '#D97706' : 'inherit' ?>;">
-            <?= (int)($metricasMes['pendientes'] ?? 0) ?>
+            <span data-metric-hoy="mesas_ocupadas"><?= (int)($metricasHoy['mesas_ocupadas'] ?? 0) ?></span> <span class="text-xs text-muted fw-500">/ <?= (int)($metricasHoy['total_mesas'] ?? 0) ?> activas</span>
         </div>
         <div class="kpi-subtext">
-            <?= !empty($metricasMes['pendientes']) && $metricasMes['pendientes'] > 0 ? 'Requieren acción inmediata en cocina' : 'Todo al día en cocina' ?>
+            <?= !empty($metricasHoy['mesas_ocupadas']) && $metricasHoy['mesas_ocupadas'] > 0 ? 'Comensales consumiendo en el salón' : 'Todas las mesas disponibles' ?>
         </div>
     </div>
 </div>
 
-<!-- 2. SECCIÓN DE GRÁFICOS ANALÍTICOS (CHART.JS) -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; margin-bottom: 24px;">
-    <!-- Gráfico 1: Ventas Diarias de los últimos 30 días -->
-    <div class="card" style="padding: 22px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle);">
+<!-- 2. OPERACIÓN EN VIVO: PLANO DE SALÓN (MESAS) & COLAS DE COCINA -->
+<div class="dashboard-operative-grid mb-5">
+    <!-- Columna Izquierda: Plano de Mesas y Ocupación en Vivo -->
+    <div class="floor-plan-card">
+        <div class="floor-plan-header">
             <div>
-                <h2 style="font-size: 15px; font-weight: 700; color: var(--color-text-main); margin: 0 0 2px 0;">
-                    Ventas Diarias (Últimos 30 días)
+                <h2 class="floor-plan-title">
+                    <?= icon('cutlery', 16) ?>
+                    <span>Salón en Vivo — Ocupación de Mesas</span>
                 </h2>
-                <span style="font-size: 12.5px; color: var(--color-text-muted);">
-                    Evolución de ingresos diarios por pedidos completados (COP)
-                </span>
+                <span class="text-xs text-muted">Estado actual de comensales y consumo acumulado en mesa</span>
             </div>
-            <span class="badge" style="background: var(--color-brand-subtle); color: var(--color-brand); font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11.5px;">
-                COP / Día
-            </span>
+            <div class="flex items-center gap-2">
+                <span class="floor-plan-summary-badge <?= !empty($metricasHoy['mesas_ocupadas']) ? 'has-occupied' : '' ?>" id="floorPlanSummaryBadge">
+                    <span class="fp-ocupadas"><?= (int)($metricasHoy['mesas_ocupadas'] ?? 0) ?> ocupadas</span>
+                    <span>&bull;</span>
+                    <span class="fp-libres"><?= max(0, (int)($metricasHoy['total_mesas'] ?? 0) - (int)($metricasHoy['mesas_ocupadas'] ?? 0)) ?> libres</span>
+                </span>
+                <a href="<?= e(app_url('/admin/mesas')) ?>" class="btn btn-secondary btn-xs fw-600">
+                    Administrar mesas &rarr;
+                </a>
+            </div>
         </div>
-        <div style="position: relative; height: 260px; width: 100%;">
-            <canvas id="chartVentasDiarias"></canvas>
+
+        <div class="floor-plan-body">
+            <?php if (empty($mesasEnVivo)): ?>
+                <div class="empty-state-box p-6 text-center">
+                    <div class="icon-bubble-lg mx-auto mb-3">
+                        <?= icon('cutlery', 20) ?>
+                    </div>
+                    <h3 class="text-sm fw-700 text-main m-0 mb-1">
+                        No hay mesas configuradas aún
+                    </h3>
+                    <p class="text-xs text-muted m-0 mb-4">
+                        Crea las mesas de tu salón para generar códigos QR y monitorear la ocupación en vivo.
+                    </p>
+                    <a href="<?= e(app_url('/admin/mesas')) ?>" class="btn btn-primary btn-sm fw-600">
+                        Crear mesas ahora
+                    </a>
+                </div>
+            <?php else: ?>
+                <div class="floor-plan-grid" id="floorPlanGrid">
+                    <?php foreach ($mesasEnVivo as $mesa): ?>
+                        <div class="table-node-card <?= $mesa['ocupada'] ? 'is-occupied' : 'is-free' ?>"
+                             id="table_node_<?= (int)$mesa['id'] ?>"
+                             data-mesa-node-id="<?= (int)$mesa['id'] ?>"
+                             data-mesa-numero="<?= e($mesa['numero']) ?>">
+                            <div class="table-node-top">
+                                <span class="table-node-title">
+                                    <span>Mesa <?= e($mesa['numero']) ?></span>
+                                </span>
+                                <?php if ($mesa['ocupada']): ?>
+                                    <span class="table-node-badge occupied">Ocupada</span>
+                                <?php else: ?>
+                                    <span class="table-node-badge free">Libre</span>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="table-node-content">
+                                <?php if ($mesa['ocupada']): ?>
+                                    <div class="table-node-total">
+                                        <?= format_cop((int)$mesa['total_mesa']) ?>
+                                    </div>
+                                    <div class="table-node-meta">
+                                        <?= icon('clock', 12) ?>
+                                        <span>Hace <?= (int)$mesa['tiempo_min'] ?> min</span>
+                                        <span>&bull;</span>
+                                        <span class="fw-600 text-main">
+                                            <?php if ($mesa['estado_pedido'] === 'entregado'): ?>
+                                                Comensales en mesa
+                                            <?php elseif ($mesa['estado_pedido'] === 'listo'): ?>
+                                                Listo para servir
+                                            <?php else: ?>
+                                                En cocina
+                                            <?php endif; ?>
+                                        </span>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="table-node-meta text-muted">
+                                        <?= icon('users', 12) ?>
+                                        <span><?= !empty($mesa['nombre']) ? e($mesa['nombre']) : 'Lista para ordenar' ?></span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="table-node-actions flex items-center justify-between gap-1">
+                                <?php if ($mesa['ocupada'] && !empty($mesa['pedido_id'])): ?>
+                                    <a href="<?= e(app_url('/admin/pedidos?pedido=' . $mesa['pedido_id'])) ?>" class="table-node-link">
+                                        <span>Comanda</span>
+                                        &rarr;
+                                    </a>
+                                    <button type="button" class="btn-liberar-mesa-node btn-ajax-liberar" data-liberar-url="<?= e(app_url('/admin/mesas/' . $mesa['id'] . '/liberar')) ?>" title="Liberar mesa (marcar como disponible y sin clientes)">
+                                        <?= icon('check', 11) ?>
+                                        <span>Liberar</span>
+                                    </button>
+                                <?php else: ?>
+                                    <a href="<?= e(app_url('/' . $tenant['slug'] . '?mesa=' . urlencode($mesa['numero']))) ?>" target="_blank" rel="noopener" class="table-node-link text-muted">
+                                        <span>Abrir QR</span>
+                                        <?= icon('external-link', 10) ?>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- Gráfico 2: Pedidos por Día de la Semana -->
-    <div class="card" style="padding: 22px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle);">
+    <!-- Columna Derecha: Comandas en Cocina / Despacho en Vivo -->
+    <div class="live-kitchen-queue">
+        <div class="live-kitchen-header">
             <div>
-                <h2 style="font-size: 15px; font-weight: 700; color: var(--color-text-main); margin: 0 0 2px 0;">
-                    Demanda por Día de la Semana
+                <h2 class="live-kitchen-title">
+                    <?= icon('clock', 16) ?>
+                    <span>Cocina y Despacho</span>
                 </h2>
-                <span style="font-size: 12.5px; color: var(--color-text-muted);">
-                    Distribución de pedidos para identificar tus días de mayor afluencia
-                </span>
+                <span class="text-xs text-muted">Comandas activas pendientes</span>
             </div>
-            <span class="badge" style="background: var(--color-bg-subtle); color: var(--color-text-secondary); font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11.5px;">
-                Total Pedidos
-            </span>
-        </div>
-        <div style="position: relative; height: 260px; width: 100%;">
-            <canvas id="chartDiasSemana"></canvas>
-        </div>
-    </div>
-</div>
-
-<!-- 3. TOP 5 PLATOS MÁS VENDIDOS & RESUMEN DE LA CARTA -->
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px;" class="dashboard-split-grid">
-    <!-- Tabla Top 5 Platos -->
-    <div class="card" style="padding: 0; overflow: hidden;">
-        <div style="padding: 18px 22px; border-bottom: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2 style="font-size: 15px; font-weight: 700; color: var(--color-text-main); margin: 0 0 2px 0;">
-                    Top 5 Platos Más Vendidos
-                </h2>
-                <span style="font-size: 12.5px; color: var(--color-text-muted);">
-                    Los platos y bebidas favoritos de tus comensales
-                </span>
-            </div>
-            <a href="<?= e(app_url('/admin/catalogo')) ?>" style="font-size: 12.5px; color: var(--color-brand); font-weight: 600; text-decoration: none;">
-                Ver catálogo &rarr;
+            <a href="<?= e(app_url('/admin/pedidos')) ?>" class="btn btn-secondary btn-xs fw-600">
+                Ver todos (<?= (int)($metricasHoy['pendientes'] ?? 0) ?>)
             </a>
         </div>
 
-        <?php if (empty($topProductos)): ?>
-            <div style="text-align: center; padding: 48px 20px;">
-                <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--color-bg-subtle); display: inline-flex; align-items: center; justify-content: center; color: var(--color-brand); margin-bottom: 12px;">
-                    <?= icon('cutlery', 20) ?>
+        <div class="live-kitchen-body" id="liveKitchenBody">
+            <?php if (empty($comandasActivas)): ?>
+                <div class="live-empty-kitchen">
+                    <div class="icon-bubble-lg mx-auto mb-3">
+                        <?= icon('check', 20) ?>
+                    </div>
+                    <h3 class="text-sm fw-700 text-main m-0 mb-1">
+                        ¡Cocina y barra al día!
+                    </h3>
+                    <p class="text-xs text-muted m-0">
+                        No hay comandas pendientes por preparar o despachar en este momento.
+                    </p>
                 </div>
-                <h3 style="font-size: 15px; font-weight: 700; color: var(--color-text-main); margin: 0 0 4px 0;">
-                    Sin datos de ventas aún
-                </h3>
-                <p style="color: var(--color-text-muted); font-size: 13px; margin: 0;">
-                    El ranking se calculará automáticamente conforme tus clientes confirmen pedidos.
-                </p>
-            </div>
-        <?php else: ?>
-            <div class="table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th style="width: 60px; text-align: center;">#</th>
-                            <th>Plato o Bebida</th>
-                            <th style="text-align: right; width: 130px;">Unidades</th>
-                            <th style="text-align: right; width: 150px;">Total Ventas</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($topProductos as $idx => $prod): ?>
-                            <tr>
-                                <td style="text-align: center;">
-                                    <?php if ($idx === 0): ?>
-                                        <span style="width: 24px; height: 24px; border-radius: 50%; background: #FEF3C7; color: #D97706; font-weight: 800; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;">1</span>
-                                    <?php elseif ($idx === 1): ?>
-                                        <span style="width: 24px; height: 24px; border-radius: 50%; background: #F1F5F9; color: #475569; font-weight: 800; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;">2</span>
-                                    <?php elseif ($idx === 2): ?>
-                                        <span style="width: 24px; height: 24px; border-radius: 50%; background: #FFEDD5; color: #C2410C; font-weight: 800; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;">3</span>
-                                    <?php else: ?>
-                                        <span style="width: 24px; height: 24px; border-radius: 50%; background: #F8FAFC; color: var(--color-text-muted); font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;"><?= $idx + 1 ?></span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <strong style="color: var(--color-text-main); font-size: 13.5px;"><?= e($prod['nombre']) ?></strong>
-                                </td>
-                                <td style="text-align: right; font-weight: 700; color: var(--color-text-main);">
-                                    <?= (int)$prod['cantidad_vendida'] ?> un.
-                                </td>
-                                <td style="text-align: right; font-weight: 700; color: #059669;">
-                                    <?= format_cop((int)$prod['total_ventas']) ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Resumen de Infraestructura & Suscripción -->
-    <div class="dashboard-restaurant-status-card">
-        <div>
-            <div class="dashboard-restaurant-status-header">
-                <h2 class="dashboard-restaurant-status-title">
-                    Estado del Restaurante
-                </h2>
-                <span class="dashboard-restaurant-status-sub">
-                    Capacidad y suscripción activa
-                </span>
-            </div>
-
-            <div class="dashboard-stats-list">
-                <div class="dashboard-stat-row">
-                    <span class="dashboard-stat-label">
-                        <?= icon('catalog', 14) ?> Categorías en carta
-                    </span>
-                    <strong class="dashboard-stat-value"><?= (int)$stats['categorias'] ?></strong>
-                </div>
-
-                <div class="dashboard-stat-row">
-                    <span class="dashboard-stat-label">
-                        <?= icon('store', 14) ?> Platos y bebidas
-                    </span>
-                    <strong class="dashboard-stat-value"><?= (int)$stats['productos'] ?></strong>
-                </div>
-
-                <div class="dashboard-stat-row">
-                    <span class="dashboard-stat-label">
-                        <?= icon('cutlery', 14) ?> Mesas con código QR
-                    </span>
-                    <strong class="dashboard-stat-value"><?= (int)$stats['mesas'] ?></strong>
-                </div>
-
-                <div class="dashboard-stat-row">
-                    <span class="dashboard-stat-label">
-                        <?= icon('modifiers', 14) ?> Grupos de opciones
-                    </span>
-                    <strong class="dashboard-stat-value"><?= (int)$stats['grupos'] ?></strong>
-                </div>
-            </div>
-        </div>
-
-        <div class="dashboard-subscription-box">
-            <div>
-                <span class="dashboard-subscription-label">Suscripción</span>
-                <span class="dashboard-subscription-date">
-                    <?= !empty($tenant['fecha_vencimiento']) ? 'Vence: ' . date('d/m/Y', strtotime($tenant['fecha_vencimiento'])) : 'Sin vencimiento' ?>
-                </span>
-            </div>
-            <?php
-            $subClass = 'active';
-            if (str_contains(strtolower($estadoSuscripcion['label'] ?? ''), 'vencid')) {
-                $subClass = 'danger';
-            } elseif (str_contains(strtolower($estadoSuscripcion['label'] ?? ''), 'por vencer')) {
-                $subClass = 'warning';
-            }
-            ?>
-            <span class="badge-status-sub <?= $subClass ?>">
-                <?= e($estadoSuscripcion['label']) ?>
-            </span>
+            <?php else: ?>
+                <?php foreach ($comandasActivas as $cmd): ?>
+                    <a href="<?= e(app_url('/admin/pedidos?pedido=' . $cmd['id'])) ?>" class="live-ticket-item text-decoration-none">
+                        <div class="live-ticket-left">
+                            <span class="live-ticket-code">
+                                <?= icon('cart', 13) ?>
+                                <span>#<?= e($cmd['consecutivo'] ?? $cmd['codigo']) ?></span>
+                            </span>
+                            <span class="live-ticket-origin">
+                                <?php if ($cmd['modalidad'] === 'mesa'): ?>
+                                    Mesa <?= e($cmd['mesa_nombre'] ?? $cmd['mesa_numero'] ?? 'S/N') ?>
+                                <?php elseif ($cmd['modalidad'] === 'domicilio'): ?>
+                                    Domicilio &bull; <?= e($cmd['cliente_nombre'] ?? 'Cliente') ?>
+                                <?php else: ?>
+                                    Para Llevar
+                                <?php endif; ?>
+                                &bull; <?= (int)$cmd['total_items'] ?> platos
+                            </span>
+                        </div>
+                        <div class="live-ticket-right">
+                            <span class="live-ticket-status <?= e($cmd['estado']) ?>">
+                                <?= ucfirst(e(str_replace('_', ' ', $cmd['estado']))) ?>
+                            </span>
+                            <span class="live-ticket-time">
+                                <?= (int)$cmd['minutos_transcurridos'] === 0 ? 'Justo ahora' : 'Hace ' . (int)$cmd['minutos_transcurridos'] . ' min' ?>
+                            </span>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
-<!-- 4. ACCESO DIRECTO A MÓDULOS DE GESTIÓN -->
-<div class="card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
-    <div style="padding: 20px 24px; border-bottom: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+<!-- 3. ACCESO DIRECTO A REPORTES ANALÍTICOS Y MÓDULOS DE GESTIÓN -->
+<div class="card p-0 overflow-hidden mb-5">
+    <div class="card-header-bar flex items-center justify-between">
         <div>
-            <h2 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 2px 0;">
-                Módulos de Gestión del Restaurante
+            <h2 class="text-md fw-700 text-main m-0 mb-1">
+                Herramientas y Módulos del Restaurante
             </h2>
-            <p style="font-size: 13px; color: var(--color-text-muted); margin: 0;">
-                Acceso a todas las herramientas de operación diaria y configuración
+            <p class="text-xs text-muted m-0">
+                Gestión comercial, carta digital, cierres diarios y analítica histórica
             </p>
         </div>
+        <a href="<?= e(app_url('/admin/reportes')) ?>" class="btn btn-secondary btn-sm fw-600 inline-flex items-center gap-1">
+            <?= icon('chart', 14) ?>
+            <span>Ir a Reportes &amp; Cierre</span>
+            &rarr;
+        </a>
     </div>
 
-    <div style="padding: 24px;">
+    <div class="card-p-6">
         <div class="modules-grid">
+            <!-- Reportes y Cierre -->
+            <a href="<?= e(app_url('/admin/reportes')) ?>" class="module-card">
+                <div>
+                    <div class="module-card-icon">
+                        <?= icon('chart', 26) ?>
+                    </div>
+                    <h3 class="module-card-title">Reportes &amp; Cierre de Ventas</h3>
+                    <p class="module-card-desc">
+                        Gráficas analíticas de evolución, horas pico, top platos más vendidos, consolidado tributario y exportación a Excel / CSV.
+                    </p>
+                </div>
+                <span class="module-card-link">Ver reportes y cierre &rarr;</span>
+            </a>
+
             <!-- Pedidos en Vivo -->
             <a href="<?= e(app_url('/admin/pedidos')) ?>" class="module-card">
                 <div>
@@ -324,7 +332,7 @@
                     </div>
                     <h3 class="module-card-title">Gestión de Pedidos</h3>
                     <p class="module-card-desc">
-                        Control en tiempo real de órdenes de comensales, actualización de cocina (generado, en preparación, listo) y enlace directo a WhatsApp.
+                        Control en tiempo real de órdenes, actualización de estado en cocina (generado, en preparación, listo) y enlace a WhatsApp.
                     </p>
                 </div>
                 <span class="module-card-link">Abrir pedidos en vivo &rarr;</span>
@@ -347,7 +355,7 @@
             <!-- Mesas y QR -->
             <a href="<?= e(app_url('/admin/mesas')) ?>" class="module-card">
                 <div>
-                    <div class="module-card-icon" style="color: #4F46E5;">
+                    <div class="module-card-icon icon-indigo">
                         <?= icon('cutlery', 26) ?>
                     </div>
                     <h3 class="module-card-title">Mesas &amp; Códigos QR</h3>
@@ -355,27 +363,27 @@
                         Genera códigos QR de alta resolución para cada mesa del local y descarga el PDF imprimible listo para recortar y laminar.
                     </p>
                 </div>
-                <span class="module-card-link" style="color: #4F46E5;">Gestionar mesas y QR &rarr;</span>
+                <span class="module-card-link text-indigo">Gestionar mesas y QR &rarr;</span>
             </a>
 
             <!-- Control de Agotados -->
-            <a href="<?= e(app_url('/admin/disponibilidad')) ?>" class="module-card" style="border-color: rgba(239, 68, 68, 0.2); background: #FFFBFB;">
+            <a href="<?= e(app_url('/admin/disponibilidad')) ?>" class="module-card module-card-danger">
                 <div>
-                    <div class="module-card-icon" style="color: var(--color-danger);">
+                    <div class="module-card-icon">
                         <?= icon('zap', 26) ?>
                     </div>
-                    <h3 class="module-card-title" style="color: var(--color-danger);">Control de Agotados</h3>
+                    <h3 class="module-card-title">Control de Agotados</h3>
                     <p class="module-card-desc">
-                        Diseñado para la hora pico: apaga un plato en 1 segundo cuando se agote un ingrediente en cocina para que los clientes no puedan pedirlo.
+                        Diseñado para la hora pico: apaga un plato en 1 segundo cuando se agote un ingrediente para que los clientes no puedan pedirlo.
                     </p>
                 </div>
-                <span class="module-card-link" style="color: var(--color-danger);">Ver disponibles y agotados &rarr;</span>
+                <span class="module-card-link">Ver disponibles y agotados &rarr;</span>
             </a>
 
             <!-- Modificadores -->
             <a href="<?= e(app_url('/admin/modificadores')) ?>" class="module-card">
                 <div>
-                    <div class="module-card-icon" style="color: var(--color-text-secondary);">
+                    <div class="module-card-icon text-muted">
                         <?= icon('modifiers', 26) ?>
                     </div>
                     <h3 class="module-card-title">Modificadores y Adiciones</h3>
@@ -385,152 +393,6 @@
                 </div>
                 <span class="module-card-link">Gestionar modificadores &rarr;</span>
             </a>
-
-            <!-- Configuración -->
-            <a href="<?= e(app_url('/admin/configuracion')) ?>" class="module-card">
-                <div>
-                    <div class="module-card-icon" style="color: var(--color-text-secondary);">
-                        <?= icon('settings', 26) ?>
-                    </div>
-                    <h3 class="module-card-title">Configuración y Marca</h3>
-                    <p class="module-card-desc">
-                        Define tu número de WhatsApp para recibir pedidos, sube tu logo, personaliza tus colores, horarios y modalidades de entrega.
-                    </p>
-                </div>
-                <span class="module-card-link">Editar configuración &rarr;</span>
-            </a>
         </div>
     </div>
 </div>
-
-<!-- 5. INICIALIZACIÓN DE GRÁFICOS CHART.JS -->
-<script nonce="<?= e($cspNonce) ?>">
-document.addEventListener('DOMContentLoaded', function () {
-    if (typeof Chart === 'undefined') {
-        console.warn('Chart.js no está cargado');
-        return;
-    }
-
-    const ventasData = <?= json_encode($ventasPorDia, JSON_UNESCAPED_UNICODE) ?>;
-    const diasSemanaData = <?= json_encode($pedidosPorDiaSemana, JSON_UNESCAPED_UNICODE) ?>;
-
-    // 1. Gráfico de Ventas Diarias (30 días)
-    const ctxVentas = document.getElementById('chartVentasDiarias');
-    if (ctxVentas && ventasData && ventasData.length > 0) {
-        new Chart(ctxVentas, {
-            type: 'line',
-            data: {
-                labels: ventasData.map(d => d.label),
-                datasets: [{
-                    label: 'Ventas (COP)',
-                    data: ventasData.map(d => d.total),
-                    borderColor: '#E85D04',
-                    backgroundColor: 'rgba(232, 93, 4, 0.08)',
-                    borderWidth: 2.5,
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: '#E85D04',
-                    pointBorderColor: '#FFFFFF',
-                    pointBorderWidth: 1.5,
-                    pointRadius: 3,
-                    pointHoverRadius: 6,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function (ctx) {
-                                const val = ctx.parsed.y || 0;
-                                return 'Ventas: $ ' + val.toLocaleString('es-CO');
-                            },
-                            afterLabel: function (ctx) {
-                                const item = ventasData[ctx.dataIndex];
-                                return (item && item.pedidos) ? 'Pedidos: ' + item.pedidos : '';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function (val) {
-                                if (val >= 1000000) return '$' + (val / 1000000) + 'M';
-                                if (val >= 1000) return '$' + (val / 1000) + 'K';
-                                return '$' + val;
-                            },
-                            font: { size: 11 }
-                        },
-                        grid: { color: 'rgba(15, 23, 42, 0.06)' }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: {
-                            font: { size: 11 },
-                            maxRotation: 0,
-                            autoSkip: true,
-                            maxTicksLimit: 10
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // 2. Gráfico de Pedidos por Día de la Semana
-    const ctxDias = document.getElementById('chartDiasSemana');
-    if (ctxDias && diasSemanaData) {
-        const labels = Object.keys(diasSemanaData);
-        const counts = Object.values(diasSemanaData);
-
-        new Chart(ctxDias, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Pedidos',
-                    data: counts,
-                    backgroundColor: 'rgba(79, 70, 229, 0.75)',
-                    hoverBackgroundColor: '#4338CA',
-                    borderRadius: 6,
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function (ctx) {
-                                const val = ctx.parsed.y || 0;
-                                return 'Pedidos: ' + val + (val === 1 ? ' pedido' : ' pedidos');
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1,
-                            precision: 0,
-                            font: { size: 11 }
-                        },
-                        grid: { color: 'rgba(15, 23, 42, 0.06)' }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { font: { size: 11.5, weight: '600' } }
-                    }
-                }
-            }
-        });
-    }
-});
-</script>

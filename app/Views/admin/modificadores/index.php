@@ -14,14 +14,14 @@
 </div>
 
 <?php if (empty($grupos)): ?>
-    <div class="card" style="text-align: center; padding: 64px 24px;">
-        <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--color-brand-subtle); color: var(--color-brand); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+    <div class="card empty-state-box p-6">
+        <div class="icon-bubble-lg mx-auto mb-4">
             <?= icon('modifiers', 26) ?>
         </div>
-        <h3 style="font-size: 17px; font-weight: 700; color: var(--color-text-main); margin: 0 0 8px 0;">
+        <h3 class="text-md fw-700 text-main m-0 mb-2">
             Aún no tienes grupos de modificadores
         </h3>
-        <p style="color: var(--color-text-muted); font-size: 14px; max-width: 480px; margin: 0 auto 24px auto; line-height: 1.5;">
+        <p class="text-muted text-sm max-w-lg mx-auto mb-5">
             Los modificadores permiten que tus clientes personalicen sus platos (ej: <em>"Término de la carne"</em>, <em>"Tipo de salsa"</em> o <em>"Adición de queso / tocineta"</em>).
         </p>
         <button type="button" class="btn btn-primary btn-abrir-grupo">
@@ -30,20 +30,20 @@
         </button>
     </div>
 <?php else: ?>
-    <div style="display: flex; flex-direction: column; gap: 24px;">
+    <div class="stack gap-5">
         <?php foreach ($grupos as $grupo): ?>
             <div class="modifier-group-card">
                 <!-- Header del Grupo -->
                 <div class="modifier-group-header">
                     <div class="modifier-group-title-wrap">
-                        <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: #FFFFFF; border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; color: var(--color-brand);">
+                        <div class="modifier-icon-box">
                             <?= icon('modifiers', 18) ?>
                         </div>
                         <div>
                             <h2 class="modifier-group-title">
                                 <?= e($grupo['nombre']) ?>
                             </h2>
-                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap;">
+                            <div class="flex items-center gap-2 mt-1 flex-wrap">
                                 <span class="badge <?= $grupo['tipo'] === 'unica' ? 'badge-neutral' : 'badge-warning' ?>">
                                     <?= $grupo['tipo'] === 'unica' ? 'Selección Única' : 'Selección Múltiple' ?>
                                 </span>
@@ -54,7 +54,7 @@
                                 <?php endif; ?>
 
                                 <?php if ($grupo['tipo'] === 'multiple'): ?>
-                                    <span style="font-size: 12px; color: var(--color-text-muted);">
+                                    <span class="text-xs text-muted">
                                         (El cliente puede elegir de <strong><?= (int)$grupo['min_selecciones'] ?></strong> a <strong><?= (int)$grupo['max_selecciones'] ?></strong> opciones)
                                     </span>
                                 <?php endif; ?>
@@ -67,9 +67,9 @@
                             <?= icon('edit', 14) ?>
                             <span>Editar Grupo</span>
                         </button>
-                        <form method="POST" action="<?= e(app_url('/admin/modificadores/grupo/' . $grupo['id'] . '/eliminar')) ?>" data-confirm="¿Seguro que deseas eliminar este grupo y todas sus opciones?" style="display: inline;">
+                        <form method="POST" action="<?= e(app_url('/admin/modificadores/grupo/' . $grupo['id'] . '/eliminar')) ?>" data-confirm="¿Seguro que deseas eliminar este grupo y todas sus opciones?" class="inline m-0">
                             <?= csrf_field() ?>
-                            <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-border);" title="Eliminar grupo completo">
+                            <button type="submit" class="btn btn-secondary btn-sm text-danger" title="Eliminar grupo completo">
                                 <?= icon('trash', 14) ?>
                             </button>
                         </form>
@@ -78,34 +78,34 @@
 
                 <!-- Lista de Opciones -->
                 <div class="modifier-options-list">
-                    <span style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-subtle); display: block; margin-bottom: 4px;">
+                    <span class="modifier-options-header">
                         Opciones configuradas (<?= count($grupo['opciones'] ?? []) ?>)
                     </span>
 
                     <?php if (empty($grupo['opciones'])): ?>
-                        <div style="background: var(--color-bg-subtle); border: 1.5px dashed var(--color-border); padding: 18px 20px; border-radius: var(--radius-md); font-size: 13.5px; color: var(--color-text-muted); text-align: center;">
+                        <div class="modifier-empty-options">
                             Este grupo aún no tiene opciones. Escribe la primera abajo y presiona <strong>Agregar Opción</strong>.
                         </div>
                     <?php else: ?>
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="stack gap-2">
                             <?php foreach ($grupo['opciones'] as $op): ?>
                                 <div class="modifier-option-item">
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-brand); display: inline-block;"></span>
+                                    <div class="flex items-center gap-3">
+                                        <span class="bullet-dot"></span>
                                         <span class="modifier-option-name">
                                             <?= e($op['nombre']) ?>
                                         </span>
                                         <?php if ((int)$op['precio_extra'] > 0): ?>
-                                            <span class="badge badge-warning" style="font-size: 11.5px; font-weight: 700;">
+                                            <span class="badge badge-warning text-xs fw-700">
                                                 + <?= format_cop($op['precio_extra']) ?>
                                             </span>
                                         <?php else: ?>
-                                            <span style="color: var(--color-text-subtle); font-size: 12px; font-weight: 500;">(Sin costo adicional)</span>
+                                            <span class="text-subtle text-xs fw-500">(Sin costo adicional)</span>
                                         <?php endif; ?>
                                     </div>
-                                    <form method="POST" action="<?= e(app_url('/admin/modificadores/opcion/' . $op['id'] . '/eliminar')) ?>" data-confirm="¿Eliminar esta opción?" style="display: inline;">
+                                    <form method="POST" action="<?= e(app_url('/admin/modificadores/opcion/' . $op['id'] . '/eliminar')) ?>" data-confirm="¿Eliminar esta opción?" class="inline m-0">
                                         <?= csrf_field() ?>
-                                        <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); padding: 4px 8px;" title="Quitar opción">
+                                        <button type="submit" class="btn btn-secondary btn-sm text-danger btn-sm-icon" title="Quitar opción">
                                             <?= icon('trash', 13) ?>
                                         </button>
                                     </form>
@@ -126,14 +126,14 @@
                         <span>Nueva Opción:</span>
                     </span>
 
-                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Tocineta crujiente, Término medio, Queso cheddar" style="flex: 2; min-width: 220px;" required>
+                    <input type="text" name="nombre" class="form-control flex-2 min-w-220" placeholder="Ej: Tocineta crujiente, Término medio, Queso cheddar" required>
 
-                    <div style="display: flex; align-items: center; position: relative; flex: 1; min-width: 150px;">
-                        <span style="position: absolute; left: 12px; font-size: 13px; font-weight: 700; color: var(--color-text-subtle);">+$</span>
-                        <input type="number" name="precio_extra" class="form-control" placeholder="0" min="0" step="100" value="0" style="padding-left: 32px; font-weight: 600; font-variant-numeric: tabular-nums;" title="Costo extra en pesos colombianos">
+                    <div class="price-input-wrapper">
+                        <span class="price-prefix">+$</span>
+                        <input type="number" name="precio_extra" class="form-control price-input-field tabular" placeholder="0" min="0" step="100" value="0" title="Costo extra en pesos colombianos">
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-sm" style="padding: 10px 18px; font-weight: 700;">
+                    <button type="submit" class="btn btn-primary btn-sm btn-action-add">
                         <?= icon('plus', 14) ?>
                         <span>Agregar Opción</span>
                     </button>
@@ -145,11 +145,11 @@
 
 <!-- MODAL GRUPO -->
 <div id="modal_grupo" class="modal-backdrop">
-    <div class="modal-dialog" style="max-width: 520px;">
+    <div class="modal-dialog modal-dialog-lg">
         <h3 id="grupo_modal_title" class="modal-title">
             Nuevo Grupo de Modificadores
         </h3>
-        <p style="font-size: 13px; color: var(--color-text-muted); margin: -10px 0 20px 0;">
+        <p class="text-xs text-muted modal-subtitle">
             Configura el tipo de pregunta y reglas que verá el comensal.
         </p>
 
@@ -171,30 +171,30 @@
                 </select>
             </div>
 
-            <div class="form-group" style="padding: 12px 14px; background: var(--color-bg-subtle); border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle);">
-                <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin: 0;">
-                    <input type="checkbox" id="grupo_obligatorio" name="obligatorio" value="1" style="width: 18px; height: 18px; margin-top: 2px; accent-color: var(--color-brand);">
+            <div class="form-group toggle-card-box">
+                <label class="toggle-card-label">
+                    <input type="checkbox" id="grupo_obligatorio" name="obligatorio" value="1" class="form-checkbox">
                     <div>
-                        <span style="font-size: 13.5px; font-weight: 600; color: var(--color-text-main); display: block;">Respuesta obligatoria</span>
-                        <span class="form-hint" style="margin-top: 2px;">El cliente no podrá agregar el plato al pedido sin elegir una opción.</span>
+                        <span class="toggle-card-title">Respuesta obligatoria</span>
+                        <span class="form-hint mt-1">El cliente no podrá agregar el plato al pedido sin elegir una opción.</span>
                     </div>
                 </label>
             </div>
 
-            <div id="box_multi_limites" style="display: none; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; padding: 14px; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
-                <div class="form-group" style="margin: 0;">
+            <div id="box_multi_limites" class="multi-limits-grid">
+                <div class="form-group m-0">
                     <label for="grupo_min" class="form-label">Mínimo de opciones</label>
                     <input type="number" id="grupo_min" name="min_selecciones" class="form-control" value="0" min="0">
                 </div>
-                <div class="form-group" style="margin: 0;">
+                <div class="form-group m-0">
                     <label for="grupo_max" class="form-label">Máximo de opciones</label>
                     <input type="number" id="grupo_max" name="max_selecciones" class="form-control" value="3" min="1">
                 </div>
             </div>
 
-            <div class="modal-footer" style="margin-top: 28px; padding-top: 20px;">
+            <div class="modal-footer modal-footer-bordered mt-6 pt-5">
                 <button type="button" class="btn btn-secondary" id="btnCancelarGrupoModal">Cancelar</button>
-                <button type="submit" class="btn btn-primary" style="padding: 10px 22px;">Guardar Grupo</button>
+                <button type="submit" class="btn btn-primary btn-save-action">Guardar Grupo</button>
             </div>
         </form>
     </div>
@@ -211,8 +211,7 @@ function abrirGrupoModal() {
     document.getElementById('grupo_min').value = '0';
     document.getElementById('grupo_max').value = '3';
     toggleTipoGrupo('unica');
-    modal.classList.add('is-open');
-    modal.style.setProperty('display', 'flex', 'important');
+    modal.classList.add('is-open', 'is-active');
     setTimeout(() => {
         const inp = document.getElementById('grupo_nombre');
         if (inp) inp.focus();
@@ -229,8 +228,7 @@ function editarGrupo(g) {
     document.getElementById('grupo_min').value = g.min_selecciones;
     document.getElementById('grupo_max').value = g.max_selecciones;
     toggleTipoGrupo(g.tipo);
-    modal.classList.add('is-open');
-    modal.style.setProperty('display', 'flex', 'important');
+    modal.classList.add('is-open', 'is-active');
     setTimeout(() => {
         const inp = document.getElementById('grupo_nombre');
         if (inp) inp.focus();
@@ -239,12 +237,14 @@ function editarGrupo(g) {
 
 function cerrarGrupoModal() {
     const modal = document.getElementById('modal_grupo');
-    modal.classList.remove('is-open');
-    modal.style.setProperty('display', 'none', 'important');
+    modal.classList.remove('is-open', 'is-active');
 }
 
 function toggleTipoGrupo(tipo) {
-    document.getElementById('box_multi_limites').style.display = tipo === 'multiple' ? 'grid' : 'none';
+    const box = document.getElementById('box_multi_limites');
+    if (box) {
+        box.classList.toggle('is-active', tipo === 'multiple');
+    }
 }
 
 document.getElementById('modal_grupo')?.addEventListener('click', function(e) {

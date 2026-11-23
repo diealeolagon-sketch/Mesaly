@@ -23,11 +23,21 @@ class TenantMiddleware implements MiddlewareInterface
 
         $tenantId = null;
 
-        // Caso 1: Super Admin en modo "Ver como"
+        // Caso 1: Super Admin en modo "Ver como" o acceso directo a /admin
         if ($user['rol'] === Auth::ROLE_SUPER_ADMIN) {
             $impersonatedId = Session::get('impersonating_tenant_id');
             if ($impersonatedId) {
                 $tenantId = (int)$impersonatedId;
+            } else {
+                // Si el Super Admin entra a /admin directamente sin haber seleccionado un negocio en /superadmin,
+                // asociar automáticamente al primer negocio activo para permitir acceso inmediato sin errores 403
+                $pdo = Model::getPdo();
+                $firstRest = $pdo->query("SELECT id, nombre FROM `restaurantes` WHERE `deleted_at` IS NULL ORDER BY `id` ASC LIMIT 1")->fetch();
+                if ($firstRest) {
+                    $tenantId = (int)$firstRest['id'];
+                    Session::set('impersonating_tenant_id', $tenantId);
+                    Session::set('impersonating_tenant_name', $firstRest['nombre']);
+                }
             }
         } else {
             // Caso 2: Admin de negocio regular

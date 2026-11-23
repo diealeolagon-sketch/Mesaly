@@ -14,13 +14,13 @@
 </div>
 
 <!-- KPIs GLOBALES -->
-<div class="kpi-grid" style="margin-bottom: 28px;">
+<div class="kpi-grid mb-5">
     <div class="kpi-card">
         <div class="kpi-label">
             <span>Restaurantes Activos</span>
             <?= icon('store', 16) ?>
         </div>
-        <div class="kpi-value" style="color: var(--color-brand);"><?= (int)($totalNegocios ?? 0) ?></div>
+        <div class="kpi-value text-brand"><?= (int)($totalNegocios ?? 0) ?></div>
         <div class="kpi-subtext">Negocios creados en la plataforma</div>
     </div>
 
@@ -29,28 +29,28 @@
             <span>En Periodo de Prueba</span>
             <?= icon('clock', 16) ?>
         </div>
-        <div class="kpi-value" style="color: var(--color-warning);"><?= (int)($enPrueba ?? 0) ?></div>
+        <div class="kpi-value text-warning"><?= (int)($enPrueba ?? 0) ?></div>
         <div class="kpi-subtext">Cortesía de 15 días activos</div>
     </div>
 
     <div class="kpi-card">
         <div class="kpi-label">
             <span>Estado de Servidor</span>
-            <span class="badge-pill success" style="font-size: 11px;">100% OK</span>
+            <span class="badge-pill success text-xs">100% OK</span>
         </div>
-        <div class="kpi-value" style="color: var(--color-success); font-size: 20px; margin-top: 6px;">Operativo</div>
+        <div class="kpi-value text-success text-xl mt-1">Operativo</div>
         <div class="kpi-subtext">PHP <?= phpversion() ?> · MySQL activo</div>
     </div>
 </div>
 
 <!-- PANEL DE NEGOCIOS Y VENCIMIENTOS -->
-<div class="card" style="padding: 0; overflow: hidden;">
-    <div style="padding: 20px 24px; border-bottom: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-subtle); flex-wrap: wrap; gap: 12px;">
+<div class="card p-0 overflow-hidden">
+    <div class="card-header-bar flex items-center justify-between flex-wrap gap-2">
         <div>
-            <h2 style="font-size: 15px; font-weight: 700; color: var(--color-text-main); margin: 0 0 2px 0;">
+            <h2 class="text-sm fw-700 text-main m-0 mb-1">
                 Negocios y Vencimientos Recientes
             </h2>
-            <p style="font-size: 13px; color: var(--color-text-muted); margin: 0;">
+            <p class="text-xs text-muted m-0">
                 Supervisa fechas de corte, planes contratados y estados de cuenta.
             </p>
         </div>
@@ -60,12 +60,12 @@
     </div>
 
     <?php if (empty($negocios)): ?>
-        <div style="text-align: center; padding: 56px 24px;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-bg-subtle); display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-subtle); margin-bottom: 16px;">
+        <div class="empty-state-box p-6">
+            <div class="icon-bubble-lg mx-auto mb-4">
                 <?= icon('store', 22) ?>
             </div>
-            <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 6px 0;">No hay restaurantes dados de alta</h3>
-            <p style="color: var(--color-text-muted); font-size: 14px; margin: 0 auto 20px auto;">Comienza creando el primer negocio.</p>
+            <h3 class="text-md fw-700 text-main m-0 mb-2">No hay restaurantes dados de alta</h3>
+            <p class="text-muted text-sm max-w-md mx-auto mb-5">Comienza creando el primer negocio.</p>
             <a href="<?= e(app_url('/superadmin/negocios/crear')) ?>" class="btn btn-primary">
                 <?= icon('plus', 16) ?>
                 <span>Registrar Primer Negocio</span>
@@ -81,40 +81,40 @@
                         <th>Ciclo</th>
                         <th>WhatsApp Oficial</th>
                         <th>Fecha de Vencimiento</th>
-                        <th style="text-align: right;">Acciones</th>
+                        <th class="text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach (array_slice($negocios, 0, 5) as $negocio): ?>
                         <tr>
                             <td>
-                                <strong style="color: var(--color-text-main); font-size: 14px;"><?= e($negocio['nombre']) ?></strong>
-                                <span style="display: block; font-size: 12px; color: var(--color-text-muted); margin-top: 2px;">
+                                <strong class="text-main text-sm"><?= e($negocio['nombre']) ?></strong>
+                                <span class="block text-xs text-muted mt-1">
                                     slug: <code><?= e($negocio['slug']) ?></code>
                                 </span>
                             </td>
                             <td>
-                                <span class="badge badge-neutral" style="font-weight: 600;">
+                                <span class="badge badge-neutral fw-600">
                                     <?= e($negocio['plan_nombre'] ?? 'Sin Plan') ?>
                                 </span>
                             </td>
-                            <td style="color: var(--color-text-secondary); font-size: 13.5px;">
+                            <td class="text-secondary text-sm">
                                 <?= e(ucfirst($negocio['ciclo'])) ?>
                             </td>
                             <td>
-                                <a href="https://wa.me/<?= e($negocio['whatsapp']) ?>" target="_blank" rel="noopener" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">
+                                <a href="https://wa.me/<?= e($negocio['whatsapp']) ?>" target="_blank" rel="noopener" class="text-brand fw-600">
                                     +<?= e($negocio['whatsapp']) ?>
                                 </a>
                             </td>
                             <td>
-                                <span style="font-variant-numeric: tabular-nums; font-weight: 600; color: var(--color-text-main);">
+                                <span class="tabular fw-600 text-main">
                                     <?= e($negocio['fecha_vencimiento'] ?? 'Sin fecha') ?>
                                 </span>
                                 <?php if (!empty($negocio['en_prueba'])): ?>
-                                    <span class="badge badge-warning" style="font-size: 10.5px; margin-left: 6px;">En Prueba</span>
+                                    <span class="badge badge-warning text-xs ml-1">En Prueba</span>
                                 <?php endif; ?>
                             </td>
-                            <td style="text-align: right;">
+                            <td class="text-right">
                                 <div class="action-btns">
                                     <a href="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/editar')) ?>" class="btn btn-secondary btn-sm">
                                         <?= icon('edit', 14) ?>

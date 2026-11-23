@@ -13,6 +13,18 @@ class Mesa extends Model
     protected string $primaryKey = 'id';
 
     /**
+     * Retorna el conteo total de mesas activas/no borradas del restaurante
+     */
+    public function contarPorRestaurante(int $restauranteId): int
+    {
+        $stmt = self::getPdo()->prepare(
+            "SELECT COUNT(*) FROM `mesas` WHERE `restaurante_id` = :rid AND `deleted_at` IS NULL"
+        );
+        $stmt->execute(['rid' => $restauranteId]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    /**
      * Retorna todas las mesas del restaurante especificado
      *
      * @return array<array<string, mixed>>

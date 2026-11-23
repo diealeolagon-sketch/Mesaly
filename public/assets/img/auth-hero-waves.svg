@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1000" preserveAspectRatio="none" width="100%" height="100%">
+  <defs>
+    <!-- Degradado Base Naranja Mesaly -->
+    <linearGradient id="mesalyHeroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A00"/>
+      <stop offset="30%" stop-color="#FF6B00"/>
+      <stop offset="70%" stop-color="#EA580C"/>
+      <stop offset="100%" stop-color="#C2410C"/>
+    </linearGradient>
+
+    <!-- Resplandor Ámbar Superior -->
+    <radialGradient id="mesalyGlow" cx="20%" cy="15%" r="65%">
+      <stop offset="0%" stop-color="#FFAE33" stop-opacity="0.45"/>
+      <stop offset="60%" stop-color="#FF6B00" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Fondo Gradiente -->
+  <rect width="900" height="1000" fill="url(#mesalyHeroGrad)"/>
+  <rect width="900" height="1000" fill="url(#mesalyGlow)"/>
+
+  <!-- Líneas de Contorno Geométricas Curvas (Estilo SaleSkip) -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity="0.18">
+    <path d="M -100 200 C 200 100, 500 220, 750 480 C 850 590, 880 750, 920 1050"/>
+    <path d="M -80 260 C 220 170, 520 280, 770 530 C 860 630, 890 780, 930 1070"/>
+    <path d="M -60 320 C 240 240, 540 340, 790 580 C 870 670, 900 810, 940 1090"/>
+    <path d="M -40 380 C 260 310, 560 400, 810 630 C 880 710, 910 840, 950 1110"/>
+    <path d="M -20 440 C 280 380, 580 460, 830 680 C 890 750, 920 870, 960 1130"/>
+  </g>
+
+  <!-- Puntos y Destellos Sutiles de Fondo -->
+  <circle cx="120" cy="120" r="3" fill="#FFFFFF" opacity="0.25"/>
+  <circle cx="680" cy="220" r="4" fill="#FFFFFF" opacity="0.2"/>
+  <circle cx="450" cy="780" r="3.5" fill="#FFFFFF" opacity="0.18"/>
+  <circle cx="780" cy="880" r="2.5" fill="#FFFFFF" opacity="0.25"/>
+</svg>

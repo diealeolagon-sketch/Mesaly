@@ -8,7 +8,7 @@ return [
     'debug' => filter_var($_ENV['APP_DEBUG'] ?? false, FILTER_VALIDATE_BOOLEAN),
     'url' => rtrim($_ENV['APP_URL'] ?? 'http://localhost/Mesaly/public', '/'),
     'timezone' => $_ENV['APP_TIMEZONE'] ?? 'America/Bogota',
-    'support_whatsapp' => $_ENV['SUPPORT_WHATSAPP'] ?? '573001234567',
+    'support_whatsapp' => $_ENV['SUPPORT_WHATSAPP'] ?? '573228991339',
     'subscription' => [
         'alert_days' => (int)($_ENV['SUBSCRIPTION_ALERT_DAYS'] ?? 5),
         'grace_days' => (int)($_ENV['SUBSCRIPTION_GRACE_DAYS'] ?? 3),

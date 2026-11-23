@@ -95,12 +95,32 @@ class NegocioController extends Controller
         $adminNombre = trim((string)$request->post('admin_nombre'));
         $adminEmail = strtolower(trim((string)$request->post('admin_email')));
         $enPrueba = (bool)$request->post('en_prueba');
+        $plan = (string)$request->post('plan', 'basico');
+        if (!in_array($plan, ['basico', 'pro', 'cadena', 'personalizado'], true)) {
+            $plan = 'basico';
+        }
+        $limiteMesasRaw = $request->post('limite_mesas');
+        if ($limiteMesasRaw !== null && $limiteMesasRaw !== '') {
+            $limiteMesas = max(0, (int)$limiteMesasRaw);
+            if ($limiteMesas === 0) {
+                $limiteMesas = null;
+            }
+        } else {
+            $limiteMesas = ($plan === 'basico') ? 6 : null;
+        }
+        $limiteFacturasMes = (int)$request->post('limite_facturas_mes', $plan === 'basico' ? 600 : ($plan === 'cadena' ? 3500 : 1500));
+        // Facturacion electronica DIAN fija para todos los planes
+        $facturacionActiva = 1;
 
         $validator = Validator::make([
             'nombre' => $nombre,
             'slug' => $slug,
             'whatsapp' => $whatsapp,
             'precio' => $precio,
+            'plan' => $plan,
+            'limite_mesas' => $limiteMesas,
+            'limite_facturas_mes' => $limiteFacturasMes,
+            'facturacion_activa' => $facturacionActiva,
             'ciclo' => $ciclo,
             'admin_nombre' => $adminNombre,
             'admin_email' => $adminEmail,
@@ -150,6 +170,10 @@ class NegocioController extends Controller
                 'slug' => $slug,
                 'whatsapp' => $whatsapp,
                 'precio' => $precio,
+                'plan' => $plan,
+                'limite_mesas' => $limiteMesas,
+                'limite_facturas_mes' => $limiteFacturasMes,
+                'facturacion_activa' => $facturacionActiva,
                 'ciclo' => $ciclo,
                 'dias_gracia' => max(1, $diasGracia),
                 'notas_internas' => $notasInternas ?: null,
@@ -225,11 +249,14 @@ class NegocioController extends Controller
         }
 
         $admin = $this->usuarioModel->findAdminByRestaurante($id);
+        $mesaModel = new \App\Models\Mesa();
+        $totalMesasCreadas = $mesaModel->contarPorRestaurante($id);
 
         return $this->render('super/negocios/editar', [
             'title' => 'Editar Negocio — Super Admin',
             'negocio' => $negocio,
             'admin' => $admin,
+            'totalMesasCreadas' => $totalMesasCreadas,
         ], 'super');
     }
 
@@ -252,12 +279,32 @@ class NegocioController extends Controller
         $diasGracia = max(1, (int)$request->post('dias_gracia', (string)($negocio['dias_gracia'] ?? 3)));
         $notasInternas = trim((string)$request->post('notas_internas', ''));
         $mostrarMarca = !empty($request->post('mostrar_marca')) ? 1 : 0;
+        $plan = (string)$request->post('plan', $negocio['plan'] ?? 'pro');
+        if (!in_array($plan, ['basico', 'pro', 'cadena', 'personalizado'], true)) {
+            $plan = 'pro';
+        }
+        $limiteMesasRaw = $request->post('limite_mesas');
+        if ($limiteMesasRaw !== null && $limiteMesasRaw !== '') {
+            $limiteMesas = max(0, (int)$limiteMesasRaw);
+            if ($limiteMesas === 0) {
+                $limiteMesas = null;
+            }
+        } else {
+            $limiteMesas = null;
+        }
+        $limiteFacturasMes = (int)$request->post('limite_facturas_mes', (string)($negocio['limite_facturas_mes'] ?? ($plan === 'basico' ? 600 : ($plan === 'cadena' ? 3500 : 1500))));
+        // Facturacion electronica DIAN fija para todos los planes
+        $facturacionActiva = 1;
 
         $validator = Validator::make([
             'nombre' => $nombre,
             'slug' => $slug,
             'whatsapp' => $whatsapp,
             'precio' => $precio,
+            'plan' => $plan,
+            'limite_mesas' => $limiteMesas,
+            'limite_facturas_mes' => $limiteFacturasMes,
+            'facturacion_activa' => $facturacionActiva,
             'ciclo' => $ciclo,
             'fecha_vencimiento' => $fechaVencimiento,
         ], [
@@ -284,6 +331,10 @@ class NegocioController extends Controller
             'slug' => $slug,
             'whatsapp' => $whatsapp,
             'precio' => $precio,
+            'plan' => $plan,
+            'limite_mesas' => $limiteMesas,
+            'limite_facturas_mes' => $limiteFacturasMes,
+            'facturacion_activa' => $facturacionActiva,
             'ciclo' => $ciclo,
             'fecha_vencimiento' => $fechaVencimiento,
             'dias_gracia' => $diasGracia,

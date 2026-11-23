@@ -1,53 +1,124 @@
-<div class="content-header" style="margin-bottom: 24px;">
+<?php
+$limiteNum = !empty($limiteMesas) ? (int)$limiteMesas : null;
+$siguienteNumero = $limiteNum !== null ? min($limiteNum, $totalMesas + 1) : ($totalMesas + 1);
+$defaultLoteDesde = ($limiteNum !== null && $totalMesas > 0 && $totalMesas < $limiteNum) ? ($totalMesas + 1) : 1;
+$defaultLoteHasta = $limiteNum !== null ? $limiteNum : 15;
+$maxLote = $limiteNum !== null ? $limiteNum : 999;
+?>
+<div class="content-header mb-5">
     <div>
-        <h1 class="page-title" style="font-size: 24px; margin-bottom: 4px;">
+        <h1 class="page-title text-2xl mb-1">
             Mesas y Códigos QR
         </h1>
-        <p class="page-subtitle" style="font-size: 14px; color: var(--color-text-muted); margin: 0;">
+        <p class="page-subtitle text-base text-muted m-0">
             Administra las mesas de tu local, obtén los códigos QR para pedidos en salón y genera tarjetas listas para imprimir.
         </p>
+        <div class="mt-2 flex items-center gap-2">
+            <span class="badge <?= !empty($limiteMesas) && $totalMesas >= $limiteMesas ? 'badge-danger' : 'badge-subtle-brand' ?> text-xs font-semibold">
+                Plan <?= e($planNombre ?? 'Pro') ?>: <?= $totalMesas ?><?= !empty($limiteMesas) ? " / {$limiteMesas} mesas" : ' mesas (Ilimitadas)' ?>
+            </span>
+            <?php if (!empty($limiteMesas) && $totalMesas >= $limiteMesas): ?>
+                <span class="text-xs text-danger font-medium">Límite del plan alcanzado. Contacta a tu asesor para ampliar.</span>
+            <?php endif; ?>
+        </div>
     </div>
 
-    <div class="content-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <div class="content-actions flex items-center gap-2 flex-wrap">
         <?php if (!empty($mesas)): ?>
-            <a href="<?= e(app_url('/admin/mesas/pdf')) ?>" class="btn btn-secondary" style="font-weight: 600;">
+            <a href="<?= e(app_url('/admin/mesas/pdf')) ?>" class="btn btn-secondary fw-600">
                 <?= icon('upload', 15) ?>
                 <span>Exportar Tarjetas PDF</span>
             </a>
         <?php endif; ?>
 
-        <button type="button" class="btn btn-secondary" id="btnAbrirModalLote" style="font-weight: 600;">
-            <?= icon('zap', 15) ?>
-            <span>Generar en Lote</span>
-        </button>
+        <?php if (!empty($limiteMesas)): ?>
+            <!-- PLAN CON TOPE (BÁSICO / EXTENDIDO): BOTONES RÁPIDOS 1-CLIC HASTA EL TOPE -->
+            <?php if ($totalMesas < $limiteMesas): ?>
+                <?php if ($totalMesas === 0): ?>
+                    <form method="POST" action="<?= e(app_url('/admin/mesas/completar-tope')) ?>" class="m-0">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-primary fw-700">
+                            <?= icon('zap', 15) ?>
+                            <span>Generar mis <?= (int)$limiteMesas ?> Mesas</span>
+                        </button>
+                    </form>
+                <?php else: ?>
+                    <form method="POST" action="<?= e(app_url('/admin/mesas/rapida')) ?>" class="m-0">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-primary fw-700">
+                            <?= icon('plus', 15) ?>
+                            <span>Agregar Mesa <?= (int)$siguienteNumero ?> (+1)</span>
+                        </button>
+                    </form>
 
-        <button type="button" class="btn btn-primary" id="btnAbrirModalCrear" style="font-weight: 700;">
-            <?= icon('plus', 16) ?>
-            <span>Nueva Mesa</span>
-        </button>
+                    <?php if (($limiteMesas - $totalMesas) > 1): ?>
+                        <form method="POST" action="<?= e(app_url('/admin/mesas/completar-tope')) ?>" class="m-0">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-secondary fw-600" title="Crea todas las mesas hasta el tope de <?= (int)$limiteMesas ?>">
+                                <?= icon('zap', 15) ?>
+                                <span>Llenar hasta <?= (int)$limiteMesas ?> mesas</span>
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <button type="button" class="btn btn-secondary fw-600" id="btnAbrirModalCrear" title="Crear mesa asignándole un nombre o zona personalizada">
+                    <?= icon('edit', 14) ?>
+                    <span>Mesa con Nombre</span>
+                </button>
+            <?php endif; ?>
+
+        <?php else: ?>
+            <!-- PLAN ILIMITADO (PRO / CADENA): GENERADOR EN LOTE TRADICIONAL + NUEVA MESA -->
+            <button type="button" class="btn btn-secondary fw-600" id="btnAbrirModalLote">
+                <?= icon('zap', 15) ?>
+                <span>Generar en Lote</span>
+            </button>
+
+            <button type="button" class="btn btn-primary fw-700" id="btnAbrirModalCrear">
+                <?= icon('plus', 16) ?>
+                <span>Nueva Mesa</span>
+            </button>
+        <?php endif; ?>
     </div>
 </div>
 
+<?php if (!empty($limiteMesas) && $totalMesas >= $limiteMesas): ?>
+    <div class="alert alert-warning mb-5 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+            <?= icon('alert', 18) ?>
+            <div>
+                <strong class="text-sm block">Has alcanzado el límite de <?= (int)$limiteMesas ?> mesas de tu Plan <?= e($planNombre ?? 'Básico') ?></strong>
+                <span class="text-xs text-secondary">Tienes <?= (int)$totalMesas ?> mesas activas. Para habilitar mesas adicionales, ponte en contacto con tu asesor de Mesaly o amplía tu capacidad.</span>
+            </div>
+        </div>
+        <a href="https://wa.me/573001234567?text=<?= urlencode('Hola Mesaly, quiero ampliar el cupo de mesas de mi restaurante (' . ($tenant['nombre'] ?? '') . ')') ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm flex-shrink-0">
+            <?= icon('phone', 13) ?>
+            <span>Solicitar más mesas</span>
+        </a>
+    </div>
+<?php endif; ?>
+
 <!-- 1. CARD QR GENERAL DEL RESTAURANTE -->
-<div class="card" style="padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, #FFFFFF 0%, #FAFBFD 100%);">
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap;">
-        <div style="display: flex; gap: 20px; align-items: center; flex: 1; min-width: 280px;">
+<div class="card qr-general-card mb-5">
+    <div class="flex items-center justify-between gap-5 flex-wrap">
+        <div class="flex items-center gap-4 flex-1 min-w-280">
             <div class="qr-general-box">
                 <?= $qrGeneralSvg ?>
             </div>
 
             <div>
-                <span class="badge" style="background: var(--color-brand-subtle); color: var(--color-brand); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: var(--radius-full); display: inline-block; margin-bottom: 6px;">
+                <span class="badge badge-subtle-brand mb-1 inline-block text-xs uppercase">
                     Código QR General del Restaurante
                 </span>
-                <h2 style="font-size: 17px; font-weight: 700; color: var(--color-text-main); margin: 0 0 6px 0;">
+                <h2 class="text-md fw-700 text-main m-0 mb-1">
                     Menú Digital para Redes Sociales y Entrada
                 </h2>
-                <p style="font-size: 13px; color: var(--color-text-muted); margin: 0 0 10px 0; line-height: 1.4;">
+                <p class="text-xs text-muted m-0 mb-2 leading-relaxed">
                     Este enlace no tiene mesa asignada. Es ideal para publicar en tu perfil de Instagram, estados de WhatsApp, pendones o volantes de domicilio.
                 </p>
-                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span style="font-size: 13px; font-family: monospace; font-weight: 600; background: var(--color-bg-subtle); padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--color-border-subtle); color: var(--color-text-main);" id="urlGeneralTexto">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="qr-general-url-text" id="urlGeneralTexto">
                         <?= e($urlGeneral) ?>
                     </span>
                     <button type="button" class="btn btn-secondary btn-sm" id="btnCopiarUrlGeneral">
@@ -62,19 +133,19 @@
             </div>
         </div>
 
-        <div style="border-left: 1px solid var(--color-border-subtle); padding-left: 24px; display: flex; flex-direction: column; gap: 10px; min-width: 180px;">
-            <div style="font-size: 12px; color: var(--color-text-muted); font-weight: 600;">RESUMEN DE SALÓN</div>
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
-                <span style="color: var(--color-text-muted);">Mesas activas:</span>
-                <strong style="color: var(--color-success); font-weight: 700;"><?= (int)$activasCount ?></strong>
+        <div class="salon-summary-box">
+            <div class="text-xs text-muted fw-600">RESUMEN DE SALÓN</div>
+            <div class="flex items-center justify-between text-xs">
+                <span class="text-muted">Mesas activas:</span>
+                <strong class="text-success fw-700"><?= (int)$activasCount ?></strong>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
-                <span style="color: var(--color-text-muted);">Mesas inactivas:</span>
-                <strong style="color: var(--color-text-subtle); font-weight: 600;"><?= (int)$inactivasCount ?></strong>
+            <div class="flex items-center justify-between text-xs">
+                <span class="text-muted">Mesas inactivas:</span>
+                <strong class="text-subtle fw-600"><?= (int)$inactivasCount ?></strong>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; border-top: 1px dashed var(--color-border-subtle); padding-top: 6px;">
-                <span style="color: var(--color-text-main); font-weight: 600;">Total configuradas:</span>
-                <strong style="color: var(--color-text-main); font-weight: 800; font-size: 15px;"><?= (int)$totalMesas ?></strong>
+            <div class="flex items-center justify-between text-xs salon-summary-total">
+                <span class="text-main fw-600">Total configuradas:</span>
+                <strong class="text-main fw-700 text-sm"><?= (int)$totalMesas ?></strong>
             </div>
         </div>
     </div>
@@ -87,89 +158,133 @@
             <?= icon('sparkles', 22) ?>
         </div>
         <div>
-            <h3 class="mesa-quick-batch-title">¿Cuántas mesas tiene tu restaurante?</h3>
-            <p class="mesa-quick-batch-subtitle">Indica el número total de mesas y generaremos todos sus códigos QR en un solo clic (del 1 al total).</p>
+            <?php if (!empty($limiteMesas)): ?>
+                <?php if ($totalMesas >= $limiteMesas): ?>
+                    <h3 class="mesa-quick-batch-title">Tope de mesas alcanzado (<?= (int)$totalMesas ?> de <?= (int)$limiteMesas ?> mesas)</h3>
+                    <p class="mesa-quick-batch-subtitle">Tu restaurante ya tiene configuradas todas las mesas de tu Plan <?= e($planNombre ?? 'Básico') ?>. Si necesitas más mesas, contacta a tu asesor para ampliar el cupo.</p>
+                <?php else: ?>
+                    <h3 class="mesa-quick-batch-title">¿Cuántas mesas tiene tu restaurante?</h3>
+                    <p class="mesa-quick-batch-subtitle">
+                        Tu plan admite un máximo de <strong><?= (int)$limiteMesas ?> mesas</strong> (tienes <?= (int)$totalMesas ?> creadas, puedes agregar <strong><?= (int)($limiteMesas - $totalMesas) ?> mesas más</strong>).
+                    </p>
+                <?php endif; ?>
+            <?php else: ?>
+                <h3 class="mesa-quick-batch-title">¿Cuántas mesas tiene tu restaurante?</h3>
+                <p class="mesa-quick-batch-subtitle">Tu plan incluye <strong>mesas ilimitadas</strong>. Indica el total de mesas y generaremos todos sus códigos QR en un solo clic.</p>
+            <?php endif; ?>
         </div>
     </div>
-    <form method="POST" action="<?= e(app_url('/admin/mesas/lote')) ?>" class="mesa-quick-batch-form">
-        <?= csrf_field() ?>
-        <input type="hidden" name="desde" value="1">
-        <label for="lote_hasta_quick" style="font-size: 13px; font-weight: 700; color: #9A3412;">Total Mesas:</label>
-        <input type="number" id="lote_hasta_quick" name="hasta" class="mesa-quick-batch-input" min="1" max="100" value="<?= max(10, (int)$totalMesas) ?>" required>
-        <button type="submit" class="btn btn-primary" style="background: #EA580C; border-color: #EA580C; font-weight: 700; white-space: nowrap;">
-            <?= icon('qrcode', 15) ?>
-            <span>Generar Códigos QR</span>
-        </button>
-    </form>
+    <?php if (empty($limiteMesas) || $totalMesas < $limiteMesas): ?>
+        <form method="POST" action="<?= e(app_url('/admin/mesas/lote')) ?>" class="mesa-quick-batch-form">
+            <?= csrf_field() ?>
+            <input type="hidden" name="desde" value="1">
+            <label for="lote_hasta_quick" class="quick-batch-label">
+                Total Mesas <?= !empty($limiteMesas) ? '(Máx. ' . (int)$limiteMesas . ')' : '' ?>:
+            </label>
+            <input type="number" 
+                   id="lote_hasta_quick" 
+                   name="hasta" 
+                   class="mesa-quick-batch-input" 
+                   min="1" 
+                   max="<?= !empty($limiteMesas) ? (int)$limiteMesas : '100' ?>" 
+                   value="<?= !empty($limiteMesas) ? (int)$limiteMesas : max(10, (int)$totalMesas) ?>" 
+                   required>
+            <button type="submit" class="btn btn-primary btn-quick-batch">
+                <?= icon('qrcode', 15) ?>
+                <span>Generar Códigos QR</span>
+            </button>
+        </form>
+    <?php else: ?>
+        <div class="flex items-center gap-2">
+            <a href="https://wa.me/573001234567?text=<?= urlencode('Hola Mesaly, quiero ampliar el cupo de mesas de mi restaurante (' . ($tenant['nombre'] ?? '') . ')') ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm flex-shrink-0">
+                <?= icon('phone', 13) ?>
+                <span>Solicitar más mesas</span>
+            </a>
+        </div>
+    <?php endif; ?>
 </div>
 
 <!-- 2. GRILLA DE MESAS CON QR -->
-<div style="margin-bottom: 30px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h2 style="font-size: 17px; font-weight: 700; color: var(--color-text-main); margin: 0;">
+<div class="mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-md fw-700 text-main m-0">
             Mesas del Restaurante (<?= (int)$totalMesas ?>)
         </h2>
     </div>
 
     <?php if (empty($mesas)): ?>
-        <div class="card" style="padding: 60px 24px; text-align: center;">
-            <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg-subtle); display: inline-flex; align-items: center; justify-content: center; color: var(--color-brand); margin-bottom: 16px;">
+        <div class="card empty-state-box p-6">
+            <div class="icon-bubble-lg mx-auto mb-4">
                 <?= icon('cutlery', 26) ?>
             </div>
-            <h3 style="font-size: 17px; font-weight: 700; color: var(--color-text-main); margin: 0 0 8px 0;">
+            <h3 class="text-md fw-700 text-main m-0 mb-2">
                 Aún no tienes mesas configuradas
             </h3>
-            <p style="font-size: 14px; color: var(--color-text-muted); max-width: 480px; margin: 0 auto 24px auto; line-height: 1.5;">
+            <p class="text-muted text-sm max-w-lg mx-auto mb-5 leading-relaxed">
                 Configura las mesas de tu restaurante para que tus comensales escaneen el código desde su sitio y pidan sin esperar atención del mesero.
             </p>
-            <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-                <button type="button" class="btn btn-secondary" id="btnEmptyLote">
-                    <?= icon('zap', 15) ?>
-                    <span>Generar Lote (1 a 10)</span>
-                </button>
-                <button type="button" class="btn btn-primary" id="btnEmptyCrear">
-                    <?= icon('plus', 16) ?>
-                    <span>Agregar Mesa 1</span>
-                </button>
+            <div class="flex justify-center gap-3 flex-wrap">
+                <?php if (!empty($limiteMesas)): ?>
+                    <form method="POST" action="<?= e(app_url('/admin/mesas/completar-tope')) ?>" class="m-0">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-primary fw-700">
+                            <?= icon('zap', 16) ?>
+                            <span>Generar mis <?= (int)$limiteMesas ?> Mesas en 1 Clic</span>
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" id="btnEmptyCrear">
+                        <?= icon('edit', 14) ?>
+                        <span>Crear Mesa Personalizada</span>
+                    </button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-secondary" id="btnEmptyLote">
+                        <?= icon('zap', 15) ?>
+                        <span>Generar Lote (1 a 15)</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnEmptyCrear">
+                        <?= icon('plus', 16) ?>
+                        <span>Agregar Mesa 1</span>
+                    </button>
+                <?php endif; ?>
             </div>
         </div>
     <?php else: ?>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px;">
+        <div class="mesas-grid">
             <?php foreach ($mesas as $mesa): ?>
                 <?php $estaActiva = !empty($mesa['activa']); ?>
-                <div class="card" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: all 120ms ease; <?= $estaActiva ? '' : 'opacity: 0.65; background: #F8FAFC;' ?>">
+                <div class="card mesa-card <?= $estaActiva ? '' : 'mesa-card--inactive' ?>">
                     
                     <div>
                         <!-- Header de la tarjeta -->
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div class="flex items-start justify-between mb-3">
                             <div>
-                                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-subtle);">MESA</span>
-                                <div style="font-size: 22px; font-weight: 800; color: var(--color-text-main); line-height: 1.1;">
+                                <span class="text-xs text-subtle fw-700 uppercase">MESA</span>
+                                <div class="mesa-num-lg">
                                     #<?= str_pad((string)$mesa['numero'], 2, '0', STR_PAD_LEFT) ?>
                                 </div>
                                 <?php if (!empty($mesa['nombre'])): ?>
-                                    <span style="font-size: 12.5px; font-weight: 600; color: var(--color-text-muted); display: block; margin-top: 2px;">
+                                    <span class="text-xs fw-600 text-muted block mt-1">
                                         <?= e($mesa['nombre']) ?>
                                     </span>
                                 <?php endif; ?>
                             </div>
 
-                            <form method="POST" action="<?= e(app_url('/admin/mesas/' . $mesa['id'] . '/toggle')) ?>" style="margin: 0;">
+                            <form method="POST" action="<?= e(app_url('/admin/mesas/' . $mesa['id'] . '/toggle')) ?>" class="m-0">
                                 <?= csrf_field() ?>
-                                <button type="submit" class="badge" style="border: none; cursor: pointer; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11.5px; font-weight: 700; <?= $estaActiva ? 'background: #ECFDF5; color: #065F46;' : 'background: #F1F5F9; color: #64748B;' ?>" title="Clic para alternar estado">
-                                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; <?= $estaActiva ? 'background: #10B981;' : 'background: #94A3B8;' ?>"></span>
+                                <button type="submit" class="<?= $estaActiva ? 'mesa-badge-active' : 'mesa-badge-inactive' ?>" title="Clic para alternar estado">
+                                    <span class="mesa-badge-dot <?= $estaActiva ? 'mesa-badge-dot--active' : 'mesa-badge-dot--inactive' ?>"></span>
                                     <?= $estaActiva ? 'Activa' : 'Inactiva' ?>
                                 </button>
                             </form>
                         </div>
 
                         <!-- Código QR Centrado -->
-                        <div style="background: #FFFFFF; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 12px; margin: 12px 0; text-align: center; box-shadow: var(--shadow-sm);">
+                        <div class="mesa-qr-wrap">
                             <div class="mesa-qr-container">
                                 <?= $mesa['qr_svg'] ?>
                             </div>
-                            <div style="margin-top: 8px;">
-                                <a href="<?= e($mesa['url']) ?>" target="_blank" rel="noopener" style="font-size: 11.5px; color: var(--color-brand); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                            <div class="mt-2">
+                                <a href="<?= e($mesa['url']) ?>" target="_blank" rel="noopener" class="text-xs text-brand fw-600 inline-flex items-center gap-1">
                                     <span>Probar Menú en Mesa</span>
                                     <?= icon('external-link', 11) ?>
                                 </a>
@@ -178,23 +293,23 @@
                     </div>
 
                     <!-- Botones de Acción de la Mesa -->
-                    <div style="border-top: 1px solid var(--color-border-subtle); padding-top: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-                        <a href="<?= e(app_url('/admin/mesas/' . $mesa['id'] . '/qr')) ?>" class="btn btn-secondary btn-sm" style="flex: 1; padding: 6px 8px; justify-content: center;" title="Descargar código QR en formato PNG">
+                    <div class="modal-footer-bordered pt-3 mt-2 flex items-center justify-between gap-2">
+                        <a href="<?= e(app_url('/admin/mesas/' . $mesa['id'] . '/qr')) ?>" class="btn btn-secondary btn-sm btn-card-action" title="Descargar código QR en formato PNG">
                             <?= icon('upload', 13) ?>
                             <span>QR PNG</span>
                         </a>
 
-                        <button type="button" class="btn btn-secondary btn-sm btn-editar-mesa" 
+                        <button type="button" class="btn btn-secondary btn-sm btn-editar-mesa btn-icon-pad" 
                                 data-id="<?= (int)$mesa['id'] ?>"
                                 data-numero="<?= (int)$mesa['numero'] ?>"
                                 data-nombre="<?= e($mesa['nombre'] ?? '') ?>"
-                                style="padding: 6px 10px;" title="Editar nombre o número de mesa">
+                                title="Editar nombre o número de mesa">
                             <?= icon('edit', 14) ?>
                         </button>
 
-                        <form method="POST" action="<?= e(app_url('/admin/mesas/' . $mesa['id'] . '/eliminar')) ?>" style="margin: 0;">
+                        <form method="POST" action="<?= e(app_url('/admin/mesas/' . $mesa['id'] . '/eliminar')) ?>" class="m-0">
                             <?= csrf_field() ?>
-                            <button type="submit" class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--color-danger);" data-confirm="¿Seguro que deseas eliminar la Mesa <?= $mesa['numero'] ?>?" title="Eliminar mesa">
+                            <button type="submit" class="btn btn-secondary btn-sm text-danger btn-icon-pad" data-confirm="¿Seguro que deseas eliminar la Mesa <?= $mesa['numero'] ?>?" title="Eliminar mesa">
                                 <?= icon('trash', 14) ?>
                             </button>
                         </form>
@@ -207,36 +322,49 @@
 </div>
 
 <!-- ═══ MODAL 1: NUEVA MESA INDIVIDUAL ═══ -->
-<div class="modal-backdrop-modern" id="modalCrearMesa" style="display: none;">
-    <div class="card" style="width: 100%; max-width: 440px; padding: 28px; box-shadow: var(--shadow-modal); animation: modalSlideUp 160ms var(--ease-fluid);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--color-brand-subtle); color: var(--color-brand); display: flex; align-items: center; justify-content: center;">
+<div class="modal-backdrop modal-backdrop-modern" id="modalCrearMesa">
+    <div class="modal-dialog modal-dialog-sm card card-p-6">
+        <div class="card-header-bordered flex items-center justify-between mb-4 pb-3">
+            <div class="flex items-center gap-2">
+                <div class="modifier-icon-box">
                     <?= icon('cutlery', 16) ?>
                 </div>
-                <h3 style="font-size: 17px; font-weight: 700; margin: 0; color: var(--color-text-main);">Agregar Nueva Mesa</h3>
+                <h3 class="text-md fw-700 text-main m-0">Agregar Nueva Mesa</h3>
             </div>
-            <button type="button" class="btn-close-modal" id="btnCerrarModalCrear" style="background: none; border: none; font-size: 20px; color: var(--color-text-muted); cursor: pointer;">&times;</button>
+            <button type="button" class="btn-close-modal text-lg text-muted pointer" id="btnCerrarModalCrear">&times;</button>
         </div>
 
         <form method="POST" action="<?= e(app_url('/admin/mesas/crear')) ?>">
             <?= csrf_field() ?>
 
+            <?php if (!empty($limiteMesas) && $totalMesas >= $limiteMesas): ?>
+                <div class="alert alert-danger mb-4 text-xs">
+                    <?= icon('alert', 14) ?>
+                    <span>Has alcanzado el límite de <?= (int)$limiteMesas ?> mesas de tu Plan <?= e($planNombre ?? 'Básico') ?>. Para crear más mesas, contacta a tu asesor de Mesaly.</span>
+                </div>
+            <?php endif; ?>
+
             <div class="form-group">
                 <label for="crear_numero" class="form-label">Número de Mesa *</label>
-                <input type="number" id="crear_numero" name="numero" class="form-control" min="1" max="999" placeholder="Ej: 5" required autofocus>
-                <span class="form-hint">Número correlativo que identificará el código QR.</span>
+                <input type="number" id="crear_numero" name="numero" class="form-control" min="1" max="<?= $maxLote ?>" value="<?= $totalMesas < ($limiteNum ?? 999) ? $siguienteNumero : '' ?>" placeholder="Ej: <?= $siguienteNumero ?>" required autofocus <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
+                <span class="form-hint">
+                    <?php if (!empty($limiteMesas)): ?>
+                        Tope máximo de tu plan: Mesa <?= (int)$limiteMesas ?>.
+                    <?php else: ?>
+                        Número correlativo que identificará el código QR.
+                    <?php endif; ?>
+                </span>
             </div>
 
             <div class="form-group">
                 <label for="crear_nombre" class="form-label">Nombre Opcional / Zona</label>
-                <input type="text" id="crear_nombre" name="nombre" class="form-control" maxlength="50" placeholder="Ej: Terraza Exterior, Barra 2...">
+                <input type="text" id="crear_nombre" name="nombre" class="form-control" maxlength="50" placeholder="Ej: Terraza Exterior, Barra 2..." <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
                 <span class="form-hint">Texto descriptivo para tu equipo (opcional).</span>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle);">
+            <div class="modal-footer-bordered pt-4 mt-5 flex justify-end gap-2">
                 <button type="button" class="btn btn-secondary" id="btnCancelarCrear">Cancelar</button>
-                <button type="submit" class="btn btn-primary" style="font-weight: 700;">
+                <button type="submit" class="btn btn-primary fw-700" <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
                     <?= icon('check', 15) ?>
                     <span>Guardar Mesa</span>
                 </button>
@@ -246,39 +374,57 @@
 </div>
 
 <!-- ═══ MODAL 2: GENERACIÓN DE MESAS EN LOTE ═══ -->
-<div class="modal-backdrop-modern" id="modalLoteMesas" style="display: none;">
-    <div class="card" style="width: 100%; max-width: 460px; padding: 28px; box-shadow: var(--shadow-modal); animation: modalSlideUp 160ms var(--ease-fluid);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center;">
+<div class="modal-backdrop modal-backdrop-modern" id="modalLoteMesas">
+    <div class="modal-dialog modal-dialog-md card card-p-6">
+        <div class="card-header-bordered flex items-center justify-between mb-4 pb-3">
+            <div class="flex items-center gap-2">
+                <div class="modifier-icon-box">
                     <?= icon('zap', 16) ?>
                 </div>
-                <h3 style="font-size: 17px; font-weight: 700; margin: 0; color: var(--color-text-main);">Generar Mesas en Lote</h3>
+                <h3 class="text-md fw-700 text-main m-0">Generar Mesas en Lote</h3>
             </div>
-            <button type="button" class="btn-close-modal" id="btnCerrarModalLote" style="background: none; border: none; font-size: 20px; color: var(--color-text-muted); cursor: pointer;">&times;</button>
+            <button type="button" class="btn-close-modal text-lg text-muted pointer" id="btnCerrarModalLote">&times;</button>
         </div>
 
         <form method="POST" action="<?= e(app_url('/admin/mesas/lote')) ?>">
             <?= csrf_field() ?>
 
-            <p style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 18px; line-height: 1.45;">
-                Crea rápidamente una secuencia consecutiva de mesas para tu local. Las mesas que ya existan dentro del rango se mantendrán sin alterarse.
-            </p>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-                <div class="form-group" style="margin: 0;">
-                    <label for="lote_desde" class="form-label">Desde Mesa *</label>
-                    <input type="number" id="lote_desde" name="desde" class="form-control" min="1" max="999" value="1" required>
+            <?php if (!empty($limiteMesas) && $totalMesas >= $limiteMesas): ?>
+                <div class="alert alert-danger mb-4 text-xs">
+                    <?= icon('alert', 14) ?>
+                    <span>Límite de <?= (int)$limiteMesas ?> mesas alcanzado en tu Plan <?= e($planNombre ?? 'Básico') ?>. No es posible generar más mesas.</span>
                 </div>
-                <div class="form-group" style="margin: 0;">
+            <?php else: ?>
+                <p class="text-xs text-muted mb-4 leading-relaxed">
+                    Crea rápidamente una secuencia consecutiva de mesas para tu local.
+                    <?php if (!empty($limiteMesas)): ?>
+                        <strong class="text-brand block mt-1">Tu plan admite hasta la mesa <?= (int)$limiteMesas ?> (te quedan <?= (int)($limiteMesas - $totalMesas) ?> mesas disponibles).</strong>
+                    <?php endif; ?>
+                </p>
+            <?php endif; ?>
+
+            <div class="config-grid-2 mb-4">
+                <div class="form-group m-0">
+                    <label for="lote_desde" class="form-label">Desde Mesa *</label>
+                    <input type="number" id="lote_desde" name="desde" class="form-control" min="1" max="<?= $maxLote ?>" value="<?= $defaultLoteDesde ?>" required <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
+                    <span class="form-hint">Mesa inicial de la secuencia.</span>
+                </div>
+                <div class="form-group m-0">
                     <label for="lote_hasta" class="form-label">Hasta Mesa *</label>
-                    <input type="number" id="lote_hasta" name="hasta" class="form-control" min="1" max="999" value="15" required>
+                    <input type="number" id="lote_hasta" name="hasta" class="form-control" min="1" max="<?= $maxLote ?>" value="<?= $defaultLoteHasta ?>" required <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
+                    <span class="form-hint">
+                        <?php if (!empty($limiteMesas)): ?>
+                            Tope máximo de tu plan: Mesa <?= (int)$limiteMesas ?>.
+                        <?php else: ?>
+                            Tope recomendado para este lote.
+                        <?php endif; ?>
+                    </span>
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle);">
+            <div class="modal-footer-bordered pt-4 mt-5 flex justify-end gap-2">
                 <button type="button" class="btn btn-secondary" id="btnCancelarLote">Cancelar</button>
-                <button type="submit" class="btn btn-primary" style="font-weight: 700;">
+                <button type="submit" class="btn btn-primary fw-700" <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
                     <?= icon('zap', 15) ?>
                     <span>Generar Secuencia</span>
                 </button>
@@ -288,16 +434,16 @@
 </div>
 
 <!-- ═══ MODAL 3: EDITAR MESA ═══ -->
-<div class="modal-backdrop-modern" id="modalEditarMesa" style="display: none;">
-    <div class="card" style="width: 100%; max-width: 440px; padding: 28px; box-shadow: var(--shadow-modal); animation: modalSlideUp 160ms var(--ease-fluid);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--color-brand-subtle); color: var(--color-brand); display: flex; align-items: center; justify-content: center;">
+<div class="modal-backdrop modal-backdrop-modern" id="modalEditarMesa">
+    <div class="modal-dialog modal-dialog-sm card card-p-6">
+        <div class="card-header-bordered flex items-center justify-between mb-4 pb-3">
+            <div class="flex items-center gap-2">
+                <div class="modifier-icon-box">
                     <?= icon('edit', 16) ?>
                 </div>
-                <h3 style="font-size: 17px; font-weight: 700; margin: 0; color: var(--color-text-main);">Editar Mesa</h3>
+                <h3 class="text-md fw-700 text-main m-0">Editar Mesa</h3>
             </div>
-            <button type="button" class="btn-close-modal" id="btnCerrarModalEditar" style="background: none; border: none; font-size: 20px; color: var(--color-text-muted); cursor: pointer;">&times;</button>
+            <button type="button" class="btn-close-modal text-lg text-muted pointer" id="btnCerrarModalEditar">&times;</button>
         </div>
 
         <form method="POST" id="formEditarMesa" action="">
@@ -313,9 +459,9 @@
                 <input type="text" id="editar_nombre" name="nombre" class="form-control" maxlength="50" placeholder="Ej: Terraza VIP...">
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle);">
+            <div class="modal-footer-bordered pt-4 mt-5 flex justify-end gap-2">
                 <button type="button" class="btn btn-secondary" id="btnCancelarEditar">Cancelar</button>
-                <button type="submit" class="btn btn-primary" style="font-weight: 700;">
+                <button type="submit" class="btn btn-primary fw-700">
                     <?= icon('check', 15) ?>
                     <span>Guardar Cambios</span>
                 </button>
@@ -342,8 +488,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 const ta = document.createElement('textarea');
                 ta.value = url;
-                ta.style.position = 'fixed';
-                ta.style.left = '-9999px';
+                ta.className = 'visually-hidden';
                 document.body.appendChild(ta);
                 ta.select();
                 try {
@@ -363,16 +508,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function abrir(modal) {
         if (!modal) return;
-        modal.classList.add('is-open');
-        modal.style.display = 'flex';
+        modal.classList.add('is-open', 'is-active');
         const input = modal.querySelector('input[type="number"]');
         if (input) setTimeout(() => input.focus(), 60);
     }
 
     function cerrar(modal) {
         if (modal) {
-            modal.classList.remove('is-open');
-            modal.style.display = 'none';
+            modal.classList.remove('is-open', 'is-active');
         }
     }
 
@@ -416,5 +559,42 @@ document.addEventListener('DOMContentLoaded', function () {
             [modalCrear, modalLote, modalEditar].forEach(m => cerrar(m));
         }
     });
+
+    // 3. Restricción en tiempo real según el tope del plan
+    const limitePlan = <?= !empty($limiteMesas) ? (int)$limiteMesas : 'null' ?>;
+    if (limitePlan !== null) {
+        const inputLoteHasta = document.getElementById('lote_hasta');
+        const inputLoteDesde = document.getElementById('lote_desde');
+        const inputCrearNum = document.getElementById('crear_numero');
+        const inputLoteQuick = document.getElementById('lote_hasta_quick');
+
+        inputLoteHasta?.addEventListener('input', function () {
+            const val = parseInt(this.value, 10);
+            if (!isNaN(val) && val > limitePlan) {
+                this.value = limitePlan;
+            }
+        });
+
+        inputLoteQuick?.addEventListener('input', function () {
+            const val = parseInt(this.value, 10);
+            if (!isNaN(val) && val > limitePlan) {
+                this.value = limitePlan;
+            }
+        });
+
+        inputLoteDesde?.addEventListener('input', function () {
+            const val = parseInt(this.value, 10);
+            if (!isNaN(val) && val > limitePlan) {
+                this.value = limitePlan;
+            }
+        });
+
+        inputCrearNum?.addEventListener('input', function () {
+            const val = parseInt(this.value, 10);
+            if (!isNaN(val) && val > limitePlan) {
+                this.value = limitePlan;
+            }
+        });
+    }
 });
 </script>

@@ -13,7 +13,9 @@ use App\Controllers\Admin\DisponibilidadController;
 use App\Controllers\Admin\MesaController;
 use App\Controllers\Admin\ModificadorController;
 use App\Controllers\Admin\PedidoAdminController;
+use App\Controllers\Admin\ReporteController;
 use App\Controllers\AuthController;
+use App\Controllers\Public\LandingController;
 use App\Controllers\Public\MenuController;
 use App\Controllers\Super\NegocioController;
 use App\Core\Auth;
@@ -34,17 +36,9 @@ $router->get('/cambiar-password', [AuthController::class, 'showChangePassword'],
 $router->post('/cambiar-password', [AuthController::class, 'changePassword'], [new AuthMiddleware(), new CsrfMiddleware()]);
 
 // -----------------------------------------------------------------------------
-// Raíz
+// Raíz — Landing Page Oficial SaaS
 // -----------------------------------------------------------------------------
-$router->get('/', function ($request) {
-    if (Auth::check()) {
-        $url = Auth::isSuperAdmin() ? app_url('/superadmin') : app_url('/admin');
-        header("Location: {$url}");
-        exit;
-    }
-    header("Location: " . app_url('/login'));
-    exit;
-});
+$router->get('/', [LandingController::class, 'index']);
 
 // -----------------------------------------------------------------------------
 // Super Admin (/superadmin)
@@ -82,9 +76,17 @@ $router->get('/admin', [AdminDashboardController::class, 'index'], $adminMiddlew
 $router->post('/admin/toggle-recibiendo-pedidos', [AdminDashboardController::class, 'toggleRecibiendoPedidos'], $adminPostMiddlewares);
 
 // Pedidos en Vivo y Operación (Fase 3)
+$router->get('/admin/pedidos/poll-nuevos', [PedidoAdminController::class, 'pollNuevos'], $adminMiddlewares);
 $router->get('/admin/pedidos', [PedidoAdminController::class, 'index'], $adminMiddlewares);
+$router->get('/admin/pedidos/{id}', [PedidoAdminController::class, 'verComanda'], $adminMiddlewares);
 $router->post('/admin/pedidos/{id}/estado', [PedidoAdminController::class, 'cambiarEstado'], $adminPostMiddlewares);
+$router->post('/admin/pedidos/{id}/liberar-mesa', [PedidoAdminController::class, 'liberarMesa'], $adminPostMiddlewares);
+$router->post('/admin/mesas/{id}/liberar', [PedidoAdminController::class, 'liberarMesaPorId'], $adminPostMiddlewares);
 $router->get('/admin/pedidos/{id}/detalle-json', [PedidoAdminController::class, 'detalleJson'], $adminMiddlewares);
+
+// Reportes Financieros y Exportación a Excel
+$router->get('/admin/reportes', [ReporteController::class, 'index'], $adminMiddlewares);
+$router->get('/admin/reportes/exportar', [ReporteController::class, 'exportar'], $adminMiddlewares);
 
 // Configuración
 $router->get('/admin/configuracion', [ConfigController::class, 'show'], $adminMiddlewares);
@@ -115,6 +117,8 @@ $router->post('/admin/disponibilidad/toggle', [DisponibilidadController::class, 
 // Mesas y Códigos QR (Fase 2)
 $router->get('/admin/mesas', [MesaController::class, 'index'], $adminMiddlewares);
 $router->post('/admin/mesas/crear', [MesaController::class, 'guardar'], $adminPostMiddlewares);
+$router->post('/admin/mesas/rapida', [MesaController::class, 'generarRapida'], $adminPostMiddlewares);
+$router->post('/admin/mesas/completar-tope', [MesaController::class, 'completarTope'], $adminPostMiddlewares);
 $router->post('/admin/mesas/lote', [MesaController::class, 'generarLote'], $adminPostMiddlewares);
 $router->post('/admin/mesas/{id}/editar', [MesaController::class, 'actualizar'], $adminPostMiddlewares);
 $router->post('/admin/mesas/{id}/toggle', [MesaController::class, 'toggle'], $adminPostMiddlewares);

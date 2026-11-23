@@ -1,15 +1,15 @@
-<div class="content-header" style="margin-bottom: 24px;">
+<div class="content-header mb-5">
     <div>
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <a href="<?= e(app_url('/superadmin')) ?>" style="color: var(--color-text-muted); font-size: 13px; text-decoration: none;">
+        <div class="flex items-center gap-2 mb-1">
+            <a href="<?= e(app_url('/superadmin')) ?>" class="text-xs text-muted">
                 Super Admin &rarr;
             </a>
-            <span style="color: var(--color-text-subtle);">Historial de Pagos</span>
+            <span class="text-subtle text-xs">Historial de Pagos</span>
         </div>
-        <h1 class="page-title" style="font-size: 24px; margin-bottom: 4px;">
+        <h1 class="page-title text-2xl mb-1">
             Historial de Pagos de Suscripción
         </h1>
-        <p class="page-subtitle" style="font-size: 14px; color: var(--color-text-muted); margin: 0;">
+        <p class="page-subtitle text-base text-muted m-0">
             Registro centralizado e inmutable de todos los cobros y renovaciones manuales efectuadas.
         </p>
     </div>
@@ -23,29 +23,29 @@
 </div>
 
 <!-- KPI DE RECAUDACIÓN -->
-<div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 24px;">
+<div class="kpi-grid mb-5">
     <div class="kpi-card-modern">
-        <div class="kpi-icon-badge" style="background: #ECFDF5; color: #059669;">
+        <div class="kpi-icon-badge kpi-icon-success">
             <?= icon('cash', 20) ?>
         </div>
-        <span style="font-size: 13px; font-weight: 600; color: var(--color-text-muted);">Recaudado Este Mes</span>
-        <strong style="font-size: 22px; color: var(--color-text-main); font-variant-numeric: tabular-nums;">
+        <span class="text-xs fw-600 text-muted">Recaudado Este Mes</span>
+        <strong class="text-2xl text-main tabular">
             <?= format_cop($totalMes) ?>
         </strong>
-        <span style="font-size: 12px; color: var(--color-success); font-weight: 600;">
+        <span class="text-xs text-success fw-600">
             Cobros verificados en <?= date('F Y') ?>
         </span>
     </div>
 
     <div class="kpi-card-modern">
-        <div class="kpi-icon-badge" style="background: var(--color-brand-subtle); color: var(--color-brand);">
+        <div class="kpi-icon-badge kpi-icon-brand">
             <?= icon('chart', 20) ?>
         </div>
-        <span style="font-size: 13px; font-weight: 600; color: var(--color-text-muted);">Total Histórico Cobrado</span>
-        <strong style="font-size: 22px; color: var(--color-brand); font-variant-numeric: tabular-nums;">
+        <span class="text-xs fw-600 text-muted">Total Histórico Cobrado</span>
+        <strong class="text-2xl text-brand tabular">
             <?= format_cop($totalHistorico) ?>
         </strong>
-        <span style="font-size: 12px; color: var(--color-text-muted);">
+        <span class="text-xs text-muted">
             En <?= (int)$conteoTransacciones ?> transacciones registradas
         </span>
     </div>
@@ -54,36 +54,36 @@
         <div class="kpi-icon-badge">
             <?= icon('settings', 20) ?>
         </div>
-        <span style="font-size: 13px; font-weight: 600; color: var(--color-text-muted);">Operación</span>
-        <strong style="font-size: 22px; color: var(--color-text-main);">100% Manual</strong>
-        <span style="font-size: 12px; color: var(--color-text-muted);">Sin pasarelas ni comisiones bancarias</span>
+        <span class="text-xs fw-600 text-muted">Operación</span>
+        <strong class="text-2xl text-main">100% Manual</strong>
+        <span class="text-xs text-muted">Sin pasarelas ni comisiones bancarias</span>
     </div>
 </div>
 
 <!-- FILTROS Y BÚSQUEDA -->
-<div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
-    <form method="GET" action="<?= e(app_url('/superadmin/pagos')) ?>" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
-        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; flex: 1;">
-            <div style="position: relative; max-width: 320px; width: 100%;">
-                <input type="text" name="q" value="<?= e($busqueda) ?>" class="form-control" placeholder="Buscar por restaurante o nota..." style="padding-left: 36px;">
-                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-subtle);">
+<div class="card card-p-4 mb-4">
+    <form method="GET" action="<?= e(app_url('/superadmin/pagos')) ?>" class="flex items-center justify-between gap-3 flex-wrap">
+        <div class="flex items-center gap-3 flex-wrap flex-1">
+            <div class="price-input-wrapper max-w-xs w-full">
+                <input type="text" name="q" value="<?= e($busqueda) ?>" class="form-control price-input-field" placeholder="Buscar por restaurante o nota...">
+                <span class="price-prefix flex items-center">
                     <?= icon('search', 15) ?>
                 </span>
             </div>
 
-            <select name="metodo" class="form-control" style="width: auto; min-width: 170px;">
+            <select name="metodo" class="form-control select-filter-compact">
                 <option value="">Todos los métodos</option>
                 <?php foreach ($metodosPago as $k => $lbl): ?>
                     <option value="<?= e($k) ?>" <?= $metodoFiltro === $k ? 'selected' : '' ?>><?= e($lbl) ?></option>
                 <?php endforeach; ?>
             </select>
 
-            <button type="submit" class="btn btn-secondary btn-sm" style="padding: 9px 16px;">
+            <button type="submit" class="btn btn-secondary btn-sm py-2 px-4">
                 <span>Filtrar</span>
             </button>
 
             <?php if (!empty($busqueda) || !empty($metodoFiltro)): ?>
-                <a href="<?= e(app_url('/superadmin/pagos')) ?>" class="btn btn-secondary btn-sm" style="color: var(--color-danger);">
+                <a href="<?= e(app_url('/superadmin/pagos')) ?>" class="btn btn-secondary btn-sm text-danger">
                     Limpiar filtros
                 </a>
             <?php endif; ?>
@@ -92,16 +92,16 @@
 </div>
 
 <!-- TABLA DE PAGOS -->
-<div class="card" style="padding: 0; overflow: hidden;">
+<div class="card p-0 overflow-hidden">
     <?php if (empty($pagos)): ?>
-        <div style="text-align: center; padding: 60px 24px;">
-            <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-bg-subtle); display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-subtle); margin-bottom: 16px;">
+        <div class="empty-state-box p-6">
+            <div class="icon-bubble-lg mx-auto mb-4">
                 <?= icon('cash', 24) ?>
             </div>
-            <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 6px 0;">
+            <h3 class="text-md fw-700 text-main m-0 mb-1">
                 No se registraron pagos con estos filtros
             </h3>
-            <p style="color: var(--color-text-muted); font-size: 14px; margin: 0;">
+            <p class="text-muted text-sm m-0">
                 Los pagos manuales que registres en la pantalla de Vencimientos aparecerán aquí en orden cronológico.
             </p>
         </div>
@@ -124,60 +124,60 @@
                     <?php foreach ($pagos as $p): ?>
                         <tr>
                             <td>
-                                <strong style="font-size: 13.5px; color: var(--color-text-main);">
+                                <strong class="text-sm text-main">
                                     <?= date('d/m/Y', strtotime($p['fecha_pago'])) ?>
                                 </strong>
-                                <span style="display: block; font-size: 11.5px; color: var(--color-text-muted);">
+                                <span class="block text-xs text-muted">
                                     <?= date('h:i A', strtotime($p['created_at'])) ?>
                                 </span>
                             </td>
                             <td>
-                                <strong style="font-size: 13.5px; color: var(--color-text-main);">
+                                <strong class="text-sm text-main">
                                     <?= e($p['restaurante_nombre']) ?>
                                 </strong>
-                                <a href="<?= e(app_url('/' . $p['restaurante_slug'])) ?>" target="_blank" style="display: block; font-size: 12px; color: var(--color-brand); text-decoration: none;">
+                                <a href="<?= e(app_url('/' . $p['restaurante_slug'])) ?>" target="_blank" class="block text-xs text-brand">
                                     /<?= e($p['restaurante_slug']) ?> &rarr;
                                 </a>
                             </td>
                             <td>
-                                <strong style="font-size: 14.5px; color: #059669; font-variant-numeric: tabular-nums;">
+                                <strong class="table-row-total">
                                     <?= format_cop((int)$p['monto']) ?>
                                 </strong>
                             </td>
                             <td>
-                                <span class="badge" style="background: var(--color-bg-subtle); color: var(--color-text-main); font-weight: 600; text-transform: capitalize;">
+                                <span class="badge badge-neutral fw-600 capitalize">
                                     <?= e($metodosPago[$p['metodo']] ?? $p['metodo']) ?>
                                 </span>
                             </td>
                             <td>
-                                <span style="font-size: 13px; font-weight: 600;">
+                                <span class="text-sm fw-600">
                                     <?= (int)$p['periodos'] ?> <?= (int)$p['periodos'] === 1 ? 'período' : 'períodos' ?>
                                 </span>
                             </td>
                             <td>
-                                <div style="display: flex; flex-direction: column;">
-                                    <strong style="font-size: 13px; color: var(--color-text-main);">
+                                <div class="stack gap-1">
+                                    <strong class="text-xs text-main">
                                         <?= date('d/m/Y', strtotime($p['fecha_vencimiento_nueva'])) ?>
                                     </strong>
                                     <?php if (!empty($p['fecha_vencimiento_anterior'])): ?>
-                                        <span style="font-size: 11.5px; color: var(--color-text-muted);">
+                                        <span class="text-xs text-muted">
                                             Antes: <?= date('d/m/Y', strtotime($p['fecha_vencimiento_anterior'])) ?>
                                         </span>
                                     <?php endif; ?>
                                 </div>
                             </td>
                             <td>
-                                <span style="font-size: 12.5px; color: var(--color-text-muted);">
+                                <span class="text-xs text-muted">
                                     <?= e($p['superadmin_nombre']) ?>
                                 </span>
                             </td>
                             <td>
                                 <?php if (!empty($p['nota'])): ?>
-                                    <span style="font-size: 12.5px; color: var(--color-text-secondary); background: #FAFAFC; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--color-border-subtle); display: inline-block;">
+                                    <span class="badge-note-subtle">
                                         <?= e($p['nota']) ?>
                                     </span>
                                 <?php else: ?>
-                                    <span style="color: var(--color-text-subtle); font-size: 12px;">—</span>
+                                    <span class="text-subtle text-xs">—</span>
                                 <?php endif; ?>
                             </td>
                         </tr>

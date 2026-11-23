@@ -93,4 +93,63 @@ class HorarioService
             'mensaje' => 'Cerrado por hoy',
         ];
     }
+
+    /**
+     * Calcula el rango de fecha/hora de la jornada operativa del restaurante.
+     * Protege el turno nocturno (pedidos de madrugada 1am-4am pertenecen al turno iniciado el día anterior).
+     *
+     * @param int $restauranteId
+     * @param string $tipo 'actual' | 'ayer' | 'todas'
+     * @param DateTimeImmutable|null $ahora
+     * @return array{tipo: string, desde: ?string, hasta: ?string, etiqueta: string, hora_apertura: string}
+     */
+    public static function obtenerRangoJornada(int $restauranteId, string $tipo = 'actual', ?DateTimeImmutable $ahora = null): array
+    {
+        $tz = new DateTimeZone(self::TIMEZONE);
+        $ahora = $ahora ?? new DateTimeImmutable('now', $tz);
+
+        if ($tipo === 'todas') {
+            return [
+                'tipo' => 'todas',
+                'desde' => null,
+                'hasta' => null,
+                'etiqueta' => 'Historial Completo',
+                'hora_apertura' => '00:00:00',
+            ];
+        }
+
+        // Hora límite de corte de turno nocturno / madrugada (05:00 AM)
+        // Pedidos entre 00:00 y 04:59 pertenecen a la jornada nocturna iniciada el día anterior.
+        // A partir de las 05:00 AM comienza la jornada operativa del día actual.
+        $corteHora = 5;
+        $horaInt = (int)$ahora->format('H');
+
+        if ($horaInt < $corteHora) {
+            $fechaOperativa = $ahora->modify('-1 day');
+        } else {
+            $fechaOperativa = $ahora;
+        }
+
+        $inicioActual = $fechaOperativa->setTime($corteHora, 0, 0);
+        $inicioAyer = $inicioActual->modify('-1 day');
+        $finAyer = $inicioActual;
+
+        if ($tipo === 'ayer') {
+            return [
+                'tipo' => 'ayer',
+                'desde' => $inicioAyer->format('Y-m-d H:i:s'),
+                'hasta' => $finAyer->format('Y-m-d H:i:s'),
+                'etiqueta' => 'Día Anterior (' . $inicioAyer->format('d/m') . ')',
+                'hora_apertura' => sprintf('%02d:00:00', $corteHora),
+            ];
+        }
+
+        return [
+            'tipo' => 'actual',
+            'desde' => $inicioActual->format('Y-m-d H:i:s'),
+            'hasta' => null,
+            'etiqueta' => 'Jornada de Hoy (' . $fechaOperativa->format('d/m') . ')',
+            'hora_apertura' => sprintf('%02d:00:00', $corteHora),
+        ];
+    }
 }

@@ -48,11 +48,10 @@ class DashboardController extends Controller
         $tenant = TenantContext::getTenant();
         $tenantId = (int)$tenant['id'];
 
-        // Métricas comerciales del restaurante
-        $metricasMes = $this->pedidoModel->metricasMes($tenantId);
-        $ventasPorDia = $this->pedidoModel->ventasPorDia($tenantId, 30);
-        $pedidosPorDiaSemana = $this->pedidoModel->pedidosPorDiaSemana($tenantId);
-        $topProductos = $this->pedidoModel->topProductos($tenantId, 5);
+        // Métricas operativas en tiempo real (HOY - Superrápido y optimizado para alto volumen)
+        $metricasHoy = $this->pedidoModel->metricasHoy($tenantId);
+        $mesasEnVivo = $this->pedidoModel->mesasEstadoEnVivo($tenantId);
+        $comandasActivas = $this->pedidoModel->listarComandasActivas($tenantId, 6);
 
         // Conteos del catálogo y mesas
         $totalCategorias = $this->categoriaModel->count();
@@ -65,10 +64,9 @@ class DashboardController extends Controller
             'title' => 'Panel de Control — ' . ($tenant['nombre'] ?? 'Mesaly'),
             'tenant' => $tenant,
             'estadoSuscripcion' => $estadoSuscripcion,
-            'metricasMes' => $metricasMes,
-            'ventasPorDia' => $ventasPorDia,
-            'pedidosPorDiaSemana' => $pedidosPorDiaSemana,
-            'topProductos' => $topProductos,
+            'metricasHoy' => $metricasHoy,
+            'mesasEnVivo' => $mesasEnVivo,
+            'comandasActivas' => $comandasActivas,
             'stats' => [
                 'categorias' => $totalCategorias,
                 'productos' => $totalProductos,

@@ -11,23 +11,23 @@
     </div>
 </div>
 
-<div class="card" style="padding: 0; overflow: hidden;">
-    <div style="padding: 18px 24px; border-bottom: 1px solid var(--color-border-subtle); background: var(--color-bg-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-        <span style="font-size: 13.5px; font-weight: 700; color: var(--color-text-main);">
+<div class="card p-0 overflow-hidden">
+    <div class="card-header-bar flex items-center justify-between flex-wrap gap-2">
+        <span class="text-sm fw-700 text-main">
             Total registrados: <?= count($negocios ?? []) ?> restaurantes
         </span>
-        <span style="font-size: 12.5px; color: var(--color-text-muted);">
+        <span class="text-xs text-muted">
             Cada negocio opera con aislamiento estricto de datos (Multi-tenant)
         </span>
     </div>
 
     <?php if (empty($negocios)): ?>
-        <div style="text-align: center; padding: 64px 24px;">
-            <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--color-brand-subtle); color: var(--color-brand); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+        <div class="empty-state-box p-6">
+            <div class="icon-bubble-lg mx-auto mb-4">
                 <?= icon('store', 26) ?>
             </div>
-            <h3 style="font-size: 17px; font-weight: 700; color: var(--color-text-main); margin: 0 0 8px 0;">Aún no hay restaurantes registrados</h3>
-            <p style="color: var(--color-text-muted); font-size: 14px; margin: 0 auto 24px auto; max-width: 440px;">
+            <h3 class="text-md fw-700 text-main m-0 mb-2">Aún no hay restaurantes registrados</h3>
+            <p class="text-muted text-sm max-w-md mx-auto mb-5">
                 Comienza registrando el primer negocio para generar automáticamente su carta digital y credenciales de acceso.
             </p>
             <a href="<?= e(app_url('/superadmin/negocios/crear')) ?>" class="btn btn-primary">
@@ -45,52 +45,52 @@
                         <th>Plan Contratado</th>
                         <th>Ciclo</th>
                         <th>Vencimiento</th>
-                        <th style="text-align: right;">Acciones</th>
+                        <th class="text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($negocios as $negocio): ?>
                         <tr>
                             <td>
-                                <strong style="color: var(--color-text-main); font-size: 14px;"><?= e($negocio['nombre']) ?></strong>
-                                <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                                    <a href="<?= e(app_url('/' . $negocio['slug'])) ?>" target="_blank" style="font-size: 12px; color: var(--color-brand); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;">
+                                <strong class="text-main text-sm"><?= e($negocio['nombre']) ?></strong>
+                                <div class="flex items-center gap-1 mt-1">
+                                    <a href="<?= e(app_url('/' . $negocio['slug'])) ?>" target="_blank" class="text-xs text-brand fw-600 inline-flex items-center gap-1">
                                         <span>/<?= e($negocio['slug']) ?></span>
                                         <?= icon('external-link', 11) ?>
                                     </a>
                                     <?php if (!empty($negocio['en_prueba'])): ?>
-                                        <span class="badge badge-warning" style="font-size: 10px; padding: 1px 6px;">Prueba 15d</span>
+                                        <span class="badge badge-warning text-xs py-0 px-1">Prueba 15d</span>
                                     <?php endif; ?>
                                 </div>
                             </td>
                             <td>
-                                <a href="https://wa.me/<?= e($negocio['whatsapp']) ?>" target="_blank" rel="noopener" style="color: var(--color-text-main); font-weight: 600; text-decoration: none; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 6px;">
+                                <a href="https://wa.me/<?= e($negocio['whatsapp']) ?>" target="_blank" rel="noopener" class="text-main fw-600 tabular inline-flex items-center gap-1">
                                     <?= icon('phone', 13) ?>
                                     <span>+<?= e($negocio['whatsapp']) ?></span>
                                 </a>
                             </td>
                             <td>
-                                <span class="badge badge-neutral" style="font-weight: 600;">
+                                <span class="badge badge-neutral fw-600">
                                     <?= e($negocio['plan_nombre'] ?? 'Sin Plan') ?>
                                 </span>
                             </td>
-                            <td style="color: var(--color-text-secondary); font-size: 13px;">
+                            <td class="text-secondary text-sm">
                                 <?= e(ucfirst($negocio['ciclo'])) ?>
                             </td>
                             <td>
-                                <span style="font-variant-numeric: tabular-nums; font-weight: 600; font-size: 13.5px; color: var(--color-text-main);">
+                                <span class="tabular fw-600 text-sm text-main">
                                     <?= e($negocio['fecha_vencimiento'] ?? 'N/A') ?>
                                 </span>
                             </td>
-                            <td style="text-align: right;">
+                            <td class="text-right">
                                 <div class="action-btns">
                                     <a href="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/editar')) ?>" class="btn btn-secondary btn-sm" title="Editar configuración">
                                         <?= icon('edit', 14) ?>
                                         <span>Editar</span>
                                     </a>
-                                    <form method="POST" action="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/reset-password')) ?>" style="display: inline;" data-confirm="¿Seguro que deseas restablecer la contraseña del admin de este negocio? Se generará una clave temporal nueva.">
+                                    <form method="POST" action="<?= e(app_url('/superadmin/negocios/' . $negocio['id'] . '/reset-password')) ?>" class="inline m-0" data-confirm="¿Seguro que deseas restablecer la contraseña del admin de este negocio? Se generará una clave temporal nueva.">
                                         <?= csrf_field() ?>
-                                        <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-border);" title="Generar clave temporal nueva">
+                                        <button type="submit" class="btn btn-secondary btn-sm text-danger" title="Generar clave temporal nueva">
                                             <?= icon('zap', 13) ?>
                                             <span>Reset Clave</span>
                                         </button>

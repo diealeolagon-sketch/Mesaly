@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Super Admin — Mesaly') ?></title>
-    <link rel="icon" type="image/svg+xml" href="<?= e(app_url('/assets/img/logo-icon.svg')) ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= e(asset_url('/assets/img/logo-icon.svg')) ?>">
+    <link rel="stylesheet" href="<?= e(asset_url('/assets/css/tokens.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('/assets/css/fonts.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('/assets/css/mesaly.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('/assets/css/admin.css')) ?>">
@@ -15,7 +16,7 @@
         <div class="top-nav-inner">
             <div class="nav-brand-group">
                 <a href="<?= e(app_url('/superadmin')) ?>" class="nav-brand-link">
-                    <img src="<?= e(app_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="nav-brand-logo">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="nav-brand-logo">
                 </a>
                 <span class="nav-tenant-badge nav-tenant-badge-super">
                     <?= icon('settings', 14) ?>
@@ -38,8 +39,8 @@
                 </a>
             </nav>
 
-            <div class="nav-user-actions" style="display: flex; align-items: center; gap: 12px;">
-                <span class="nav-user-name" style="font-size: 13px; font-weight: 600; color: var(--color-text-main);">
+            <div class="nav-user-actions flex items-center gap-3">
+                <span class="nav-user-name text-sm fw-600 text-main">
                     <?= e($user['nombre'] ?? 'Super Admin') ?>
                 </span>
                 <form method="POST" action="<?= e(app_url('/logout')) ?>" class="nav-logout-form">

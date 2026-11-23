@@ -22,6 +22,17 @@
 # Recursos de diseño y skills de referencia
 skills/
 
+# Node / paquetes de desarrollo JS
+/node_modules/
+package-lock.json
+
+# Scripts temporales y desarrollo local
+/scratch/
+/tools/
+/compartir_celular.*
+/ENLACES_CELULAR.txt
+/ver_qr.html
+
 # IDEs y SO
 .vscode/
 .idea/

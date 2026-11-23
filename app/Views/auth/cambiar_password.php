@@ -1,21 +1,21 @@
 <div class="auth-form-header">
     <h1 class="auth-form-title">Actualizar Contraseña</h1>
-    <p class="auth-form-subtitle">Por seguridad, debes definir una contraseña nueva de al menos 10 caracteres.</p>
+    <p class="auth-form-subtitle">Por seguridad, debes definir una contraseña nueva de al menos 10 caracteres para tu cuenta.</p>
 </div>
 
-<form method="POST" action="<?= e(app_url('/cambiar-password')) ?>">
+<form method="POST" action="<?= e(app_url('/cambiar-password')) ?>" class="auth-form">
     <?= csrf_field() ?>
 
     <div class="auth-input-group">
         <label for="password">Nueva Contraseña (mínimo 10 caracteres)</label>
         <div class="auth-input-inner">
             <span class="auth-input-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
+                <?= icon('lock', 18) ?>
             </span>
-            <input type="password" id="password" name="password" class="auth-text-input" minlength="10" placeholder="••••••••••••" required autofocus>
+            <input type="password" id="password" name="password" class="auth-text-input" minlength="10" placeholder="••••••••••••" autocomplete="new-password" required autofocus>
+            <button type="button" class="auth-toggle-pwd" data-action="toggle-password" data-target="password" aria-label="Mostrar u ocultar contraseña" title="Mostrar contraseña">
+                <?= icon('eye', 16) ?>
+            </button>
         </div>
     </div>
 
@@ -23,19 +23,17 @@
         <label for="password_confirmation">Confirmar Nueva Contraseña</label>
         <div class="auth-input-inner">
             <span class="auth-input-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
+                <?= icon('lock', 18) ?>
             </span>
-            <input type="password" id="password_confirmation" name="password_confirmation" class="auth-text-input" minlength="10" placeholder="••••••••••••" required>
+            <input type="password" id="password_confirmation" name="password_confirmation" class="auth-text-input" minlength="10" placeholder="••••••••••••" autocomplete="new-password" required>
+            <button type="button" class="auth-toggle-pwd" data-action="toggle-password" data-target="password_confirmation" aria-label="Mostrar u ocultar contraseña" title="Mostrar contraseña">
+                <?= icon('eye', 16) ?>
+            </button>
         </div>
     </div>
 
     <button type="submit" class="auth-btn-primary">
         <span>Guardar y Continuar</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12h14M13 6l6 6-6 6"/>
-        </svg>
+        <?= icon('arrow-right', 18) ?>
     </button>
 </form>

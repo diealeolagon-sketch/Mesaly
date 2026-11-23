@@ -19,13 +19,13 @@
 </div>
 
 <!-- RESUMEN DE SECCIONES -->
-<div class="card" style="margin-bottom: 24px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+<div class="card mb-5">
+    <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
         <div>
-            <h2 style="font-size: 15px; font-weight: 700; color: var(--color-text-main); margin: 0 0 2px 0;">
+            <h2 class="text-sm fw-700 text-main m-0 mb-1">
                 Secciones del Menú
             </h2>
-            <p style="font-size: 13px; color: var(--color-text-muted); margin: 0;">
+            <p class="text-xs text-muted m-0">
                 Pestañas de navegación visibles para tus clientes en la carta digital.
             </p>
         </div>
@@ -35,7 +35,7 @@
     </div>
 
     <?php if (empty($categorias)): ?>
-        <p style="color: var(--color-text-muted); font-size: 13.5px; margin: 12px 0 0 0;">
+        <p class="text-muted text-sm mt-3 mb-0">
             Aún no tienes secciones creadas. Haz clic en <strong>Nueva Sección</strong> (ej: <em>Platos Fuertes</em> o <em>Bebidas</em>) para clasificar tus productos.
         </p>
     <?php else: ?>
@@ -52,7 +52,7 @@
                     <button type="button" class="cat-chip-btn btn-editar-cat" data-cat="<?= e(json_encode($cat)) ?>" title="Editar sección">
                         <?= icon('edit', 14) ?>
                     </button>
-                    <form method="POST" action="<?= e(app_url('/admin/catalogo/categoria/' . $cat['id'] . '/eliminar')) ?>" style="display: inline;" data-confirm="¿Seguro que deseas eliminar esta sección?">
+                    <form method="POST" action="<?= e(app_url('/admin/catalogo/categoria/' . $cat['id'] . '/eliminar')) ?>" class="inline m-0" data-confirm="¿Seguro que deseas eliminar esta sección?">
                         <?= csrf_field() ?>
                         <button type="submit" class="cat-chip-btn danger" title="Eliminar sección">
                             <?= icon('x', 14) ?>
@@ -65,13 +65,13 @@
 </div>
 
 <!-- LISTADO DE PLATOS Y BEBIDAS -->
-<div class="card" style="padding: 0; overflow: hidden;">
-    <div style="padding: 20px 24px; border-bottom: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+<div class="card p-0 overflow-hidden">
+    <div class="card-header-bar">
         <div>
-            <h2 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 2px 0;">
+            <h2 class="text-md fw-700 text-main m-0 mb-1">
                 Platos Registrados (<?= count($productos) ?>)
             </h2>
-            <p style="font-size: 13px; color: var(--color-text-muted); margin: 0;">
+            <p class="text-xs text-muted m-0">
                 Los cambios se reflejan inmediatamente en tu menú digital.
             </p>
         </div>
@@ -82,12 +82,12 @@
     </div>
 
     <?php if (empty($productos)): ?>
-        <div style="text-align: center; padding: 56px 24px;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-bg-subtle); display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-subtle); margin-bottom: 16px;">
+        <div class="empty-state-box p-6">
+            <div class="icon-bubble-lg mx-auto mb-4">
                 <?= icon('menu', 22) ?>
             </div>
-            <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 6px 0;">Aún no tienes platos en tu carta</h3>
-            <p style="color: var(--color-text-muted); font-size: 14px; max-width: 420px; margin: 0 auto 20px auto;">
+            <h3 class="text-md fw-700 text-main m-0 mb-2">Aún no tienes platos en tu carta</h3>
+            <p class="text-muted text-sm max-w-md mx-auto mb-5">
                 Sube tus platos con foto y precio en pesos colombianos para comenzar a recibir pedidos.
             </p>
             <a href="<?= e(app_url('/admin/catalogo/producto/nuevo')) ?>" class="btn btn-primary">
@@ -100,12 +100,12 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th style="width: 64px;">Foto</th>
+                        <th class="col-foto">Foto</th>
                         <th>Plato / Bebida</th>
                         <th>Sección</th>
-                        <th style="text-align: right;">Precio (COP)</th>
-                        <th style="text-align: center;">Disponibilidad</th>
-                        <th style="text-align: right;">Acciones</th>
+                        <th class="text-right">Precio (COP)</th>
+                        <th class="text-center">Disponibilidad</th>
+                        <th class="text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -146,23 +146,23 @@
                             <td class="prod-price">
                                 <?= format_cop($prod['precio']) ?>
                             </td>
-                            <td style="text-align: center;">
-                                <form method="POST" action="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/toggle-agotado')) ?>" style="display: inline;">
+                            <td class="text-center">
+                                <form method="POST" action="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/toggle-agotado')) ?>" class="inline m-0">
                                     <?= csrf_field() ?>
-                                    <button type="submit" class="badge <?= !empty($prod['disponible']) ? 'badge-success' : 'badge-danger' ?>" style="cursor: pointer; border: none; font-size: 12px; font-weight: 600; padding: 4px 10px;">
+                                    <button type="submit" class="badge btn-badge-toggle <?= !empty($prod['disponible']) ? 'badge-success' : 'badge-danger' ?>">
                                         <?= !empty($prod['disponible']) ? icon('check', 12) . ' Disponible' : icon('x', 12) . ' Agotado' ?>
                                     </button>
                                 </form>
                             </td>
-                            <td style="text-align: right;">
+                            <td class="text-right">
                                 <div class="action-btns">
                                     <a href="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/editar')) ?>" class="btn btn-secondary btn-sm" title="Editar plato">
                                         <?= icon('edit', 14) ?>
                                         <span>Editar</span>
                                     </a>
-                                    <form method="POST" action="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/eliminar')) ?>" data-confirm="¿Seguro que deseas eliminar este producto? Se ocultará del menú pero su historial se mantendrá intacto." style="display: inline;">
+                                    <form method="POST" action="<?= e(app_url('/admin/catalogo/producto/' . $prod['id'] . '/eliminar')) ?>" data-confirm="¿Seguro que deseas eliminar este producto? Se ocultará del menú pero su historial se mantendrá intacto." class="inline m-0">
                                         <?= csrf_field() ?>
-                                        <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--color-danger);" title="Eliminar plato">
+                                        <button type="submit" class="btn btn-secondary btn-sm text-danger" title="Eliminar plato">
                                             <?= icon('trash', 14) ?>
                                         </button>
                                     </form>
@@ -178,12 +178,12 @@
 
 <!-- MODAL DE SECCIÓN -->
 <div id="modal_categoria" class="modal-backdrop">
-    <div class="modal-dialog" style="max-width: 480px;">
-        <div style="margin-bottom: 20px;">
-            <h3 id="cat_modal_title" class="modal-title" style="margin: 0 0 6px 0;">
+    <div class="modal-dialog modal-dialog-md">
+        <div class="mb-5">
+            <h3 id="cat_modal_title" class="modal-title mb-1">
                 Nueva Sección del Menú
             </h3>
-            <p style="font-size: 13px; color: var(--color-text-muted); margin: 0;">
+            <p class="text-xs text-muted m-0">
                 Las secciones organizan los platos en pestañas para tus clientes (ej: Entradas, Carnes, Bebidas).
             </p>
         </div>
@@ -200,13 +200,13 @@
 
             <div class="form-group">
                 <label for="cat_orden" class="form-label">Posición en el menú</label>
-                <input type="number" id="cat_orden" name="orden" class="form-control" value="0" min="0" style="max-width: 140px;">
+                <input type="number" id="cat_orden" name="orden" class="form-control input-w-sm" value="0" min="0">
                 <span class="form-hint">0 = primera pestaña visible para los comensales.</span>
             </div>
 
             <div class="form-group">
-                <label class="toggle-option-card" style="margin: 0;">
-                    <input type="checkbox" id="cat_activa" name="activa" value="1" checked style="width: 18px; height: 18px; margin-top: 2px; accent-color: var(--color-brand); flex-shrink: 0;">
+                <label class="toggle-option-card m-0">
+                    <input type="checkbox" id="cat_activa" name="activa" value="1" checked class="form-checkbox">
                     <div>
                         <span class="toggle-option-title">Sección visible y activa</span>
                         <span class="toggle-option-desc">Si se desactiva, se ocultará temporalmente en la carta digital.</span>
@@ -214,9 +214,9 @@
                 </label>
             </div>
 
-            <div class="modal-footer" style="margin-top: 28px; padding-top: 20px;">
+            <div class="modal-footer modal-footer-bordered mt-6 pt-5">
                 <button type="button" class="btn btn-secondary" id="btnCancelarCatModal">Cancelar</button>
-                <button type="submit" class="btn btn-primary" style="padding: 10px 22px;">Guardar Sección</button>
+                <button type="submit" class="btn btn-primary btn-save-action">Guardar Sección</button>
             </div>
         </form>
     </div>
@@ -231,9 +231,6 @@ function abrirCatModal() {
     document.getElementById('cat_orden').value = '0';
     document.getElementById('cat_activa').checked = true;
     modal.classList.add('is-open', 'is-active');
-    modal.style.setProperty('display', 'flex', 'important');
-    modal.style.setProperty('opacity', '1', 'important');
-    modal.style.setProperty('visibility', 'visible', 'important');
     setTimeout(() => {
         const inp = document.getElementById('cat_nombre');
         if (inp) inp.focus();
@@ -248,9 +245,6 @@ function editarCat(cat) {
     document.getElementById('cat_orden').value = cat.orden;
     document.getElementById('cat_activa').checked = cat.activa == 1;
     modal.classList.add('is-open', 'is-active');
-    modal.style.setProperty('display', 'flex', 'important');
-    modal.style.setProperty('opacity', '1', 'important');
-    modal.style.setProperty('visibility', 'visible', 'important');
     setTimeout(() => {
         const inp = document.getElementById('cat_nombre');
         if (inp) inp.focus();
@@ -260,7 +254,6 @@ function editarCat(cat) {
 function cerrarCatModal() {
     const modal = document.getElementById('modal_categoria');
     modal.classList.remove('is-open', 'is-active');
-    modal.style.setProperty('display', 'none', 'important');
 }
 
 document.getElementById('modal_categoria')?.addEventListener('click', function(e) {

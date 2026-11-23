@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="45%" stop-color="#1E1B4B"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E85D04" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#9A3412" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="waveGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FB923C" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#EA580C" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="waveGrad3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFB703" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#F97316" stop-opacity="0.7"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Background -->
+  <rect width="1200" height="1400" fill="url(#bgGrad)"/>
+
+  <!-- Fluid Wave 1 (Deep Warm Coral Flow) -->
+  <path d="M-100,200 C300,100 500,450 850,300 C1100,180 1250,350 1350,280 L1350,1500 L-100,1500 Z" fill="url(#waveGrad1)"/>
+
+  <!-- Fluid Wave 2 (Mid Amber Swirl) -->
+  <path d="M-150,550 C250,380 450,750 800,600 C1100,480 1250,680 1400,600 L1400,1500 L-150,1500 Z" fill="url(#waveGrad2)"/>
+
+  <!-- Fluid Wave 3 (Foreground Bright Golden Wave) -->
+  <path d="M-100,900 C300,750 650,1100 950,920 C1150,800 1280,950 1350,880 L1350,1500 L-100,1500 Z" fill="url(#waveGrad3)"/>
+
+  <!-- Subtle Top Ambient Light -->
+  <circle cx="200" cy="150" r="350" fill="url(#glowGrad)"/>
+
+  <!-- Subtle Geometry Arc Accents (as seen in Reference 1) -->
+  <g fill="none" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1.5">
+    <circle cx="250" cy="500" r="280"/>
+    <circle cx="250" cy="500" r="360"/>
+    <circle cx="250" cy="500" r="440"/>
+    <circle cx="250" cy="500" r="520"/>
+  </g>
+</svg>

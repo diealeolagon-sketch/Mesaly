@@ -104,15 +104,6 @@ class WhatsAppService
         $lineas[] = "*TOTAL A PAGAR:* " . format_cop((int)$pedido['total']) . " COP";
         $lineas[] = "--------------------------------";
 
-        // Método de pago
-        $metodoMap = [
-            'efectivo' => 'Efectivo',
-            'transferencia' => 'Transferencia (Nequi / Daviplata / Bancolombia)',
-            'datafono' => 'Datáfono (Tarjeta débito / crédito)',
-        ];
-        $metodoNombre = $metodoMap[$pedido['metodo_pago']] ?? ucfirst((string)$pedido['metodo_pago']);
-        $lineas[] = "*Método de pago informado:* {$metodoNombre}";
-
         $lineas[] = "\n_¡Hola! Acabo de armar este pedido en su menú interactivo de Mesaly. ¿Me confirman recepción y tiempo de preparación?_";
 
         return implode("\n", $lineas);

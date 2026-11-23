@@ -14,12 +14,12 @@
 </div>
 
 <?php if (empty($productos)): ?>
-    <div class="card" style="text-align: center; padding: 56px 24px;">
-        <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg-subtle); display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-subtle); margin-bottom: 16px;">
+    <div class="card text-center p-6">
+        <div class="icon-bubble-lg">
             <?= icon('zap', 24) ?>
         </div>
-        <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 8px 0;">Sin productos registrados</h3>
-        <p style="color: var(--color-text-muted); font-size: 14px; margin: 0 0 20px 0;">
+        <h3 class="text-md fw-700 text-main mb-2">Sin productos registrados</h3>
+        <p class="text-muted text-base mb-5">
             Agrega platos en el Catálogo para poder controlar su disponibilidad aquí.
         </p>
         <a href="<?= e(app_url('/admin/catalogo')) ?>" class="btn btn-primary">
@@ -34,13 +34,13 @@ $disponibles = array_filter($productos, fn($p) => !empty($p['disponible']));
 $agotados    = array_filter($productos, fn($p) =>  empty($p['disponible']));
 ?>
 
-<div class="kpi-grid" style="margin-bottom: 24px;">
+<div class="kpi-grid mb-5">
     <div class="kpi-card">
         <div class="kpi-label">
             <span>Disponibles</span>
             <?= icon('check', 16) ?>
         </div>
-        <div class="kpi-value" style="color: var(--color-success);"><?= count($disponibles) ?></div>
+        <div class="kpi-value text-success"><?= count($disponibles) ?></div>
         <div class="kpi-subtext">Visibles en la carta digital</div>
     </div>
     <div class="kpi-card">
@@ -48,7 +48,7 @@ $agotados    = array_filter($productos, fn($p) =>  empty($p['disponible']));
             <span>Agotados</span>
             <?= icon('x', 16) ?>
         </div>
-        <div class="kpi-value" style="color: var(--color-danger);"><?= count($agotados) ?></div>
+        <div class="kpi-value text-danger"><?= count($agotados) ?></div>
         <div class="kpi-subtext">No se pueden pedir</div>
     </div>
     <div class="kpi-card">
@@ -61,15 +61,15 @@ $agotados    = array_filter($productos, fn($p) =>  empty($p['disponible']));
     </div>
 </div>
 
-<div class="card" style="padding: 0; overflow: hidden;">
-    <div style="padding: 18px 24px; border-bottom: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-subtle);">
+<div class="card p-0 overflow-hidden">
+    <div class="card-header-bar">
         <div>
-            <span style="font-size: 14px; font-weight: 700; color: var(--color-text-main);">Todos los Platos</span>
-            <span style="font-size: 12px; color: var(--color-text-muted); margin-left: 8px;">Toca el toggle para cambiar el estado al instante</span>
+            <span class="text-base fw-700 text-main">Todos los Platos</span>
+            <span class="text-xs text-muted ml-2">Toca el toggle para cambiar el estado al instante</span>
         </div>
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <span class="badge badge-success" style="font-size: 11px;"><?= count($disponibles) ?> disponibles</span>
-            <span class="badge badge-danger" style="font-size: 11px;"><?= count($agotados) ?> agotados</span>
+        <div class="flex gap-2 items-center">
+            <span class="badge badge-success text-xs"><?= count($disponibles) ?> disponibles</span>
+            <span class="badge badge-danger text-xs"><?= count($agotados) ?> agotados</span>
         </div>
     </div>
 
@@ -88,8 +88,8 @@ $agotados    = array_filter($productos, fn($p) =>  empty($p['disponible']));
                 <div class="avail-info">
                     <span class="avail-name" id="txt_prod_<?= $prod['id'] ?>"><?= e($prod['nombre']) ?></span>
                     <span class="avail-meta">
-                        <span class="badge badge-neutral" style="font-size: 11px;"><?= e($prod['categoria_nombre'] ?? 'Sin sección') ?></span>
-                        <span style="font-weight: 700; color: var(--color-text-secondary); font-variant-numeric: tabular-nums;"><?= format_cop($prod['precio']) ?></span>
+                        <span class="badge badge-neutral text-xs"><?= e($prod['categoria_nombre'] ?? 'Sin sección') ?></span>
+                        <span class="fw-700 text-muted tabular"><?= format_cop($prod['precio']) ?></span>
                     </span>
                 </div>
 
@@ -131,10 +131,8 @@ async function toggleAjax(event, form, prodId) {
     const label = document.getElementById('label_prod_' + prodId);
     const pill  = document.getElementById('pill_prod_' + prodId);
     const row   = document.getElementById('row_prod_' + prodId);
-    const name  = document.getElementById('txt_prod_' + prodId);
 
     btn.disabled = true;
-    btn.style.opacity = '0.5';
 
     try {
         const res  = await fetch(form.action, {
@@ -149,15 +147,12 @@ async function toggleAjax(event, form, prodId) {
                 btn.className = 'avail-toggle avail-toggle--on';
                 label.textContent = 'ON';
                 row.className = 'avail-row';
-                name.style.textDecoration = 'none';
-                name.style.color = '';
                 pill.className = 'avail-pill avail-pill--on';
                 pill.innerHTML = '<span class="avail-dot"></span> Disponible';
             } else {
                 btn.className = 'avail-toggle avail-toggle--off';
                 label.textContent = 'OFF';
                 row.className = 'avail-row avail-row--off';
-                name.style.textDecoration = 'line-through';
                 pill.className = 'avail-pill avail-pill--off';
                 pill.innerHTML = '<span class="avail-dot"></span> Agotado';
             }
@@ -168,7 +163,6 @@ async function toggleAjax(event, form, prodId) {
         form.submit();
     } finally {
         btn.disabled = false;
-        btn.style.opacity = '1';
     }
     return false;
 }

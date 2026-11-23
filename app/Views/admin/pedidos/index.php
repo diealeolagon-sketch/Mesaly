@@ -1,21 +1,26 @@
-<div class="content-header" style="margin-bottom: 24px;">
+<div class="content-header mb-4">
     <div>
-        <h1 class="page-title" style="font-size: 24px; margin-bottom: 4px;">
-            Gestión de Pedidos en Vivo
+        <h1 class="page-title text-2xl mb-1 flex items-center gap-2">
+            <span>Gestión de Pedidos en Vivo</span>
+            <span class="live-dot-pulse" title="Actualización en tiempo real"></span>
         </h1>
-        <p class="page-subtitle" style="font-size: 14px; color: var(--color-text-muted); margin: 0;">
-            Control de comandas de salón, despachos de domicilio organizados y notificaciones directas a WhatsApp.
+        <p class="page-subtitle text-base text-muted m-0">
+            Turno operativo de hoy (<?= e(date('d/m/Y')) ?>). Control de comandas de salón, despachos de domicilio y notificaciones automáticas.
         </p>
     </div>
 
-    <div class="content-actions" style="display: flex; gap: 10px; align-items: center;">
-        <?php if (!empty($conteos['pendientes'])): ?>
-            <span class="badge" style="background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; padding: 6px 14px; border-radius: var(--radius-full); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: #2563EB; display: inline-block;"></span>
-                <?= (int)$conteos['pendientes'] ?> pedido(s) activos
-            </span>
-        <?php endif; ?>
-        <a href="<?= e(app_url('/' . $tenant['slug'])) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="font-weight: 600;">
+    <div class="content-actions flex items-center gap-2 flex-wrap">
+        <span class="badge badge-subtle-brand py-1 px-3 inline-flex items-center gap-2 text-sm fw-700" id="badgePedidosActivos">
+            <span class="dot-indicator dot-indicator-success"></span>
+            <span data-count-key="pendientes"><?= (int)($conteos['pendientes'] ?? 0) ?></span> pedido(s) activos
+        </span>
+
+        <a href="<?= e(app_url('/admin/reportes?tab=datos&from=pedidos')) ?>" class="btn btn-secondary btn-sm fw-600 flex items-center gap-1.5" title="Ver auditoría de ventas, reportes y comandas históricas">
+            <?= icon('chart', 14) ?>
+            <span>Ver Reportes y Cierre &rarr;</span>
+        </a>
+
+        <a href="<?= e(app_url('/' . $tenant['slug'])) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm fw-600">
             <?= icon('eye', 14) ?>
             <span>Ver Menú Digital</span>
         </a>
@@ -28,80 +33,72 @@
        class="admin-order-view-tab <?= ($vista === 'domicilios') ? 'active' : '' ?>">
         <?= icon('motorcycle', 16) ?>
         <span>Despacho de Domicilios</span>
-        <span class="tab-badge"><?= (int)($conteos['modalidad_domicilio'] ?? 0) ?></span>
+        <span class="tab-badge" data-count-key="modalidad_domicilio"><?= (int)($conteos['modalidad_domicilio'] ?? 0) ?></span>
     </a>
 
     <a href="<?= e(app_url('/admin/pedidos?vista=local' . (!empty($filtros['estado']) ? '&estado=' . urlencode($filtros['estado']) : ''))) ?>" 
        class="admin-order-view-tab <?= ($vista === 'local') ? 'active' : '' ?>">
         <?= icon('cutlery', 16) ?>
-        <span>Salón y Para Llevar</span>
-        <span class="tab-badge"><?= (int)($conteos['modalidad_local'] ?? 0) ?></span>
+        <span>Salón en Mesa</span>
+        <span class="tab-badge" data-count-key="modalidad_local"><?= (int)($conteos['modalidad_local'] ?? 0) ?></span>
     </a>
 
     <a href="<?= e(app_url('/admin/pedidos?vista=todos' . (!empty($filtros['estado']) ? '&estado=' . urlencode($filtros['estado']) : ''))) ?>" 
        class="admin-order-view-tab <?= ($vista === 'todos') ? 'active' : '' ?>">
         <?= icon('list', 16) ?>
         <span>Todos los Pedidos</span>
-        <span class="tab-badge"><?= (int)($conteos['todos'] ?? 0) ?></span>
+        <span class="tab-badge" data-count-key="pendientes"><?= (int)($conteos['pendientes'] ?? 0) ?></span>
     </a>
 </div>
 
 <!-- 2. PESTAÑAS DE FILTRO RÁPIDO POR ESTADO (5 ESTADOS SIMPLIFICADOS) -->
-<div class="filter-bar-card" style="margin-bottom: 18px;">
+<div class="filter-bar-card mb-4">
     <div class="filter-pills-group">
         <a href="<?= e(app_url('/admin/pedidos?vista=' . urlencode($vista) . (!empty($filtros['q']) ? '&q=' . urlencode($filtros['q']) : ''))) ?>" 
-           class="filter-pill <?= empty($filtros['estado']) ? 'active' : '' ?>">
+           class="filter-pill <?= empty($filtros['estado']) ? 'active' : '' ?>"
+           data-filtro-estado="">
             <span>Todos los estados</span>
-            <span class="filter-count"><?= (int)$conteos['todos'] ?></span>
+            <span class="filter-count" data-count-key="todos"><?= (int)$conteos['todos'] ?></span>
         </a>
 
         <?php foreach ($estadosConfig as $codigoEst => $cfg): ?>
             <?php 
             $queryUrl = '?vista=' . urlencode($vista) . '&estado=' . urlencode($codigoEst);
             if (!empty($filtros['q'])) $queryUrl .= '&q=' . urlencode($filtros['q']);
-            if (!empty($filtros['fecha_desde'])) $queryUrl .= '&fecha_desde=' . urlencode($filtros['fecha_desde']);
-            if (!empty($filtros['fecha_hasta'])) $queryUrl .= '&fecha_hasta=' . urlencode($filtros['fecha_hasta']);
             ?>
             <a href="<?= e(app_url('/admin/pedidos' . $queryUrl)) ?>" 
-               class="filter-pill <?= ($filtros['estado'] ?? '') === $codigoEst ? 'active' : '' ?>">
+               class="filter-pill <?= ($filtros['estado'] ?? '') === $codigoEst ? 'active' : '' ?>"
+               data-filtro-estado="<?= e($codigoEst) ?>">
                 <span><?= e($cfg['label']) ?></span>
-                <span class="filter-count"><?= (int)($conteos[$codigoEst] ?? 0) ?></span>
+                <span class="filter-count" data-count-key="<?= e($codigoEst) ?>"><?= (int)($conteos[$codigoEst] ?? 0) ?></span>
             </a>
         <?php endforeach; ?>
     </div>
 </div>
 
-<!-- 3. BARRA DE BÚSQUEDA Y FILTROS AVANZADOS -->
-<div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
-    <form method="GET" action="<?= e(app_url('/admin/pedidos')) ?>" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+<!-- 3. BARRA DE BÚSQUEDA RÁPIDA EN PEDIDOS DE HOY -->
+<div class="card card-p-4 mb-4">
+    <form method="GET" action="<?= e(app_url('/admin/pedidos')) ?>" class="flex items-center justify-between gap-3 flex-wrap">
         <input type="hidden" name="vista" value="<?= e($vista) ?>">
         <?php if (!empty($filtros['estado'])): ?>
             <input type="hidden" name="estado" value="<?= e($filtros['estado']) ?>">
         <?php endif; ?>
 
-        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; flex: 1; min-width: 280px;">
-            <!-- Buscador por código, cliente o teléfono -->
-            <div style="position: relative; max-width: 280px; width: 100%;">
-                <input type="text" name="q" value="<?= e($filtros['q']) ?>" class="form-control" placeholder="Buscar #código, cliente o teléfono..." style="padding-left: 36px; height: 38px;">
-                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-subtle); display: flex; align-items: center;">
+        <div class="flex items-center gap-3 flex-wrap flex-1 min-w-280">
+            <div class="price-input-wrapper max-w-sm w-full">
+                <input type="text" name="q" value="<?= e($filtros['q']) ?>" class="form-control price-input-field" placeholder="Buscar en pedidos de hoy (#código, cliente o teléfono)...">
+                <span class="price-prefix flex items-center">
                     <?= icon('search', 14) ?>
                 </span>
             </div>
 
-            <!-- Rango de Fechas -->
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <input type="date" name="fecha_desde" value="<?= e($filtros['fecha_desde']) ?>" class="form-control" style="width: auto; height: 38px; font-size: 13px;" title="Fecha desde">
-                <span style="color: var(--color-text-subtle); font-size: 12px;">a</span>
-                <input type="date" name="fecha_hasta" value="<?= e($filtros['fecha_hasta']) ?>" class="form-control" style="width: auto; height: 38px; font-size: 13px;" title="Fecha hasta">
-            </div>
-
-            <button type="submit" class="btn btn-secondary btn-sm" style="height: 38px; padding: 0 16px; font-weight: 600;">
-                <span>Filtrar</span>
+            <button type="submit" class="btn btn-secondary btn-sm fw-600">
+                <span>Buscar</span>
             </button>
 
-            <?php if (!empty($filtros['q']) || !empty($filtros['fecha_desde']) || !empty($filtros['fecha_hasta']) || !empty($filtros['estado'])): ?>
+            <?php if (!empty($filtros['q']) || !empty($filtros['estado'])): ?>
                 <a href="<?= e(app_url('/admin/pedidos?vista=' . urlencode($vista))) ?>" 
-                   class="btn btn-secondary btn-sm" style="height: 38px; color: var(--color-danger); display: inline-flex; align-items: center;" title="Limpiar filtros">
+                   class="btn btn-secondary btn-sm text-danger inline-flex items-center" title="Limpiar búsqueda">
                     &times; Limpiar
                 </a>
             <?php endif; ?>
@@ -110,29 +107,29 @@
 </div>
 
 <!-- 4. CONTENIDO SEGÚN LA VISTA SELECCIONADA -->
-
+<div id="pedidosTablesWrapper">
 <?php if ($vista === 'domicilios'): ?>
     <!-- ═══ VISTA 1: TABLA ESPECIALIZADA DE DOMICILIOS ═══ -->
-    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
-        <div style="padding: 16px 20px; border-bottom: 1px solid var(--color-border-subtle); background: #FFF7ED; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: #EA580C; display: flex; align-items: center;"><?= icon('motorcycle', 18) ?></span>
-                <h3 style="font-size: 15px; font-weight: 800; color: #9A3412; margin: 0;">Despacho de Domicilios</h3>
+    <div class="card p-0 overflow-hidden mb-5">
+        <div class="table-header-domicilio">
+            <div class="flex items-center gap-2">
+                <span class="text-brand flex items-center"><?= icon('motorcycle', 18) ?></span>
+                <h3 class="text-sm fw-700 text-main m-0">Despacho de Domicilios</h3>
             </div>
-            <span class="badge" style="background: #FDBA74; color: #7C2D12; font-weight: 700; font-size: 12px;">
+            <span class="badge badge-orange-subtle">
                 <?= count($pedidos) ?> despacho(s) en esta vista
             </span>
         </div>
 
         <?php if (empty($pedidos)): ?>
-            <div style="text-align: center; padding: 50px 24px;">
-                <div style="width: 50px; height: 50px; border-radius: 50%; background: #FFEDD5; display: inline-flex; align-items: center; justify-content: center; color: #EA580C; margin-bottom: 14px;">
+            <div class="empty-state-box p-6">
+                <div class="icon-bubble-lg mx-auto mb-3">
                     <?= icon('motorcycle', 24) ?>
                 </div>
-                <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 6px 0;">
+                <h3 class="text-md fw-700 text-main m-0 mb-1">
                     No hay pedidos de domicilio
                 </h3>
-                <p style="color: var(--color-text-muted); font-size: 13.5px; margin: 0 auto; max-width: 400px;">
+                <p class="text-muted text-sm max-w-md mx-auto m-0">
                     Los pedidos solicitados para entrega a domicilio con dirección y teléfono aparecerán en esta tabla.
                 </p>
             </div>
@@ -141,12 +138,12 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="min-width: 130px;"># Pedido / Hora</th>
-                            <th style="min-width: 170px;">Cliente &amp; Contacto</th>
-                            <th style="min-width: 220px;">Dirección de Entrega</th>
-                            <th>Total &amp; Pago</th>
-                            <th style="min-width: 170px;">Estado del Reparto</th>
-                            <th style="text-align: right; min-width: 150px;">Acciones</th>
+                            <th># Pedido / Hora</th>
+                            <th>Cliente &amp; Contacto</th>
+                            <th>Dirección de Entrega</th>
+                            <th>Total</th>
+                            <th>Estado del Reparto</th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -154,11 +151,11 @@
                             <tr id="pedido_fila_<?= (int)$p['id'] ?>">
                                 <!-- Código y Hora -->
                                 <td>
-                                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                                        <strong style="font-size: 14px; font-family: monospace; color: var(--color-brand); letter-spacing: 0.04em;">
+                                    <div class="stack gap-1">
+                                        <strong class="table-row-code">
                                             #<?= e($p['codigo']) ?>
                                         </strong>
-                                        <span style="font-size: 11.5px; color: var(--color-text-muted);">
+                                        <span class="text-xs text-muted">
                                             <?= date('d/m/Y h:i A', strtotime($p['created_at'])) ?>
                                         </span>
                                     </div>
@@ -166,17 +163,17 @@
 
                                 <!-- Cliente & Teléfono -->
                                 <td>
-                                    <div style="display: flex; flex-direction: column; gap: 3px;">
-                                        <strong style="font-size: 13.5px; color: var(--color-text-main);">
+                                    <div class="stack gap-1">
+                                        <strong class="text-sm text-main">
                                             <?= e($p['cliente_nombre']) ?>
                                         </strong>
                                         <?php if (!empty($p['cliente_telefono'])): ?>
-                                            <div style="display: flex; align-items: center; gap: 6px;">
-                                                <span style="font-size: 12px; color: var(--color-text-muted); font-variant-numeric: tabular-nums;">
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-xs text-muted tabular">
                                                     <?= e($p['cliente_telefono']) ?>
                                                 </span>
                                                 <?php if (!empty($p['wa_enlace'])): ?>
-                                                    <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" style="color: #25D366; display: inline-flex; align-items: center;" title="Escribir al cliente por WhatsApp">
+                                                    <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" class="text-success inline-flex items-center" title="Escribir al cliente por WhatsApp">
                                                         <?= icon('whatsapp', 13) ?>
                                                     </a>
                                                 <?php endif; ?>
@@ -187,40 +184,35 @@
 
                                 <!-- Dirección y Barrio -->
                                 <td>
-                                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                                        <strong style="font-size: 13px; color: var(--color-text-main);">
+                                    <div class="stack gap-1">
+                                        <strong class="text-xs text-main">
                                             <?= e($p['direccion'] ?: 'Sin dirección') ?>
                                         </strong>
                                         <?php if (!empty($p['barrio'])): ?>
-                                            <span style="font-size: 11.5px; color: var(--color-text-muted);">
+                                            <span class="text-xs text-muted">
                                                 Barrio: <?= e($p['barrio']) ?>
                                             </span>
                                         <?php endif; ?>
                                         <?php if (!empty($p['notas_entrega'])): ?>
-                                            <span style="font-size: 11px; color: #EA580C; font-style: italic;">
+                                            <span class="text-xs text-orange-bold">
                                                 Indicación: <?= e($p['notas_entrega']) ?>
                                             </span>
                                         <?php endif; ?>
                                     </div>
                                 </td>
 
-                                <!-- Total & Pago -->
+                                <!-- Total -->
                                 <td>
-                                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                                        <strong style="font-size: 14.5px; color: #059669; font-variant-numeric: tabular-nums;">
-                                            <?= format_cop((int)$p['total']) ?>
-                                        </strong>
-                                        <span style="font-size: 11px; color: var(--color-text-muted); text-transform: capitalize;">
-                                            <?= e(str_replace('_', ' ', (string)$p['metodo_pago'])) ?>
-                                        </span>
-                                    </div>
+                                    <strong class="table-row-total">
+                                        <?= format_cop((int)$p['total']) ?>
+                                    </strong>
                                 </td>
 
                                 <!-- Estado con Aviso en "En Camino" -->
                                 <td>
-                                    <form method="POST" action="<?= e(app_url('/admin/pedidos/' . $p['id'] . '/estado')) ?>" class="form-cambio-estado" style="margin: 0;">
+                                    <form method="POST" action="<?= e(app_url('/admin/pedidos/' . $p['id'] . '/estado')) ?>" class="form-cambio-estado m-0">
                                         <?= csrf_field() ?>
-                                        <select name="estado" class="form-control select-estado-pedido" data-id="<?= (int)$p['id'] ?>" style="height: 32px; padding: 4px 8px; font-size: 12.5px; font-weight: 600; border-radius: var(--radius-sm); border: 1px solid <?= $p['estado_info']['border'] ?>; background-color: <?= $p['estado_info']['bg'] ?>; color: <?= $p['estado_info']['color'] ?>;">
+                                        <select name="estado" class="form-control select-estado-pedido estado-sel--<?= e($p['estado']) ?>" data-id="<?= (int)$p['id'] ?>">
                                             <?php foreach ($estadosConfig as $eCod => $eCfg): ?>
                                                 <option value="<?= e($eCod) ?>" <?= $p['estado'] === $eCod ? 'selected' : '' ?>>
                                                     <?= e($eCfg['label']) ?>
@@ -231,14 +223,14 @@
                                 </td>
 
                                 <!-- Acciones -->
-                                <td style="text-align: right;">
-                                    <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                <td class="text-right">
+                                    <div class="inline-flex items-center justify-end gap-2">
                                         <button type="button" class="btn btn-secondary btn-sm btn-ver-detalle" data-id="<?= (int)$p['id'] ?>" title="Ver platos del pedido">
                                             <?= icon('eye', 13) ?>
                                             <span>Detalle</span>
                                         </button>
                                         <?php if (!empty($p['wa_enlace'])): ?>
-                                            <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="color: #25D366; border-color: #A7F3D0; background: #F0FDF4; padding: 6px 10px;" title="Avisar al cliente por WhatsApp">
+                                            <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm btn-wa-notify-inline" title="Avisar al cliente por WhatsApp">
                                                 <?= icon('whatsapp', 14) ?>
                                             </a>
                                         <?php endif; ?>
@@ -253,28 +245,28 @@
     </div>
 
 <?php elseif ($vista === 'local'): ?>
-    <!-- ═══ VISTA 2: TABLA ESPECIALIZADA DE SALÓN Y PARA LLEVAR ═══ -->
-    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
-        <div style="padding: 16px 20px; border-bottom: 1px solid var(--color-border-subtle); background: #EFF6FF; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: #2563EB; display: flex; align-items: center;"><?= icon('cutlery', 18) ?></span>
-                <h3 style="font-size: 15px; font-weight: 800; color: #1E40AF; margin: 0;">Salón en Mesa y Para Llevar</h3>
+    <!-- ═══ VISTA 2: TABLA ESPECIALIZADA DE SALÓN EN MESA ═══ -->
+    <div class="card p-0 overflow-hidden mb-5">
+        <div class="table-header-salon">
+            <div class="flex items-center gap-2">
+                <span class="text-indigo flex items-center"><?= icon('cutlery', 18) ?></span>
+                <h3 class="text-sm fw-700 text-main m-0">Salón en Mesa</h3>
             </div>
-            <span class="badge" style="background: #BFDBFE; color: #1E3A8A; font-weight: 700; font-size: 12px;">
+            <span class="badge badge-blue-subtle">
                 <?= count($pedidos) ?> orden(es) en esta vista
             </span>
         </div>
 
         <?php if (empty($pedidos)): ?>
-            <div style="text-align: center; padding: 50px 24px;">
-                <div style="width: 50px; height: 50px; border-radius: 50%; background: #DBEAFE; display: inline-flex; align-items: center; justify-content: center; color: #2563EB; margin-bottom: 14px;">
+            <div class="empty-state-box p-6">
+                <div class="icon-bubble-lg mx-auto mb-3">
                     <?= icon('cutlery', 24) ?>
                 </div>
-                <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0 0 6px 0;">
-                    No hay comandas de mesa o pedidos para recoger
+                <h3 class="text-md fw-700 text-main m-0 mb-1">
+                    No hay comandas de mesa en este momento
                 </h3>
-                <p style="color: var(--color-text-muted); font-size: 13.5px; margin: 0 auto; max-width: 400px;">
-                    Las órdenes tomadas por los comensales directamente en sus mesas físicas o pedidos para recoger se mostrarán aquí.
+                <p class="text-muted text-sm max-w-md mx-auto m-0">
+                    Las órdenes tomadas por los comensales directamente en sus mesas físicas se mostrarán aquí.
                 </p>
             </div>
         <?php else: ?>
@@ -282,23 +274,23 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="min-width: 130px;"># Pedido / Hora</th>
-                            <th style="min-width: 140px;">Ubicación / Modalidad</th>
-                            <th style="min-width: 160px;">Cliente / Comensal</th>
-                            <th>Total &amp; Pago</th>
-                            <th style="min-width: 170px;">Estado de Cocina</th>
-                            <th style="text-align: right; min-width: 140px;">Acciones</th>
+                            <th># Pedido / Hora</th>
+                            <th>Ubicación / Modalidad</th>
+                            <th>Cliente / Comensal</th>
+                            <th>Total</th>
+                            <th>Estado de Cocina</th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($pedidos as $p): ?>
                             <tr id="pedido_fila_<?= (int)$p['id'] ?>">
                                 <td>
-                                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                                        <strong style="font-size: 14px; font-family: monospace; color: var(--color-brand); letter-spacing: 0.04em;">
+                                    <div class="stack gap-1">
+                                        <strong class="table-row-code">
                                             #<?= e($p['codigo']) ?>
                                         </strong>
-                                        <span style="font-size: 11.5px; color: var(--color-text-muted);">
+                                        <span class="text-xs text-muted">
                                             <?= date('d/m/Y h:i A', strtotime($p['created_at'])) ?>
                                         </span>
                                     </div>
@@ -306,17 +298,17 @@
 
                                 <td>
                                     <?php if ($p['modalidad'] === 'mesa'): ?>
-                                        <span class="badge" style="background: #EFF6FF; color: #1D4ED8; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); font-size: 12.5px; display: inline-flex; align-items: center; gap: 5px;">
+                                        <span class="badge badge-subtle-brand py-1 px-2 inline-flex items-center gap-1 text-xs fw-700">
                                             <?= icon('cutlery', 13) ?>
                                             <span>Mesa <?= !empty($p['mesa_numero_rel']) ? (int)$p['mesa_numero_rel'] : (!empty($p['mesa_numero']) ? (int)$p['mesa_numero'] : '—') ?></span>
                                         </span>
                                     <?php else: ?>
-                                        <span class="badge" style="background: #F1F5F9; color: #475569; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); font-size: 12px; display: inline-flex; align-items: center; gap: 5px;">
+                                        <span class="badge badge-neutral py-1 px-2 inline-flex items-center gap-1 text-xs fw-700">
                                             <?= icon('shopping-bag', 13) ?>
                                             <span>Para Llevar</span>
                                         </span>
                                         <?php if (!empty($p['hora_recogida'])): ?>
-                                            <span style="font-size: 11px; color: var(--color-text-muted); display: block; margin-top: 2px;">
+                                            <span class="text-xs text-muted block mt-1">
                                                 <?= e($p['hora_recogida']) ?>
                                             </span>
                                         <?php endif; ?>
@@ -324,12 +316,12 @@
                                 </td>
 
                                 <td>
-                                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                                        <strong style="font-size: 13.5px; color: var(--color-text-main);">
+                                    <div class="stack gap-1">
+                                        <strong class="text-sm text-main">
                                             <?= e($p['cliente_nombre']) ?>
                                         </strong>
                                         <?php if (!empty($p['cliente_telefono'])): ?>
-                                            <span style="font-size: 12px; color: var(--color-text-muted);">
+                                            <span class="text-xs text-muted">
                                                 <?= e($p['cliente_telefono']) ?>
                                             </span>
                                         <?php endif; ?>
@@ -337,20 +329,15 @@
                                 </td>
 
                                 <td>
-                                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                                        <strong style="font-size: 14.5px; color: #059669; font-variant-numeric: tabular-nums;">
-                                            <?= format_cop((int)$p['total']) ?>
-                                        </strong>
-                                        <span style="font-size: 11px; color: var(--color-text-muted); text-transform: capitalize;">
-                                            <?= e(str_replace('_', ' ', (string)$p['metodo_pago'])) ?>
-                                        </span>
-                                    </div>
+                                    <strong class="table-row-total">
+                                        <?= format_cop((int)$p['total']) ?>
+                                    </strong>
                                 </td>
 
                                 <td>
-                                    <form method="POST" action="<?= e(app_url('/admin/pedidos/' . $p['id'] . '/estado')) ?>" class="form-cambio-estado" style="margin: 0;">
+                                    <form method="POST" action="<?= e(app_url('/admin/pedidos/' . $p['id'] . '/estado')) ?>" class="form-cambio-estado m-0">
                                         <?= csrf_field() ?>
-                                        <select name="estado" class="form-control select-estado-pedido" data-id="<?= (int)$p['id'] ?>" style="height: 32px; padding: 4px 8px; font-size: 12.5px; font-weight: 600; border-radius: var(--radius-sm); border: 1px solid <?= $p['estado_info']['border'] ?>; background-color: <?= $p['estado_info']['bg'] ?>; color: <?= $p['estado_info']['color'] ?>;">
+                                        <select name="estado" class="form-control select-estado-pedido estado-sel--<?= e($p['estado']) ?>" data-id="<?= (int)$p['id'] ?>">
                                             <?php foreach ($estadosConfig as $eCod => $eCfg): ?>
                                                 <option value="<?= e($eCod) ?>" <?= $p['estado'] === $eCod ? 'selected' : '' ?>>
                                                     <?= e($eCfg['label']) ?>
@@ -360,14 +347,14 @@
                                     </form>
                                 </td>
 
-                                <td style="text-align: right;">
-                                    <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                <td class="text-right">
+                                    <div class="inline-flex items-center justify-end gap-2">
                                         <button type="button" class="btn btn-secondary btn-sm btn-ver-detalle" data-id="<?= (int)$p['id'] ?>" title="Ver platos y notas de cocina">
                                             <?= icon('eye', 13) ?>
                                             <span>Detalle</span>
                                         </button>
                                         <?php if (!empty($p['wa_enlace'])): ?>
-                                            <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="color: #25D366; border-color: #A7F3D0; background: #F0FDF4; padding: 6px 10px;" title="WhatsApp del cliente">
+                                            <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm btn-wa-notify-inline" title="WhatsApp del cliente">
                                                 <?= icon('whatsapp', 14) ?>
                                             </a>
                                         <?php endif; ?>
@@ -385,19 +372,19 @@
     <!-- ═══ VISTA 3: AMBAS TABLAS SEPARADAS ORDENADAMENTE ═══ -->
 
     <!-- TABLA 1: DESPACHOS A DOMICILIO -->
-    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
-        <div style="padding: 16px 20px; border-bottom: 1px solid var(--color-border-subtle); background: #FFF7ED; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: #EA580C; display: flex; align-items: center;"><?= icon('motorcycle', 18) ?></span>
-                <h3 style="font-size: 15px; font-weight: 800; color: #9A3412; margin: 0;">Tabla de Domicilios</h3>
+    <div class="card p-0 overflow-hidden mb-5">
+        <div class="table-header-domicilio">
+            <div class="flex items-center gap-2">
+                <span class="text-brand flex items-center"><?= icon('motorcycle', 18) ?></span>
+                <h3 class="text-sm fw-700 text-main m-0">Tabla de Domicilios</h3>
             </div>
-            <a href="<?= e(app_url('/admin/pedidos?vista=domicilios')) ?>" class="btn btn-secondary btn-sm" style="font-size: 11.5px; padding: 3px 10px;">
+            <a href="<?= e(app_url('/admin/pedidos?vista=domicilios')) ?>" class="btn btn-secondary btn-sm text-xs py-1 px-3">
                 Ver solo Domicilios (<?= count($pedidosDomicilio) ?>)
             </a>
         </div>
 
         <?php if (empty($pedidosDomicilio)): ?>
-            <div style="text-align: center; padding: 36px 20px; color: var(--color-text-muted); font-size: 13.5px;">
+            <div class="empty-state-box p-5 text-muted text-sm">
                 No hay pedidos de domicilio en este rango.
             </div>
         <?php else: ?>
@@ -405,39 +392,38 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="min-width: 120px;"># Pedido</th>
-                            <th style="min-width: 160px;">Cliente &amp; Teléfono</th>
-                            <th style="min-width: 200px;">Dirección de Entrega</th>
-                            <th>Total &amp; Pago</th>
-                            <th style="min-width: 160px;">Estado</th>
-                            <th style="text-align: right; min-width: 140px;">Acciones</th>
+                            <th># Pedido</th>
+                            <th>Cliente &amp; Teléfono</th>
+                            <th>Dirección de Entrega</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($pedidosDomicilio as $p): ?>
                             <tr id="pedido_fila_<?= (int)$p['id'] ?>">
                                 <td>
-                                    <strong style="font-size: 13.5px; font-family: monospace; color: var(--color-brand);">#<?= e($p['codigo']) ?></strong>
-                                    <span style="font-size: 11px; color: var(--color-text-muted); display: block;"><?= date('d/m h:i A', strtotime($p['created_at'])) ?></span>
+                                    <strong class="table-row-code">#<?= e($p['codigo']) ?></strong>
+                                    <span class="text-xs text-muted block"><?= date('d/m h:i A', strtotime($p['created_at'])) ?></span>
                                 </td>
                                 <td>
-                                    <strong style="font-size: 13px; color: var(--color-text-main);"><?= e($p['cliente_nombre']) ?></strong>
-                                    <span style="font-size: 11.5px; color: var(--color-text-muted); display: block;"><?= e($p['cliente_telefono'] ?: 'Sin teléfono') ?></span>
+                                    <strong class="text-sm text-main"><?= e($p['cliente_nombre']) ?></strong>
+                                    <span class="text-xs text-muted block"><?= e($p['cliente_telefono'] ?: 'Sin teléfono') ?></span>
                                 </td>
                                 <td>
-                                    <span style="font-size: 12.5px; color: var(--color-text-main); font-weight: 600;"><?= e($p['direccion'] ?: '—') ?></span>
+                                    <span class="text-xs text-main fw-600"><?= e($p['direccion'] ?: '—') ?></span>
                                     <?php if (!empty($p['barrio'])): ?>
-                                        <span style="font-size: 11px; color: var(--color-text-muted); display: block;"><?= e($p['barrio']) ?></span>
+                                        <span class="text-xs text-muted block"><?= e($p['barrio']) ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <strong style="font-size: 14px; color: #059669;"><?= format_cop((int)$p['total']) ?></strong>
-                                    <span style="font-size: 11px; color: var(--color-text-muted); display: block; text-transform: capitalize;"><?= e(str_replace('_', ' ', (string)$p['metodo_pago'])) ?></span>
+                                    <strong class="table-row-total"><?= format_cop((int)$p['total']) ?></strong>
                                 </td>
                                 <td>
-                                    <form method="POST" action="<?= e(app_url('/admin/pedidos/' . $p['id'] . '/estado')) ?>" class="form-cambio-estado" style="margin: 0;">
+                                    <form method="POST" action="<?= e(app_url('/admin/pedidos/' . $p['id'] . '/estado')) ?>" class="form-cambio-estado m-0">
                                         <?= csrf_field() ?>
-                                        <select name="estado" class="form-control select-estado-pedido" data-id="<?= (int)$p['id'] ?>" style="height: 30px; padding: 2px 6px; font-size: 12px; font-weight: 600; border-radius: var(--radius-sm); border: 1px solid <?= $p['estado_info']['border'] ?>; background-color: <?= $p['estado_info']['bg'] ?>; color: <?= $p['estado_info']['color'] ?>;">
+                                        <select name="estado" class="form-control select-estado-pedido estado-sel--<?= e($p['estado']) ?>" data-id="<?= (int)$p['id'] ?>">
                                             <?php foreach ($estadosConfig as $eCod => $eCfg): ?>
                                                 <option value="<?= e($eCod) ?>" <?= $p['estado'] === $eCod ? 'selected' : '' ?>>
                                                     <?= e($eCfg['label']) ?>
@@ -446,10 +432,10 @@
                                         </select>
                                     </form>
                                 </td>
-                                <td style="text-align: right;">
+                                <td class="text-right">
                                     <button type="button" class="btn btn-secondary btn-sm btn-ver-detalle" data-id="<?= (int)$p['id'] ?>">Detalle</button>
                                     <?php if (!empty($p['wa_enlace'])): ?>
-                                        <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="color: #25D366; padding: 5px 8px;">
+                                        <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm btn-wa-notify-sm">
                                             <?= icon('whatsapp', 13) ?>
                                         </a>
                                     <?php endif; ?>
@@ -462,64 +448,63 @@
         <?php endif; ?>
     </div>
 
-    <!-- TABLA 2: SALÓN Y PARA LLEVAR -->
-    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
-        <div style="padding: 16px 20px; border-bottom: 1px solid var(--color-border-subtle); background: #EFF6FF; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: #2563EB; display: flex; align-items: center;"><?= icon('cutlery', 18) ?></span>
-                <h3 style="font-size: 15px; font-weight: 800; color: #1E40AF; margin: 0;">Tabla de Salón y Para Llevar</h3>
+    <!-- TABLA 2: SALÓN EN MESA -->
+    <div class="card p-0 overflow-hidden mb-5">
+        <div class="table-header-salon">
+            <div class="flex items-center gap-2">
+                <span class="text-indigo flex items-center"><?= icon('cutlery', 18) ?></span>
+                <h3 class="text-sm fw-700 text-main m-0">Tabla de Salón en Mesa</h3>
             </div>
-            <a href="<?= e(app_url('/admin/pedidos?vista=local')) ?>" class="btn btn-secondary btn-sm" style="font-size: 11.5px; padding: 3px 10px;">
+            <a href="<?= e(app_url('/admin/pedidos?vista=local')) ?>" class="btn btn-secondary btn-sm text-xs py-1 px-3">
                 Ver solo Salón (<?= count($pedidosLocal) ?>)
             </a>
         </div>
 
         <?php if (empty($pedidosLocal)): ?>
-            <div style="text-align: center; padding: 36px 20px; color: var(--color-text-muted); font-size: 13.5px;">
-                No hay órdenes de salón o para recoger en este rango.
+            <div class="empty-state-box p-5 text-muted text-sm">
+                No hay órdenes de salón en este rango.
             </div>
         <?php else: ?>
             <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="min-width: 120px;"># Pedido</th>
-                            <th style="min-width: 140px;">Ubicación</th>
-                            <th style="min-width: 160px;">Cliente</th>
-                            <th>Total &amp; Pago</th>
-                            <th style="min-width: 160px;">Estado</th>
-                            <th style="text-align: right; min-width: 140px;">Acciones</th>
+                            <th># Pedido</th>
+                            <th>Ubicación</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($pedidosLocal as $p): ?>
                             <tr id="pedido_fila_<?= (int)$p['id'] ?>">
                                 <td>
-                                    <strong style="font-size: 13.5px; font-family: monospace; color: var(--color-brand);">#<?= e($p['codigo']) ?></strong>
-                                    <span style="font-size: 11px; color: var(--color-text-muted); display: block;"><?= date('d/m h:i A', strtotime($p['created_at'])) ?></span>
+                                    <strong class="table-row-code">#<?= e($p['codigo']) ?></strong>
+                                    <span class="text-xs text-muted block"><?= date('d/m h:i A', strtotime($p['created_at'])) ?></span>
                                 </td>
                                 <td>
                                     <?php if ($p['modalidad'] === 'mesa'): ?>
-                                        <span class="badge" style="background: #EFF6FF; color: #1D4ED8; font-weight: 700; padding: 3px 8px; border-radius: var(--radius-full); font-size: 12px;">
+                                        <span class="badge badge-subtle-brand py-1 px-2 text-xs fw-700">
                                             Mesa <?= !empty($p['mesa_numero_rel']) ? (int)$p['mesa_numero_rel'] : (!empty($p['mesa_numero']) ? (int)$p['mesa_numero'] : '—') ?>
                                         </span>
                                     <?php else: ?>
-                                        <span class="badge" style="background: #F1F5F9; color: #475569; font-weight: 700; padding: 3px 8px; border-radius: var(--radius-full); font-size: 12px;">
+                                        <span class="badge badge-neutral py-1 px-2 text-xs fw-700">
                                             Para Llevar
                                         </span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <strong style="font-size: 13px; color: var(--color-text-main);"><?= e($p['cliente_nombre']) ?></strong>
+                                    <strong class="text-sm text-main"><?= e($p['cliente_nombre']) ?></strong>
                                 </td>
                                 <td>
-                                    <strong style="font-size: 14px; color: #059669;"><?= format_cop((int)$p['total']) ?></strong>
-                                    <span style="font-size: 11px; color: var(--color-text-muted); display: block; text-transform: capitalize;"><?= e(str_replace('_', ' ', (string)$p['metodo_pago'])) ?></span>
+                                    <strong class="table-row-total"><?= format_cop((int)$p['total']) ?></strong>
                                 </td>
                                 <td>
-                                    <form method="POST" action="<?= e(app_url('/admin/pedidos/' . $p['id'] . '/estado')) ?>" class="form-cambio-estado" style="margin: 0;">
+                                    <form method="POST" action="<?= e(app_url('/admin/pedidos/' . $p['id'] . '/estado')) ?>" class="form-cambio-estado m-0">
                                         <?= csrf_field() ?>
-                                        <select name="estado" class="form-control select-estado-pedido" data-id="<?= (int)$p['id'] ?>" style="height: 30px; padding: 2px 6px; font-size: 12px; font-weight: 600; border-radius: var(--radius-sm); border: 1px solid <?= $p['estado_info']['border'] ?>; background-color: <?= $p['estado_info']['bg'] ?>; color: <?= $p['estado_info']['color'] ?>;">
+                                        <select name="estado" class="form-control select-estado-pedido estado-sel--<?= e($p['estado']) ?>" data-id="<?= (int)$p['id'] ?>">
                                             <?php foreach ($estadosConfig as $eCod => $eCfg): ?>
                                                 <option value="<?= e($eCod) ?>" <?= $p['estado'] === $eCod ? 'selected' : '' ?>>
                                                     <?= e($eCfg['label']) ?>
@@ -528,10 +513,10 @@
                                         </select>
                                     </form>
                                 </td>
-                                <td style="text-align: right;">
+                                <td class="text-right">
                                     <button type="button" class="btn btn-secondary btn-sm btn-ver-detalle" data-id="<?= (int)$p['id'] ?>">Detalle</button>
                                     <?php if (!empty($p['wa_enlace'])): ?>
-                                        <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="color: #25D366; padding: 5px 8px;">
+                                        <a href="<?= e($p['wa_enlace']) ?>" target="_blank" rel="noopener" class="btn btn-secondary btn-sm btn-wa-notify-sm">
                                             <?= icon('whatsapp', 13) ?>
                                         </a>
                                     <?php endif; ?>
@@ -547,11 +532,11 @@
 
 <!-- PAGINACIÓN GENERAL -->
 <?php if ($totalPaginas > 1): ?>
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #FFF; border: 1px solid var(--color-border); border-radius: var(--radius-md); margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
-        <span style="font-size: 13px; color: var(--color-text-muted);">
+    <div class="pagination-bar">
+        <span class="text-xs text-muted">
             Página <strong><?= (int)$pagina ?></strong> de <strong><?= (int)$totalPaginas ?></strong> (<?= (int)$totalPedidos ?> pedidos en total)
         </span>
-        <div style="display: flex; gap: 6px;">
+        <div class="flex gap-2">
             <?php if ($pagina > 1): ?>
                 <a href="<?= e(app_url('/admin/pedidos?' . http_build_query(array_merge($filtros, ['vista' => $vista, 'page' => $pagina - 1])))) ?>" class="btn btn-secondary btn-sm">
                     &larr; Anterior
@@ -565,11 +550,11 @@
         </div>
     </div>
 <?php endif; ?>
+</div>
 
-<!-- ═══ MODAL: AVISAR AL CLIENTE POR WHATSAPP (ESTADO EN CAMINO) ═══ -->
 <!-- ═══ MODAL: AVISO WHATSAPP CUANDO SALE EN CAMINO ═══ -->
-<div class="modal-backdrop-modern" id="modalAvisoWhatsApp">
-    <div class="modal-aviso-wa-dialog">
+<div class="modal-backdrop modal-backdrop-modern" id="modalAvisoWhatsApp">
+    <div class="modal-dialog modal-aviso-wa-dialog">
         <div class="modal-aviso-wa-header">
             <div class="modal-aviso-wa-brand">
                 <div class="modal-aviso-wa-icon">
@@ -592,7 +577,7 @@
         </p>
 
         <div class="modal-aviso-wa-card">
-            <span style="font-size: 11px; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">
+            <span class="text-xs fw-700 text-success uppercase block mb-1">
                 Mensaje a enviar:
             </span>
             <div class="modal-aviso-wa-bubble" id="avisoWaMensaje">
@@ -613,8 +598,8 @@
 </div>
 
 <!-- ═══ MODAL: DETALLE COMPLETO DEL PEDIDO ═══ -->
-<div class="modal-backdrop-modern" id="modalDetallePedido">
-    <div class="order-modal-dialog">
+<div class="modal-backdrop modal-backdrop-modern" id="modalDetallePedido">
+    <div class="modal-dialog order-modal-dialog">
         
         <div class="order-detail-header">
             <div class="order-detail-header-left">
@@ -633,28 +618,47 @@
             <button type="button" class="btn-close-modal" id="btnCerrarModalDetalle" aria-label="Cerrar">&times;</button>
         </div>
 
-        <div id="detLoading" style="text-align: center; padding: 40px; color: var(--color-text-muted);">
+        <div id="detLoading" class="empty-state-box p-6 text-muted">
             Cargando detalle del pedido...
         </div>
 
         <div id="detContent" class="order-detail-content-wrap is-hidden">
             
+            <!-- Banner de Mesa y Liberación (Solo para pedidos en salón) -->
+            <div id="detMesaCardWrap" class="p-3.5 rounded-xl border flex items-center justify-between flex-wrap gap-3 is-hidden" style="background: #FFFBF7; border-color: #FED7AA;">
+                <div class="flex items-center gap-3">
+                    <div style="background: rgba(232, 93, 4, 0.12); color: #E85D04; padding: 10px; border-radius: 10px; display: flex; align-items: center;">
+                        <?= icon('cutlery', 20) ?>
+                    </div>
+                    <div>
+                        <strong class="text-base text-main" id="detMesaNumeroTxt">Mesa 1</strong>
+                        <div class="mt-1">
+                            <span id="detMesaStatusTxt" class="order-mesa-occupancy-pill is-occupied">Comensales en mesa (Consumiendo)</span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-liberar-mesa-modal" id="btnLiberarMesaModal" title="Marcar la mesa como desocupada para nuevos clientes">
+                    <?= icon('check', 14) ?>
+                    <span>Liberar Mesa Ahora</span>
+                </button>
+            </div>
+
             <!-- Datos del Cliente y Entrega -->
             <div class="order-detail-customer-box">
                 <div class="order-detail-field-col">
-                    <span class="order-detail-label">Cliente</span>
+                    <span class="order-detail-label">Cliente / Solicitante</span>
                     <strong class="order-detail-val-strong" id="detClienteNombre">—</strong>
                     <div id="detClienteTelWrap" class="order-detail-val-muted">—</div>
                 </div>
 
                 <div class="order-detail-field-col">
-                    <span class="order-detail-label">Modalidad</span>
+                    <span class="order-detail-label">Modalidad de Orden</span>
                     <strong class="order-detail-val-strong" id="detModalidad">—</strong>
                     <div id="detModalidadExtra" class="order-detail-val-muted">—</div>
                 </div>
 
                 <div class="order-detail-field-col full-col" id="detNotasWrap">
-                    <span class="order-detail-label">Instrucciones / Notas de Entrega</span>
+                    <span class="order-detail-label">Instrucciones / Notas Especiales</span>
                     <p class="order-detail-notes-box" id="detNotas">
                         —
                     </p>
@@ -663,14 +667,14 @@
 
             <!-- Tabla de Ítems del Pedido -->
             <div>
-                <h4 style="font-size: 14px; font-weight: 700; color: var(--color-text-main); margin: 0 0 10px 0;">
-                    Productos Ordenados
+                <h4 class="text-sm fw-700 text-main m-0 mb-2">
+                    Platos y Bebidas Ordenadas
                 </h4>
                 <div class="order-detail-table-card">
                     <table class="order-detail-table">
                         <thead>
                             <tr>
-                                <th class="col-left">Cant · Producto</th>
+                                <th class="col-left">Cant · Plato / Especificación</th>
                                 <th class="col-right">Total</th>
                             </tr>
                         </thead>
@@ -685,31 +689,33 @@
             <div class="order-detail-totals-box">
                 <div class="order-detail-total-row">
                     <span>Subtotal:</span>
-                    <strong style="color: var(--color-text-main);" id="detSubtotal">$ 0</strong>
+                    <strong class="text-main" id="detSubtotal">$ 0</strong>
                 </div>
                 <div class="order-detail-total-row" id="detEnvioRow">
                     <span>Costo de Envío:</span>
-                    <strong style="color: var(--color-text-main);" id="detEnvio">$ 0</strong>
+                    <strong class="text-main" id="detEnvio">$ 0</strong>
                 </div>
                 <div class="order-detail-total-row grand-row">
-                    <span>Total General:</span>
-                    <span style="color: #059669;" id="detTotal">$ 0</span>
-                </div>
-                <div class="order-detail-total-row">
-                    <span style="font-size: 12px; color: var(--color-text-subtle);">Método de pago acordado:</span>
-                    <span style="text-transform: capitalize; font-weight: 600; color: var(--color-text-muted);" id="detMetodoPago">Efectivo</span>
+                    <span>Total a Cobrar:</span>
+                    <span class="text-success fw-700 text-lg" id="detTotal">$ 0</span>
                 </div>
             </div>
 
             <!-- Botones de Acción en el Modal -->
-            <div class="order-detail-actions-row">
-                <a href="#" id="detBtnWa" target="_blank" rel="noopener" class="btn btn-primary btn-wa-notify">
-                    <?= icon('whatsapp', 15) ?>
-                    <span>Escribir por WhatsApp</span>
-                </a>
+            <div class="order-detail-actions-row flex items-center justify-between flex-wrap gap-2 pt-3 border-t">
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn btn-secondary btn-sm flex items-center gap-1.5" id="btnImprimirComandaModal" title="Imprimir ticket para cocina o comanda de mesa">
+                        <?= icon('printer', 14) ?>
+                        <span>Imprimir Comanda</span>
+                    </button>
+                    <a href="#" id="detBtnWa" target="_blank" rel="noopener" class="btn btn-primary btn-sm btn-wa-notify flex items-center gap-1.5">
+                        <?= icon('whatsapp', 14) ?>
+                        <span>WhatsApp</span>
+                    </a>
+                </div>
 
-                <button type="button" class="btn btn-secondary" id="btnCerrarModalDetalleFooter">
-                    Cerrar Detalle
+                <button type="button" class="btn btn-secondary btn-sm" id="btnCerrarModalDetalleFooter">
+                    Cerrar
                 </button>
             </div>
 
@@ -721,88 +727,94 @@
 <script nonce="<?= e($cspNonce ?? '') ?>">
 document.addEventListener('DOMContentLoaded', function () {
     const baseUrl = <?= json_encode(app_url(''), JSON_UNESCAPED_UNICODE) ?>;
+    const filtroActivo = <?= json_encode($filtros['estado'] ?? '') ?>;
     const modal = document.getElementById('modalDetallePedido');
     const loading = document.getElementById('detLoading');
     const content = document.getElementById('detContent');
     const modalAvisoWa = document.getElementById('modalAvisoWhatsApp');
 
-    // 1. Cambio rápido de estado en tabla mediante AJAX + Notificación WhatsApp
-    document.querySelectorAll('.select-estado-pedido').forEach(function (select) {
-        select.addEventListener('change', function () {
-            const form = this.closest('form');
-            const nuevoEstado = this.value;
-            const selectEl = this;
+    // Función para actualizar los contadores en las pestañas en tiempo real
+    function actualizarConteos(conteos) {
+        if (!conteos) return;
+        document.querySelectorAll('[data-count-key]').forEach(function (el) {
+            const key = el.getAttribute('data-count-key');
+            if (typeof conteos[key] !== 'undefined') {
+                el.textContent = conteos[key];
+            }
+        });
+    }
 
-            selectEl.disabled = true;
+    // 1. Enlazar eventos de tabla (cambio de estado y ver detalle)
+    function bindPedidosTableEvents() {
+        document.querySelectorAll('.select-estado-pedido').forEach(function (select) {
+            let estadoPrevio = select.value;
+            select.addEventListener('focus', function () {
+                estadoPrevio = this.value;
+            });
 
-            const formData = new FormData(form);
+            select.addEventListener('change', function () {
+                const form = this.closest('form');
+                const nuevoEstado = this.value;
+                const selectEl = this;
+                const row = selectEl.closest('tr');
+                const codigoEl = row ? row.querySelector('.table-row-code') : null;
+                const codigo = codigoEl ? codigoEl.textContent.trim() : '';
 
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: formData
-            })
-            .then(r => r.json())
-            .then(data => {
-                selectEl.disabled = false;
-                if (data.success) {
-                    selectEl.style.backgroundColor = data.bg;
-                    selectEl.style.color = data.color;
-                    selectEl.style.borderColor = data.color;
+                const formData = new FormData(form);
+                formData.set('estado', nuevoEstado);
+                selectEl.disabled = true;
 
-                    // Si el estado pasó a 'en_camino' y hay datos de WhatsApp, disparar popup
-                    if (data.aviso_whatsapp && data.aviso_whatsapp.wa_url) {
-                        abrirModalAvisoWhatsApp(data.aviso_whatsapp);
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(data => {
+                    selectEl.disabled = false;
+                    if (data.success) {
+                        estadoPrevio = nuevoEstado;
+                        selectEl.className = 'form-control select-estado-pedido estado-sel--' + nuevoEstado;
+
+                        if (data.conteos) {
+                            actualizarConteos(data.conteos);
+                        }
+
+                        if (typeof window.mostrarAdminToast === 'function') {
+                            window.mostrarAdminToast('Pedido ' + codigo + ' marcado como ' + (data.label || nuevoEstado));
+                        }
+
+                        if (filtroActivo && nuevoEstado !== filtroActivo && row) {
+                            row.classList.add('order-row--exit');
+                            setTimeout(function () {
+                                const tbody = row.closest('tbody');
+                                row.remove();
+                                if (tbody && tbody.querySelectorAll('tr').length === 0) {
+                                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">No hay más pedidos en este estado.</td></tr>';
+                                }
+                            }, 250);
+                        }
+
+                        if (data.aviso_whatsapp && data.aviso_whatsapp.wa_url) {
+                            abrirModalAvisoWhatsApp(data.aviso_whatsapp);
+                        }
+                    } else {
+                        selectEl.value = estadoPrevio;
+                        alert(data.error || 'No se pudo actualizar el estado.');
                     }
-                } else {
-                    alert(data.error || 'No se pudo actualizar el estado.');
-                }
-            })
-            .catch(() => {
-                selectEl.disabled = false;
-                alert('Error al comunicarse con el servidor.');
+                })
+                .catch(() => {
+                    selectEl.disabled = false;
+                    selectEl.value = estadoPrevio;
+                    alert('Error al comunicarse con el servidor.');
+                });
             });
         });
-    });
 
-    // Función para abrir modal de aviso WhatsApp
-    function abrirModalAvisoWhatsApp(aviso) {
-        document.getElementById('avisoWaCodigo').textContent = '#' + aviso.codigo;
-        document.getElementById('avisoWaCliente').textContent = aviso.cliente_nombre;
-        document.getElementById('avisoWaMensaje').textContent = aviso.mensaje;
-        
-        const btnWa = document.getElementById('btnAbrirAvisoWa');
-        btnWa.href = aviso.wa_url;
-
-        modalAvisoWa.classList.add('is-open');
-        modalAvisoWa.style.display = 'flex';
-    }
-
-    function cerrarModalAvisoWhatsApp() {
-        modalAvisoWa.classList.remove('is-open');
-        modalAvisoWa.style.display = 'none';
-    }
-
-    document.getElementById('btnCerrarModalAvisoWa')?.addEventListener('click', cerrarModalAvisoWhatsApp);
-    document.getElementById('btnCancelarAvisoWa')?.addEventListener('click', cerrarModalAvisoWhatsApp);
-    document.getElementById('btnAbrirAvisoWa')?.addEventListener('click', function () {
-        setTimeout(cerrarModalAvisoWhatsApp, 300);
-    });
-
-    modalAvisoWa?.addEventListener('click', function (e) {
-        if (e.target === this) cerrarModalAvisoWhatsApp();
-    });
-
-    // 2. Modal: Ver detalle del pedido vía AJAX
-    document.querySelectorAll('.btn-ver-detalle').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            const id = this.getAttribute('data-id');
-            modal.classList.add('is-open');
-            modal.style.display = 'flex';
+        function cargarYMostrarPedido(id) {
+            if (!id) return;
+            modal.classList.add('is-open', 'is-active');
             loading.classList.remove('is-hidden');
-            loading.style.display = 'block';
             content.classList.add('is-hidden');
 
             fetch(baseUrl + '/admin/pedidos/' + id + '/detalle-json', {
@@ -811,7 +823,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(r => r.json())
             .then(data => {
                 loading.classList.add('is-hidden');
-                loading.style.display = 'none';
                 if (!data.success || !data.pedido) {
                     alert(data.error || 'Error al obtener pedido');
                     cerrarDetalle();
@@ -821,15 +832,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 const p = data.pedido;
                 content.classList.remove('is-hidden');
 
-                // Cabecera
                 document.getElementById('detCodigo').innerText = '#' + p.codigo;
                 const badge = document.getElementById('detEstadoBadge');
                 badge.innerText = p.estado_info.label;
-                badge.style.backgroundColor = p.estado_info.bg;
-                badge.style.color = p.estado_info.color;
+                badge.className = 'badge estado-badge--' + p.estado;
                 document.getElementById('detFecha').innerText = p.fecha_formateada;
 
-                // Cliente
+                // Banner de Mesa y Liberación
+                const mesaCardWrap = document.getElementById('detMesaCardWrap');
+                const btnLiberarMesaModal = document.getElementById('btnLiberarMesaModal');
+                if (p.modalidad === 'mesa') {
+                    mesaCardWrap.classList.remove('is-hidden');
+                    const mesaNum = p.mesa_numero_rel || p.mesa_numero || 'S/N';
+                    document.getElementById('detMesaNumeroTxt').innerText = 'Mesa ' + mesaNum;
+                    const mesaStatusText = document.getElementById('detMesaStatusTxt');
+                    if (p.mesa_liberada_at) {
+                        mesaStatusText.innerText = 'Mesa Liberada (Desocupada)';
+                        mesaStatusText.className = 'order-mesa-occupancy-pill is-free';
+                        btnLiberarMesaModal.classList.add('is-hidden');
+                    } else {
+                        mesaStatusText.innerText = 'Comensales consumiendo en salón (Mesa Ocupada)';
+                        mesaStatusText.className = 'order-mesa-occupancy-pill is-occupied';
+                        btnLiberarMesaModal.classList.remove('is-hidden');
+                        btnLiberarMesaModal.setAttribute('data-id', p.id);
+                    }
+                } else {
+                    mesaCardWrap.classList.add('is-hidden');
+                }
+
                 document.getElementById('detClienteNombre').innerText = p.cliente_nombre;
                 const telWrap = document.getElementById('detClienteTelWrap');
                 if (p.cliente_telefono) {
@@ -838,94 +868,207 @@ document.addEventListener('DOMContentLoaded', function () {
                     telWrap.innerText = 'Sin teléfono registrado';
                 }
 
-                // Modalidad
                 document.getElementById('detModalidad').innerText = p.modalidad_label;
                 const extraWrap = document.getElementById('detModalidadExtra');
                 if (p.modalidad === 'mesa') {
-                    extraWrap.innerText = 'Atención en mesa física ' + (p.mesa_numero_rel || p.mesa_numero || '');
+                    extraWrap.innerText = 'Atención en salón · Mesa ' + (p.mesa_numero_rel || p.mesa_numero || '');
                 } else if (p.modalidad === 'domicilio') {
                     extraWrap.innerText = (p.direccion || '') + (p.barrio ? ' (' + p.barrio + ')' : '');
                 } else {
                     extraWrap.innerText = p.hora_recogida ? 'Hora acordada: ' + p.hora_recogida : 'Pasa a recoger al local';
                 }
 
-                // Notas
                 const notasWrap = document.getElementById('detNotasWrap');
                 if (p.notas_entrega) {
-                    notasWrap.style.display = 'block';
+                    notasWrap.classList.remove('is-hidden');
                     document.getElementById('detNotas').innerText = p.notas_entrega;
                 } else {
-                    notasWrap.style.display = 'none';
+                    notasWrap.classList.add('is-hidden');
                 }
 
-                // Ítems
                 const tbody = document.getElementById('detItemsTbody');
                 tbody.innerHTML = '';
                 p.items.forEach(function (it) {
                     let opcionesHtml = '';
                     if (it.opciones && it.opciones.length > 0) {
-                        opcionesHtml = '<div style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px;">';
+                        opcionesHtml = '<div class="order-item-options-list mt-1">';
                         it.opciones.forEach(function (op) {
-                            opcionesHtml += '<span style="font-size: 11.5px; color: var(--color-text-muted);">&bull; ' + op.nombre_grupo + ': <strong>' + op.nombre_opcion + '</strong> (' + op.precio_extra_formateado + ')</span>';
+                            opcionesHtml += '<span class="order-item-option-row text-xs text-muted block">&bull; ' + op.nombre_grupo + ': <strong class="text-main">' + op.nombre_opcion + '</strong> (' + op.precio_extra_formateado + ')</span>';
                         });
                         opcionesHtml += '</div>';
                     }
 
                     let notaHtml = '';
                     if (it.nota) {
-                        notaHtml = '<div style="margin-top: 3px; font-size: 11.5px; color: var(--color-brand); font-style: italic;">Nota: ' + it.nota + '</div>';
+                        notaHtml = '<div class="order-item-note mt-1 text-xs text-warning fw-600 bg-amber-50 p-1.5 rounded border border-amber-200">Nota del comensal: ' + it.nota + '</div>';
                     }
 
                     const tr = document.createElement('tr');
-                    tr.style.borderBottom = '1px solid var(--color-border-subtle)';
+                    tr.className = 'order-item-table-row border-b';
                     tr.innerHTML = `
-                        <td style="padding: 10px 14px; vertical-align: top;">
-                            <strong style="color: var(--color-text-main); font-size: 13.5px;">${it.cantidad}x ${it.nombre_producto}</strong>
+                        <td class="order-item-cell-name py-2.5 px-3">
+                            <span class="badge badge-subtle-brand text-xs font-bold mr-1.5">${it.cantidad}x</span>
+                            <strong class="order-item-title text-main text-sm">${it.nombre_producto}</strong>
                             ${opcionesHtml}
                             ${notaHtml}
                         </td>
-                        <td style="padding: 10px 14px; text-align: right; vertical-align: top; font-weight: 700; color: var(--color-text-main);">
+                        <td class="order-item-cell-total py-2.5 px-3 text-right font-bold text-main">
                             ${it.total_linea_formateado}
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
 
-                // Totales
                 document.getElementById('detSubtotal').innerText = p.subtotal_formateado;
                 const envioRow = document.getElementById('detEnvioRow');
                 if (p.costo_envio > 0) {
-                    envioRow.style.display = 'flex';
+                    envioRow.classList.remove('is-hidden');
                     document.getElementById('detEnvio').innerText = p.costo_envio_formateado;
                 } else {
-                    envioRow.style.display = 'none';
+                    envioRow.classList.add('is-hidden');
                 }
                 document.getElementById('detTotal').innerText = p.total_formateado;
-                document.getElementById('detMetodoPago').innerText = p.metodo_pago.replace('_', ' ');
 
-                // Botón WhatsApp
                 const btnWa = document.getElementById('detBtnWa');
                 if (p.cliente_telefono) {
-                    btnWa.style.display = 'inline-flex';
+                    btnWa.classList.remove('is-hidden');
                     let phone = p.cliente_telefono.replace(/\D/g, '');
                     if (phone.length === 10 && phone.startsWith('3')) phone = '57' + phone;
                     const msg = encodeURIComponent('Hola ' + p.cliente_nombre + ', te escribimos con relación a tu pedido #' + p.codigo + '.');
                     btnWa.href = 'https://wa.me/' + phone + '?text=' + msg;
                 } else {
-                    btnWa.style.display = 'none';
+                    btnWa.classList.add('is-hidden');
                 }
             })
             .catch(() => {
                 alert('Error al cargar detalle del pedido');
-                modal.style.display = 'none';
+                cerrarDetalle();
+            });
+        }
+
+        document.querySelectorAll('.btn-ver-detalle').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                cargarYMostrarPedido(this.getAttribute('data-id'));
             });
         });
-    });
+
+        // Auto-abrir pedido si viene en el query string (ej: ?pedido=16)
+        const urlParams = new URLSearchParams(window.location.search);
+        const pedidoParam = urlParams.get('pedido');
+        if (pedidoParam) {
+            cargarYMostrarPedido(pedidoParam);
+        }
+
+        // Acción de Liberar Mesa desde el Modal
+        document.getElementById('btnLiberarMesaModal')?.addEventListener('click', function () {
+            const id = this.getAttribute('data-id');
+            if (!id) return;
+            if (!confirm('¿Deseas marcar la mesa como liberada? El salón se actualizará y la mesa quedará disponible.')) return;
+
+            fetch(baseUrl + '/admin/pedidos/' + id + '/liberar-mesa', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '<?= csrf_token() ?>'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    if (window.mostrarAdminToast) window.mostrarAdminToast('Mesa liberada correctamente');
+                    cerrarDetalle();
+                    setTimeout(() => window.location.reload(), 300);
+                } else {
+                    alert(data.error || 'Error al liberar mesa');
+                }
+            })
+            .catch(() => alert('Error de conexión al liberar mesa'));
+        });
+
+        // Imprimir Comanda
+        document.getElementById('btnImprimirComandaModal')?.addEventListener('click', function () {
+            window.print();
+        });
+    }
+
+    // 2. Exponer función de recarga en vivo para nuevos pedidos detectados por polling
+    window.recargarPedidosEnVivo = function (nuevosIds) {
+        const isModalOpen = document.querySelector('.modal-backdrop.is-active, .modal-backdrop.is-open');
+        if (isModalOpen) return;
+
+        const refreshUrl = new URL(window.location.href);
+        refreshUrl.searchParams.set('_nocache', Date.now());
+
+        fetch(refreshUrl.toString(), {
+            cache: 'no-store',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const oldShell = document.querySelector('.admin-shell');
+            const newShell = doc.querySelector('.admin-shell');
+            if (oldShell && newShell) {
+                // Guardar los modales existentes para no perder sus referencias
+                const oldModals = Array.from(oldShell.querySelectorAll('.modal-backdrop'));
+                oldShell.innerHTML = newShell.innerHTML;
+
+                // Re-anexar modales en caso de que la vista dependa de ellos
+                oldModals.forEach(m => {
+                    if (!oldShell.querySelector('#' + m.id)) {
+                        oldShell.appendChild(m);
+                    }
+                });
+            }
+
+            bindPedidosTableEvents();
+
+            if (Array.isArray(nuevosIds)) {
+                nuevosIds.forEach(id => {
+                    const row = document.getElementById('pedido_fila_' + id);
+                    if (row) {
+                        row.classList.add('order-row--new');
+                        row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                });
+            }
+        })
+        .catch(err => console.error('Error al actualizar pedidos en vivo:', err));
+    };
+
+    window.actualizarConteosPedidos = actualizarConteos;
+
+    // Enlazar eventos al cargar
+    bindPedidosTableEvents();
+
+    // Inicializar Flatpickr en pedidos
+    if (typeof flatpickr !== 'undefined') {
+        const fpD = "<?= e($filtros['fecha_desde'] ?? '') ?>";
+        const fpH = "<?= e($filtros['fecha_hasta'] ?? '') ?>";
+        flatpickr("#dateRangePickerPedidos", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            defaultDate: (fpD && fpH) ? [fpD, fpH] : [],
+            locale: flatpickr.l10ns.es || "es",
+            altInput: true,
+            altFormat: "d M Y",
+            onClose: function (selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    document.getElementById('fechaDesdePedidos').value = instance.formatDate(selectedDates[0], "Y-m-d");
+                    document.getElementById('fechaHastaPedidos').value = instance.formatDate(selectedDates[1], "Y-m-d");
+                } else if (selectedDates.length === 0) {
+                    document.getElementById('fechaDesdePedidos').value = '';
+                    document.getElementById('fechaHastaPedidos').value = '';
+                }
+            }
+        });
+    }
 
     // Cerrar Modal Detalle
     function cerrarDetalle() {
-        modal.classList.remove('is-open');
-        modal.style.display = 'none';
+        modal.classList.remove('is-open', 'is-active');
     }
     document.getElementById('btnCerrarModalDetalle')?.addEventListener('click', cerrarDetalle);
     document.getElementById('btnCerrarModalDetalleFooter')?.addEventListener('click', cerrarDetalle);

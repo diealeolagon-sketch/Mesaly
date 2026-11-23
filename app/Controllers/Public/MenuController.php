@@ -81,8 +81,7 @@ class MenuController extends Controller
         $estadoHorario = HorarioService::estaAbierto($horarios);
 
         // Consultar métodos de pago aceptados
-        $metodoModel = new MetodoPagoNegocio();
-        $metodosPago = $metodoModel->getMetodosByRestaurantId($restauranteId);
+        $metodosPago = [];
 
         // Consultar categorías activas
         $categoriaModel = new Categoria();
@@ -218,11 +217,21 @@ class MenuController extends Controller
             ], 429);
         }
 
-        // 3. Validar estado del restaurante
+        // 3. Validar estado y horario de atención del restaurante
         if (empty($restaurante['recibiendo_pedidos'])) {
             return $this->json([
                 'ok' => false,
                 'error' => 'En este momento el restaurante no está recibiendo pedidos por la plataforma.'
+            ], 400);
+        }
+
+        $horarioModel = new Horario();
+        $horarios = $horarioModel->allByRestaurantId($restauranteId);
+        $estadoHorario = HorarioService::estaAbierto($horarios);
+        if (!$estadoHorario['abierto']) {
+            return $this->json([
+                'ok' => false,
+                'error' => 'El local se encuentra cerrado en este momento (' . $estadoHorario['mensaje'] . '). No es posible realizar pedidos fuera del horario de atención.'
             ], 400);
         }
 
@@ -283,12 +292,8 @@ class MenuController extends Controller
             }
         }
 
-        // 6. Validar método de pago
-        $metodoPago = trim((string)($input['metodo_pago'] ?? 'efectivo'));
-        $metodosAceptados = (new MetodoPagoNegocio())->getMetodosByRestaurantId((int)$restaurante['id']);
-        if (!empty($metodosAceptados) && !in_array($metodoPago, $metodosAceptados, true)) {
-            $metodoPago = $metodosAceptados[0];
-        }
+        // 6. Método de pago acordado directamente con el restaurante (contraentrega)
+        $metodoPago = 'acordar';
 
         // 7. Validar ítems del carrito
         $rawItems = $input['items'] ?? [];
@@ -473,6 +478,8 @@ class MenuController extends Controller
         return $this->json([
             'ok' => true,
             'codigo' => $pedidoGuardado['codigo'],
+            'modalidad' => $modalidad,
+            'mesa_numero' => $mesaNumero,
             'total' => $totalGeneral,
             'total_formateado' => format_cop($totalGeneral),
             'whatsapp_url' => $whatsappUrl,

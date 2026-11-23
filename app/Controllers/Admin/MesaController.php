@@ -79,6 +79,8 @@ class MesaController extends Controller
             'totalMesas' => count($mesas),
             'activasCount' => $activasCount,
             'inactivasCount' => count($mesas) - $activasCount,
+            'limiteMesas' => !empty($restaurante['limite_mesas']) ? (int)$restaurante['limite_mesas'] : null,
+            'planNombre' => ucfirst($restaurante['plan'] ?? 'Pro'),
         ], 'admin');
     }
 
@@ -103,6 +105,24 @@ class MesaController extends Controller
             return $this->back();
         }
 
+        $restaurante = $this->restauranteModel->find($tenantId);
+        $limiteMesas = !empty($restaurante['limite_mesas']) ? (int)$restaurante['limite_mesas'] : null;
+
+        if ($limiteMesas !== null && $limiteMesas > 0) {
+            if ($numero > $limiteMesas) {
+                $plan = ucfirst($restaurante['plan'] ?? 'Básico');
+                Session::flash('error', "El número de mesa ({$numero}) excede el tope de {$limiteMesas} mesas permitido en tu plan ({$plan}).");
+                return $this->back();
+            }
+            $totalActual = $this->mesaModel->contarPorRestaurante($tenantId);
+            $existente = $this->mesaModel->findByNumero($tenantId, $numero, false);
+            if (!$existente && $totalActual >= $limiteMesas) {
+                $plan = ucfirst($restaurante['plan'] ?? 'Básico');
+                Session::flash('error', "Has alcanzado el límite de {$limiteMesas} mesas permitido en tu plan ({$plan}). Si necesitas más mesas para tu local, contacta a tu asesor para ampliar tu capacidad.");
+                return $this->back();
+            }
+        }
+
         try {
             $this->mesaModel->crear($tenantId, $numero, $nombre ?: null);
             Session::flash('success', "Mesa {$numero} creada exitosamente.");
@@ -110,6 +130,75 @@ class MesaController extends Controller
             Session::flash('error', $e->getMessage());
         } catch (\Throwable $e) {
             Session::flash('error', 'Error al crear la mesa: ' . $e->getMessage());
+        }
+
+        return $this->redirect(app_url('/admin/mesas'));
+    }
+
+    /**
+     * Agrega la siguiente mesa consecutiva en 1 solo clic hasta el tope del plan
+     */
+    public function generarRapida(Request $request): Response
+    {
+        $tenantId = Auth::tenantId();
+        $restaurante = $this->restauranteModel->find($tenantId);
+        $limiteMesas = !empty($restaurante['limite_mesas']) ? (int)$restaurante['limite_mesas'] : null;
+
+        $totalActual = $this->mesaModel->contarPorRestaurante($tenantId);
+        if ($limiteMesas !== null && $totalActual >= $limiteMesas) {
+            $plan = ucfirst($restaurante['plan'] ?? 'Básico');
+            Session::flash('error', "Has alcanzado el límite de {$limiteMesas} mesas de tu plan ({$plan}).");
+            return $this->back();
+        }
+
+        // Buscar el menor número de mesa libre
+        $todas = $this->mesaModel->allByRestaurante($tenantId);
+        $ocupados = array_map(fn($m) => (int)$m['numero'], $todas);
+        $siguienteNumero = 1;
+        while (in_array($siguienteNumero, $ocupados, true)) {
+            $siguienteNumero++;
+        }
+
+        if ($limiteMesas !== null && $siguienteNumero > $limiteMesas) {
+            Session::flash('error', "No puedes agregar más mesas porque alcanzarías el tope de {$limiteMesas} mesas de tu plan.");
+            return $this->back();
+        }
+
+        try {
+            $this->mesaModel->crear($tenantId, $siguienteNumero, null);
+            Session::flash('success', "Mesa {$siguienteNumero} agregada exitosamente.");
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error al agregar la mesa: ' . $e->getMessage());
+        }
+
+        return $this->redirect(app_url('/admin/mesas'));
+    }
+
+    /**
+     * Genera automáticamente todas las mesas faltantes hasta el tope del plan en 1 solo clic
+     */
+    public function completarTope(Request $request): Response
+    {
+        $tenantId = Auth::tenantId();
+        $restaurante = $this->restauranteModel->find($tenantId);
+        $limiteMesas = !empty($restaurante['limite_mesas']) ? (int)$restaurante['limite_mesas'] : null;
+
+        if ($limiteMesas === null) {
+            Session::flash('error', 'Tu plan tiene mesas ilimitadas. Usa la opción "Generar en Lote".');
+            return $this->back();
+        }
+
+        $totalActual = $this->mesaModel->contarPorRestaurante($tenantId);
+        if ($totalActual >= $limiteMesas) {
+            Session::flash('error', "Ya tienes configuradas las {$limiteMesas} mesas de tu plan.");
+            return $this->back();
+        }
+
+        try {
+            $resultado = $this->mesaModel->crearLote($tenantId, 1, $limiteMesas);
+            Session::flash('success', "¡Listo! Se completaron las {$limiteMesas} mesas de tu plan.");
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error al completar las mesas: ' . $e->getMessage());
         }
 
         return $this->redirect(app_url('/admin/mesas'));
@@ -127,6 +216,25 @@ class MesaController extends Controller
         if ($desde < 1 || $hasta < $desde || ($hasta - $desde) > 100) {
             Session::flash('error', 'El rango de mesas no es válido (máximo 100 mesas por lote).');
             return $this->back();
+        }
+
+        $restaurante = $this->restauranteModel->find($tenantId);
+        $limiteMesas = !empty($restaurante['limite_mesas']) ? (int)$restaurante['limite_mesas'] : null;
+
+        if ($limiteMesas !== null && $limiteMesas > 0) {
+            if ($hasta > $limiteMesas) {
+                $plan = ucfirst($restaurante['plan'] ?? 'Básico');
+                Session::flash('error', "El número de mesa final ({$hasta}) excede el tope de {$limiteMesas} mesas de tu plan ({$plan}).");
+                return $this->back();
+            }
+            $totalActual = $this->mesaModel->contarPorRestaurante($tenantId);
+            $aCrearEstimadas = ($hasta - $desde + 1);
+            if (($totalActual + $aCrearEstimadas) > $limiteMesas) {
+                $disponibles = max(0, $limiteMesas - $totalActual);
+                $plan = ucfirst($restaurante['plan'] ?? 'Básico');
+                Session::flash('error', "No es posible generar este lote: tu plan ({$plan}) tiene un límite de {$limiteMesas} mesas (tienes {$totalActual} creadas y te quedan {$disponibles} cupos disponibles).");
+                return $this->back();
+            }
         }
 
         try {

@@ -1,8 +1,51 @@
 /**
- * MESALY — Fuentes Locales Autohospedadas (Licencia OFL)
- * Cumplimiento estricto con CSP (sin CDN externo)
+ * MESALY — Catálogo Maestro de Tipografías Web Autohospedadas
+ * Fuentes locales con licencia SIL Open Font License (OFL)
+ * Cumplimiento estricto con CSP (font-src 'self', sin CDN externo)
  */
 
+/* ============================================================
+   1. PLUS JAKARTA SANS (Moderna, Geométrica & Premium Tech)
+   ============================================================ */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/plus_jakarta_sans_400_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/plus_jakarta_sans_500_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/plus_jakarta_sans_600_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/plus_jakarta_sans_700_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/plus_jakarta_sans_800_normal.woff2') format('woff2');
+}
+
+/* ============================================================
+   2. INTER (Universal, Limpia, Hiper-legible)
+   ============================================================ */
 @font-face {
   font-family: 'Inter';
   font-style: normal;
@@ -10,23 +53,6 @@
   font-display: swap;
   src: url('../fonts/inter_400_normal.woff2') format('woff2');
 }
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../fonts/inter_400_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../fonts/inter_400_normal.woff2') format('woff2');
-}
-
 @font-face {
   font-family: 'Inter';
   font-style: normal;
@@ -34,23 +60,6 @@
   font-display: swap;
   src: url('../fonts/inter_500_normal.woff2') format('woff2');
 }
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('../fonts/inter_500_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('../fonts/inter_500_normal.woff2') format('woff2');
-}
-
 @font-face {
   font-family: 'Inter';
   font-style: normal;
@@ -58,23 +67,6 @@
   font-display: swap;
   src: url('../fonts/inter_600_normal.woff2') format('woff2');
 }
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/inter_600_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/inter_600_normal.woff2') format('woff2');
-}
-
 @font-face {
   font-family: 'Inter';
   font-style: normal;
@@ -83,22 +75,9 @@
   src: url('../fonts/inter_700_normal.woff2') format('woff2');
 }
 
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/inter_700_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/inter_700_normal.woff2') format('woff2');
-}
-
+/* ============================================================
+   3. POPPINS (Geométrica, Amigable & Dinámica)
+   ============================================================ */
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
@@ -106,23 +85,6 @@
   font-display: swap;
   src: url('../fonts/poppins_600_normal.woff2') format('woff2');
 }
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/poppins_600_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/poppins_600_normal.woff2') format('woff2');
-}
-
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
@@ -130,23 +92,6 @@
   font-display: swap;
   src: url('../fonts/poppins_700_normal.woff2') format('woff2');
 }
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/poppins_700_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/poppins_700_normal.woff2') format('woff2');
-}
-
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
@@ -155,22 +100,9 @@
   src: url('../fonts/poppins_800_normal.woff2') format('woff2');
 }
 
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url('../fonts/poppins_800_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url('../fonts/poppins_800_normal.woff2') format('woff2');
-}
-
+/* ============================================================
+   4. OUTFIT (Minimalista, Sofisticada & Contemporánea)
+   ============================================================ */
 @font-face {
   font-family: 'Outfit';
   font-style: normal;
@@ -178,15 +110,6 @@
   font-display: swap;
   src: url('../fonts/outfit_600_normal.woff2') format('woff2');
 }
-
-@font-face {
-  font-family: 'Outfit';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/outfit_600_normal.woff2') format('woff2');
-}
-
 @font-face {
   font-family: 'Outfit';
   font-style: normal;
@@ -195,134 +118,59 @@
   src: url('../fonts/outfit_700_normal.woff2') format('woff2');
 }
 
+/* ============================================================
+   5. DM SANS (Humanista, Fresca & Moderna)
+   ============================================================ */
 @font-face {
-  font-family: 'Outfit';
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/dm_sans_400_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/dm_sans_500_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DM Sans';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('../fonts/outfit_700_normal.woff2') format('woff2');
+  src: url('../fonts/dm_sans_700_normal.woff2') format('woff2');
 }
 
+/* ============================================================
+   6. MONTSERRAT (Urbana, Sólida & Corporativa)
+   ============================================================ */
 @font-face {
-  font-family: 'Fraunces';
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/montserrat_400_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Montserrat';
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url('../fonts/fraunces_600_normal.woff2') format('woff2');
+  src: url('../fonts/montserrat_600_normal.woff2') format('woff2');
 }
-
 @font-face {
-  font-family: 'Fraunces';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/fraunces_600_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fraunces';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/fraunces_600_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fraunces';
+  font-family: 'Montserrat';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('../fonts/fraunces_700_normal.woff2') format('woff2');
+  src: url('../fonts/montserrat_700_normal.woff2') format('woff2');
 }
 
-@font-face {
-  font-family: 'Fraunces';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/fraunces_700_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fraunces';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/fraunces_700_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: italic;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/playfair_display_600_italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: italic;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/playfair_display_600_italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: italic;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/playfair_display_600_italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/playfair_display_600_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/playfair_display_600_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/playfair_display_600_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/playfair_display_700_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/playfair_display_700_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/playfair_display_700_normal.woff2') format('woff2');
-}
-
+/* ============================================================
+   7. OSWALD (Impacto, Condensada - Bares, Hamburguesas & Parrilla)
+   ============================================================ */
 @font-face {
   font-family: 'Oswald';
   font-style: normal;
@@ -330,23 +178,6 @@
   font-display: swap;
   src: url('../fonts/oswald_600_normal.woff2') format('woff2');
 }
-
-@font-face {
-  font-family: 'Oswald';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/oswald_600_normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Oswald';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/oswald_600_normal.woff2') format('woff2');
-}
-
 @font-face {
   font-family: 'Oswald';
   font-style: normal;
@@ -355,19 +186,88 @@
   src: url('../fonts/oswald_700_normal.woff2') format('woff2');
 }
 
+/* ============================================================
+   8. FRAUNCES (Cálida, Artesanal & Gourmet - Brunch & Panadería)
+   ============================================================ */
 @font-face {
-  font-family: 'Oswald';
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/fraunces_600_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fraunces';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('../fonts/oswald_700_normal.woff2') format('woff2');
+  src: url('../fonts/fraunces_700_normal.woff2') format('woff2');
 }
 
+/* ============================================================
+   9. LORA (Bistró, Acogedora & Orgánica - Cafeterías & Trattoria)
+   ============================================================ */
 @font-face {
-  font-family: 'Oswald';
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/lora_400_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/lora_600_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('../fonts/oswald_700_normal.woff2') format('woff2');
+  src: url('../fonts/lora_700_normal.woff2') format('woff2');
 }
 
+/* ============================================================
+   10. PLAYFAIR DISPLAY (Elegante, Clásica & Fina - Alta Cocina)
+   ============================================================ */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/playfair_display_600_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/playfair_display_600_italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/playfair_display_700_normal.woff2') format('woff2');
+}
+
+/* ============================================================
+   11. CORMORANT GARAMOND (Exclusiva, Editorial & Distinguida)
+   ============================================================ */
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/cormorant_garamond_600_normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/cormorant_garamond_700_normal.woff2') format('woff2');
+}
