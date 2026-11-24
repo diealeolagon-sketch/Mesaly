@@ -77,6 +77,10 @@ class AuthController extends Controller
 
         return $this->render('auth/cambiar_password', [
             'title' => 'Actualizar Contraseña — Mesaly',
+            'hero_title_prefix' => '¡Seguridad',
+            'hero_title_highlight' => 'Mesaly!',
+            'hero_desc' => 'Mantén tu cuenta protegida y gestiona tus restaurantes con total tranquilidad y control de accesos.',
+            'hero_mascot' => '/assets/img/landing/waitress-qr-transparent.png',
         ], 'auth');
     }
 

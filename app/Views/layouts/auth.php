@@ -25,16 +25,16 @@
 
             <div class="auth-hero-side-content">
                 <h1 class="auth-hero-side-title">
-                    ¡Hola<br>
-                    <span>Mesaly!</span>
+                    <?= e($hero_title_prefix ?? '¡Hola') ?><br>
+                    <span><?= e($hero_title_highlight ?? 'Mesaly!') ?></span>
                 </h1>
 
                 <p class="auth-hero-side-desc">
-                    Automatiza la toma de pedidos, administra tus mesas con QR inteligente y recibe comandas directas a WhatsApp sin pagar comisiones.
+                    <?= e($hero_desc ?? 'Automatiza la toma de pedidos, administra tus mesas con QR inteligente y recibe comandas directas a WhatsApp sin pagar comisiones.') ?>
                 </p>
 
                 <div class="auth-hero-mascot-container">
-                    <img src="<?= e(asset_url('/assets/img/landing/mascot-manager-waving.png')) ?>" alt="Gerente Mesaly" class="auth-hero-mascot-img">
+                    <img src="<?= e(asset_url($hero_mascot ?? '/assets/img/landing/mascot-manager-waving.png')) ?>" alt="Mascota Mesaly" class="auth-hero-mascot-img">
                 </div>
             </div>
 
