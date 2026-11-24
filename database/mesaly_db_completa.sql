@@ -1,5 +1,5 @@
 -- Mesaly Complete Database Dump
--- Generated: 2026-11-24 21:01:04
+-- Generated: 2026-11-24 21:22:28
 -- Database: mesaly_db
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -25,9 +25,9 @@ CREATE TABLE `auditoria` (
   PRIMARY KEY (`id`),
   KEY `idx_auditoria_restaurante` (`restaurante_id`,`created_at`),
   KEY `idx_auditoria_usuario` (`usuario_id`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for `auditoria` (5 rows)
+-- Dumping data for `auditoria` (6 rows)
 LOCK TABLES `auditoria` WRITE;
 /*!40000 ALTER TABLE `auditoria` DISABLE KEYS */;
 INSERT INTO `auditoria` VALUES
@@ -35,7 +35,8 @@ INSERT INTO `auditoria` VALUES
 (2, 1, 1, 'crear_negocio', 'restaurante', 1, NULL, '{\"slug\": \"cafe-macondo\", \"nombre\": \"Café Macondo\"}', '127.0.0.1', '2026-11-22 10:00:00'),
 (3, 1, 2, 'crear_negocio', 'restaurante', 2, NULL, '{\"slug\": \"pizzeria-di-roma\", \"nombre\": \"Pizzería Di Roma\"}', '127.0.0.1', '2026-11-22 10:30:00'),
 (4, 1, 3, 'crear_negocio', 'restaurante', 3, NULL, '{\"slug\": \"sabor-criollo\", \"nombre\": \"Sabor Criollo Colombiano\"}', '127.0.0.1', '2026-11-22 11:00:00'),
-(5, 1, 1, 'pago_suscripcion_registrado', 'pago_suscripcion', 1, NULL, '{\"monto\": 49000, \"metodo\": \"Wompi\", \"referencia\": \"WOMPI-MESA-001\"}', '127.0.0.1', '2026-11-14 20:37:44');
+(5, 1, 1, 'pago_suscripcion_registrado', 'pago_suscripcion', 1, NULL, '{\"monto\": 49000, \"metodo\": \"Wompi\", \"referencia\": \"WOMPI-MESA-001\"}', '127.0.0.1', '2026-11-14 20:37:44'),
+(6, 1, 2, 'reset_password_admin', 'usuarios', 3, NULL, '{\"email\": \"admin@pizzeriadiroma.co\"}', '::1', '2026-11-24 15:05:25');
 /*!40000 ALTER TABLE `auditoria` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -200,13 +201,17 @@ CREATE TABLE `intentos_login` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_intentos_ip_email` (`ip`,`email`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for `intentos_login` (1 rows)
+-- Dumping data for `intentos_login` (5 rows)
 LOCK TABLES `intentos_login` WRITE;
 /*!40000 ALTER TABLE `intentos_login` DISABLE KEYS */;
 INSERT INTO `intentos_login` VALUES
-(1, '::1', 'admin@mesaly.co', 1, '2026-11-24 15:00:58');
+(1, '::1', 'admin@mesaly.co', 1, '2026-11-24 15:00:58'),
+(2, '::1', 'admin@mesaly.co', 1, '2026-11-24 15:04:24'),
+(3, '::1', 'admin@pizzeriadiroma.co', 1, '2026-11-24 15:06:06'),
+(4, '::1', 'admin@mesaly.co', 1, '2026-11-24 15:10:13'),
+(5, '::1', 'admin@mesaly.co', 1, '2026-11-24 15:22:08');
 /*!40000 ALTER TABLE `intentos_login` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -594,38 +599,38 @@ CREATE TABLE `productos` (
 LOCK TABLES `productos` WRITE;
 /*!40000 ALTER TABLE `productos` DISABLE KEYS */;
 INSERT INTO `productos` VALUES
-(1, 1, 1, 'Café Espresso Doble', 'Extracción doble de café arábica de origen Huila con notas achocolatadas y crema dorada densa.', 5500, NULL, 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(2, 1, 1, 'Cappuccino Italiano', 'Espresso de especialidad combinado con leche texturizada sedosa y fina capa de microespuma.', 8500, NULL, 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(3, 1, 1, 'Latte Vainilla Bourbon', 'Café latte con infusión de sirope artesanal de vainilla natural y un toque sutil de canela.', 9500, NULL, 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(4, 1, 2, 'Tostada de Aguacate & Huevo Poché', 'Pan campesino de masa madre tostado, guacamole rústico, tomates cherry confitados y huevo poché con semillas de chía.', 16500, NULL, 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(5, 1, 2, 'Tostada Francesa Brioche con Frutos Rojos', 'Pan brioche dorado a la mantequilla avellanada, reducción de frutos rojos silvestres, sirope de arce y azúcar glas.', 19000, NULL, 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(6, 1, 2, 'Sandwich Gourmet Jamón Serrano & Brie', 'Pan ciabatta horneado en casa, láminas de jamón serrano reserva, queso brie fundido, rúcula fresca y mermelada de higos.', 22000, NULL, 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(7, 1, 3, 'Croissant de Almendras Horneado', 'Hojaldre 100% mantequilla relleno con crema frangipane y cubierto con almendras laminadas tostadas.', 10000, NULL, 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(8, 1, 3, 'Tarta de Zanahoria & Nuez con Frosting', 'Bizcocho especiado con canela y nueces crujientes, cubierto con suave frosting de queso crema Philadelphia.', 12000, NULL, 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(9, 1, 4, 'Cold Brew Artesanal con Cítricos', 'Extracción en frío durante 18 horas servido sobre rocas de hielo y una fina rodaja de naranja deshidratada.', 10500, NULL, 1, 0, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(10, 1, 4, 'Chai Latte Especiado Frío', 'Té negro con cardamomo, canela, clavo y jengibre mezclado con leche fría y canela en polvo.', 11000, NULL, 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(11, 2, 5, 'Pizza Margarita Clásica Napolitana', 'Salsa pomodoro San Marzano, mozzarella fior di latte fundida, albahaca fresca del huerto y aceite de oliva virgen extra.', 34000, NULL, 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(12, 2, 5, 'Pizza Pepperoni Rústica Artesanal', 'Base pomodoro, doble capa de mozzarella hilada, abundante pepperoni italiano artesanal crocante y orégano seco.', 39000, NULL, 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(13, 2, 5, 'Pizza Cuatro Quesos DOP Italiana', 'Exquisita combinación de mozzarella, gorgonzola cremoso, fontina fundida y parmigiano reggiano madurado.', 42000, NULL, 1, 1, 3, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(14, 2, 5, 'Pizza Prosciutto & Rúcula Fresca', 'Salsa pomodoro, mozzarella fresca, finas lonchas de jamón serrano prosciutto crudo, rúcula fresca y lascas de parmesano.', 46000, NULL, 1, 0, 4, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(15, 2, 6, 'Lasagna Tradicional Boloñesa al Horno', 'Capas de pasta artesanal al huevo con ragú boloñesa de carne seleccionada a cocción lenta, bechamel cremosa y gratín de queso.', 32000, NULL, 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(16, 2, 6, 'Fettuccine Alfredo con Pollo & Champiñones', 'Pasta fresca bañada en cremosa salsa Alfredo a base de mantequilla y parmesano, pechuga a la plancha y champiñones salteados.', 30000, NULL, 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(17, 2, 7, 'Tiramisú Tradicional de Café & Mascarpone', 'Savoiardi empapados en café espresso fuerte y licor de café, capas de suave crema mascarpone y lluvia de cacao amargo.', 16000, NULL, 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(18, 2, 7, 'Panna Cotta Artesanal con Frutos Rojos', 'Postre cremoso de crema de leche aromatizada con vainilla natural servido con coulis casero de moras y arándanos.', 14000, NULL, 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(19, 2, 8, 'Limonada de Coco Cremosita', 'Zumo de limón fresco batido con crema de coco natural y hielo frappé refrescante.', 11000, NULL, 1, 0, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(20, 2, 8, 'Cerveza Moretti Italiana 330ml', 'Auténtica cerveza rubia italiana con notas maltosas suaves y final refrescante.', 15000, NULL, 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(21, 3, 9, 'Bandeja Paisa Tradicional Completa', 'El orgullo antioqueño: chicharrón carnudo de 6 patas, fríjoles con pezuña, carne molida sazonada, chorizo santarrosano, huevo frito criollo, tajada de maduro, porción de arroz, aguacate hass y arepa blanca.', 38000, NULL, 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(22, 3, 9, 'Churrasco a la Parrilla 350g con Chimichurri', 'Corte tierno de res a la brasa de leña, acompañado de papa salada cocida, tajadas de plátano maduro con queso y ensalada fresca.', 42000, NULL, 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(23, 3, 10, 'Ajiaco Santafereño con Pollo Desmechado', 'Sopa tradicional bogotana con tres tipos de papa (criolla, pastusa y sabanera), pechuga desmechada, mazorca tierna, servido con alcaparras, crema de leche y aguacate.', 32000, NULL, 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(24, 3, 10, 'Sancocho Trifásico Tradicional de Campo', 'Caldo espeso con carne de res, pollo de campo y cerdo, yuca harinosa, plátano verde, mazorca y cilantro fresco. Servido con arroz y aguacate.', 34000, NULL, 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(25, 3, 10, 'Cazuela de Mariscos del Pacífico Colombiano', 'Frutos del mar seleccionados (camarones, calamares, mejillones y pescado) guisados en leche de coco y especias criollas. Servido con arroz con coco y patacones.', 44000, NULL, 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(26, 3, 11, 'Picada Criolla Mixta para 2 Personas', 'Generosa picada con trozos de chicharrón crocante, costilla de cerdo ahumada, chorizo criollo, morcilla campesina, papas criollas doradas, plátano maduro y arepitas con ají.', 48000, NULL, 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(27, 3, 11, 'Canasta de Empanaditas Vallunas (5 unidades)', 'Empanadas doradas y crocantes de masa de maíz amarillo rellenas de papa y carne criolla, acompañadas de ají casero picantico y limón.', 15000, NULL, 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(28, 3, 11, 'Arepa de Chócolo con Quesito Campesino', 'Arepa dulce de maíz tierno asada en parrilla con abundante mantequilla y generosa capa de quesito campesino antioqueño.', 12000, NULL, 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(29, 3, 12, 'Jugo Natural de Lulo Colombiano', 'Pulpa 100% natural de lulo fresco del Valle, servido bien frío en agua o en leche cremosa según tu preferencia.', 8500, NULL, 1, 0, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(30, 3, 12, 'Jugo Natural de Maracuyá Silvestre', 'Exquisita acidez y frescura de la maracuyá colombiana, batido al instante con hielo frappé.', 8500, NULL, 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(31, 3, 12, 'Limonada de Panela con Jengibre y Menta', 'Bebida campesina de aguapanela fría con jugo de limón mandarino fresco, infusión ligera de jengibre y hojas de menta.', 7000, NULL, 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(32, 3, 13, 'Brevas en Almíbar con Arequipe & Queso', 'Postre de tradición colonial: brevas tiernas en almíbar de panela y canela servidas con arequipe de leche y tajada de queso fresco.', 10000, NULL, 1, 0, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL);
+(1, 1, 1, 'Café Espresso Doble', 'Extracción doble de café arábica de origen Huila con notas achocolatadas y crema dorada densa.', 5500, 'uploads/cafe_macondo/espresso_doble.jpg', 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(2, 1, 1, 'Cappuccino Italiano', 'Espresso de especialidad combinado con leche texturizada sedosa y fina capa de microespuma.', 8500, 'uploads/cafe_macondo/cappuccino_italiano.jpg', 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(3, 1, 1, 'Latte Vainilla Bourbon', 'Café latte con infusión de sirope artesanal de vainilla natural y un toque sutil de canela.', 9500, 'uploads/cafe_macondo/latte_vainilla.jpg', 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(4, 1, 2, 'Tostada de Aguacate & Huevo Poché', 'Pan campesino de masa madre tostado, guacamole rústico, tomates cherry confitados y huevo poché con semillas de chía.', 16500, 'uploads/cafe_macondo/tostada_aguacate.jpg', 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(5, 1, 2, 'Tostada Francesa Brioche con Frutos Rojos', 'Pan brioche dorado a la mantequilla avellanada, reducción de frutos rojos silvestres, sirope de arce y azúcar glas.', 19000, 'uploads/cafe_macondo/tostada_francesa.jpg', 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(6, 1, 2, 'Sandwich Gourmet Jamón Serrano & Brie', 'Pan ciabatta horneado en casa, láminas de jamón serrano reserva, queso brie fundido, rúcula fresca y mermelada de higos.', 22000, 'uploads/cafe_macondo/sandwich_brie.jpg', 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(7, 1, 3, 'Croissant de Almendras Horneado', 'Hojaldre 100% mantequilla relleno con crema frangipane y cubierto con almendras laminadas tostadas.', 10000, 'uploads/cafe_macondo/croissant_almendras.jpg', 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(8, 1, 3, 'Tarta de Zanahoria & Nuez con Frosting', 'Bizcocho especiado con canela y nueces crujientes, cubierto con suave frosting de queso crema Philadelphia.', 12000, 'uploads/cafe_macondo/tarta_zanahoria.jpg', 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(9, 1, 4, 'Cold Brew Artesanal con Cítricos', 'Extracción en frío durante 18 horas servido sobre rocas de hielo y una fina rodaja de naranja deshidratada.', 10500, 'uploads/cafe_macondo/cold_brew.jpg', 1, 0, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(10, 1, 4, 'Chai Latte Especiado Frío', 'Té negro con cardamomo, canela, clavo y jengibre mezclado con leche fría y canela en polvo.', 11000, 'uploads/cafe_macondo/chai_latte.jpg', 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(11, 2, 5, 'Pizza Margarita Clásica Napolitana', 'Salsa pomodoro San Marzano, mozzarella fior di latte fundida, albahaca fresca del huerto y aceite de oliva virgen extra.', 34000, 'uploads/pizzeria_di_roma/pizza_margarita.jpg', 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(12, 2, 5, 'Pizza Pepperoni Rústica Artesanal', 'Base pomodoro, doble capa de mozzarella hilada, abundante pepperoni italiano artesanal crocante y orégano seco.', 39000, 'uploads/pizzeria_di_roma/pizza_pepperoni.jpg', 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(13, 2, 5, 'Pizza Cuatro Quesos DOP Italiana', 'Exquisita combinación de mozzarella, gorgonzola cremoso, fontina fundida y parmigiano reggiano madurado.', 42000, 'uploads/pizzeria_di_roma/pizza_cuatro_quesos.jpg', 1, 1, 3, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(14, 2, 5, 'Pizza Prosciutto & Rúcula Fresca', 'Salsa pomodoro, mozzarella fresca, finas lonchas de jamón serrano prosciutto crudo, rúcula fresca y lascas de parmesano.', 46000, 'uploads/pizzeria_di_roma/pizza_prosciutto.jpg', 1, 0, 4, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(15, 2, 6, 'Lasagna Tradicional Boloñesa al Horno', 'Capas de pasta artesanal al huevo con ragú boloñesa de carne seleccionada a cocción lenta, bechamel cremosa y gratín de queso.', 32000, 'uploads/pizzeria_di_roma/lasagna_bolonesa.jpg', 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(16, 2, 6, 'Fettuccine Alfredo con Pollo & Champiñones', 'Pasta fresca bañada en cremosa salsa Alfredo a base de mantequilla y parmesano, pechuga a la plancha y champiñones salteados.', 30000, 'uploads/pizzeria_di_roma/fettuccine_alfredo.jpg', 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(17, 2, 7, 'Tiramisú Tradicional de Café & Mascarpone', 'Savoiardi empapados en café espresso fuerte y licor de café, capas de suave crema mascarpone y lluvia de cacao amargo.', 16000, 'uploads/pizzeria_di_roma/tiramisu_italiano.jpg', 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(18, 2, 7, 'Panna Cotta Artesanal con Frutos Rojos', 'Postre cremoso de crema de leche aromatizada con vainilla natural servido con coulis casero de moras y arándanos.', 14000, 'uploads/pizzeria_di_roma/panna_cotta.jpg', 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(19, 2, 8, 'Limonada de Coco Cremosita', 'Zumo de limón fresco batido con crema de coco natural y hielo frappé refrescante.', 11000, 'uploads/pizzeria_di_roma/limonada_coco.jpg', 1, 0, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(20, 2, 8, 'Cerveza Moretti Italiana 330ml', 'Auténtica cerveza rubia italiana con notas maltosas suaves y final refrescante.', 15000, 'uploads/pizzeria_di_roma/cerveza_moretti.jpg', 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(21, 3, 9, 'Bandeja Paisa Tradicional Completa', 'El orgullo antioqueño: chicharrón carnudo de 6 patas, fríjoles con pezuña, carne molida sazonada, chorizo santarrosano, huevo frito criollo, tajada de maduro, porción de arroz, aguacate hass y arepa blanca.', 38000, 'uploads/sabor_criollo/bandeja_paisa.jpg', 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(22, 3, 9, 'Churrasco a la Parrilla 350g con Chimichurri', 'Corte tierno de res a la brasa de leña, acompañado de papa salada cocida, tajadas de plátano maduro con queso y ensalada fresca.', 42000, 'uploads/sabor_criollo/churrasco_parrilla.jpg', 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(23, 3, 10, 'Ajiaco Santafereño con Pollo Desmechado', 'Sopa tradicional bogotana con tres tipos de papa (criolla, pastusa y sabanera), pechuga desmechada, mazorca tierna, servido con alcaparras, crema de leche y aguacate.', 32000, 'uploads/sabor_criollo/ajiaco_santafereno.jpg', 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(24, 3, 10, 'Sancocho Trifásico Tradicional de Campo', 'Caldo espeso con carne de res, pollo de campo y cerdo, yuca harinosa, plátano verde, mazorca y cilantro fresco. Servido con arroz y aguacate.', 34000, 'uploads/sabor_criollo/sancocho_trifasico.jpg', 1, 1, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(25, 3, 10, 'Cazuela de Mariscos del Pacífico Colombiano', 'Frutos del mar seleccionados (camarones, calamares, mejillones y pescado) guisados en leche de coco y especias criollas. Servido con arroz con coco y patacones.', 44000, 'uploads/sabor_criollo/cazuela_mariscos.jpg', 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(26, 3, 11, 'Picada Criolla Mixta para 2 Personas', 'Generosa picada con trozos de chicharrón crocante, costilla de cerdo ahumada, chorizo criollo, morcilla campesina, papas criollas doradas, plátano maduro y arepitas con ají.', 48000, 'uploads/sabor_criollo/picada_criolla.jpg', 1, 1, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(27, 3, 11, 'Canasta de Empanaditas Vallunas (5 unidades)', 'Empanadas doradas y crocantes de masa de maíz amarillo rellenas de papa y carne criolla, acompañadas de ají casero picantico y limón.', 15000, 'uploads/sabor_criollo/empanadas_vallunas.jpg', 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(28, 3, 11, 'Arepa de Chócolo con Quesito Campesino', 'Arepa dulce de maíz tierno asada en parrilla con abundante mantequilla y generosa capa de quesito campesino antioqueño.', 12000, 'uploads/sabor_criollo/arepa_chocolo.jpg', 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(29, 3, 12, 'Jugo Natural de Lulo Colombiano', 'Pulpa 100% natural de lulo fresco del Valle, servido bien frío en agua o en leche cremosa según tu preferencia.', 8500, 'uploads/sabor_criollo/jugo_lulo.jpg', 1, 0, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(30, 3, 12, 'Jugo Natural de Maracuyá Silvestre', 'Exquisita acidez y frescura de la maracuyá colombiana, batido al instante con hielo frappé.', 8500, 'uploads/sabor_criollo/jugo_maracuya.jpg', 1, 0, 2, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(31, 3, 12, 'Limonada de Panela con Jengibre y Menta', 'Bebida campesina de aguapanela fría con jugo de limón mandarino fresco, infusión ligera de jengibre y hojas de menta.', 7000, 'uploads/sabor_criollo/limonada_panela.jpg', 1, 0, 3, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL),
+(32, 3, 13, 'Brevas en Almíbar con Arequipe & Queso', 'Postre de tradición colonial: brevas tiernas en almíbar de panela y canela servidas con arequipe de leche y tajada de queso fresco.', 10000, 'uploads/sabor_criollo/brevas_arequipe.jpg', 1, 0, 1, '2026-11-24 14:37:44', '2026-11-24 15:21:12', NULL);
 /*!40000 ALTER TABLE `productos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -684,9 +689,9 @@ CREATE TABLE `restaurantes` (
 LOCK TABLES `restaurantes` WRITE;
 /*!40000 ALTER TABLE `restaurantes` DISABLE KEYS */;
 INSERT INTO `restaurantes` VALUES
-(1, 'Café Macondo', 'cafe-macondo', 'Cafetería de especialidad, brunch de autor y repostería artesanal. Café 100% colombiano de origen tostado en casa.', NULL, NULL, '#B45309', '#F59E0B', '#FFFBEB', '#1E1B18', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 4000, 15000, NULL, 49000, 'pro', 20, 500, 0, NULL, 1, 'mensual', '2026-12-24', 3, NULL, 0, NULL, NULL, '2026-11-24 15:00:58', 1, '2026-11-24 14:37:44', '2026-11-24 15:00:58', NULL),
-(2, 'Pizzería Di Roma', 'pizzeria-di-roma', 'Auténtica trattoria y pizzería napolitana artesanal. Masa madre con 48h de fermentación lenta, mozzarella di bufala y horno a la piedra.', NULL, NULL, '#DC2626', '#EF4444', '#FEF2F2', '#18181B', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 5000, 25000, NULL, 49000, 'pro', 25, 500, 0, NULL, 1, 'mensual', '2026-12-20', 3, NULL, 0, NULL, NULL, '2026-11-24 15:00:58', 1, '2026-11-24 14:37:44', '2026-11-24 15:00:58', NULL),
-(3, 'Sabor Criollo Colombiano', 'sabor-criollo', 'Auténtica sazón tradicional colombiana. Bandeja paisa completa, ajiaco santafereño, sancocho de leña, picadas mixtas y jugos naturales.', NULL, NULL, '#EA580C', '#F97316', '#FFF7ED', '#1C1917', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 6000, 20000, NULL, 49000, 'pro', 30, 500, 0, NULL, 1, 'mensual', '2026-12-22', 3, NULL, 0, NULL, NULL, '2026-11-24 15:00:58', 1, '2026-11-24 14:37:44', '2026-11-24 15:00:58', NULL);
+(1, 'Café Macondo', 'cafe-macondo', 'Cafetería de especialidad, brunch de autor y repostería artesanal. Café 100% colombiano de origen tostado en casa.', 'uploads/cafe_macondo/logo_cafe_macondo.jpg', 'uploads/cafe_macondo/banner_cafe_macondo.jpg', '#B45309', '#F59E0B', '#FFFBEB', '#1E1B18', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 4000, 15000, NULL, 49000, 'pro', 20, 500, 0, NULL, 1, 'mensual', '2026-12-24', 3, NULL, 0, NULL, NULL, '2026-11-24 15:22:09', 1, '2026-11-24 14:37:44', '2026-11-24 15:22:09', NULL),
+(2, 'Pizzería Di Roma', 'pizzeria-di-roma', 'Auténtica trattoria y pizzería napolitana artesanal. Masa madre con 48h de fermentación lenta, mozzarella di bufala y horno a la piedra.', 'uploads/pizzeria_di_roma/logo_pizzeria_di_roma.jpg', 'uploads/pizzeria_di_roma/banner_pizzeria_di_roma.jpg', '#DC2626', '#EF4444', '#FEF2F2', '#18181B', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 5000, 25000, NULL, 49000, 'pro', 25, 500, 0, NULL, 1, 'mensual', '2026-12-20', 3, NULL, 0, NULL, NULL, '2026-11-24 15:22:09', 1, '2026-11-24 14:37:44', '2026-11-24 15:22:09', NULL),
+(3, 'Sabor Criollo Colombiano', 'sabor-criollo', 'Auténtica sazón tradicional colombiana. Bandeja paisa completa, ajiaco santafereño, sancocho de leña, picadas mixtas y jugos naturales.', 'uploads/sabor_criollo/logo_sabor_criollo.jpg', 'uploads/sabor_criollo/banner_sabor_criollo.jpg', '#EA580C', '#F97316', '#FFF7ED', '#1C1917', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 6000, 20000, NULL, 49000, 'pro', 30, 500, 0, NULL, 1, 'mensual', '2026-12-22', 3, NULL, 0, NULL, NULL, '2026-11-24 15:22:09', 1, '2026-11-24 14:37:44', '2026-11-24 15:22:09', NULL);
 /*!40000 ALTER TABLE `restaurantes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -717,9 +722,9 @@ CREATE TABLE `usuarios` (
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
 INSERT INTO `usuarios` VALUES
-(1, NULL, 'Super Admin Mesaly', 'admin@mesaly.co', '$argon2id$v=19$m=65536,t=4,p=1$RTRvNzJ3M25xRWNxeU16TA$gvDKzfxk9rmhQKcoTQunTB/j93gCua/kgiNiuVRf1/w', 'super_admin', 0, 1, '2026-11-24 15:00:58', '2026-11-24 14:37:44', '2026-11-24 15:00:58'),
+(1, NULL, 'Super Admin Mesaly', 'admin@mesaly.co', '$argon2id$v=19$m=65536,t=4,p=1$RTRvNzJ3M25xRWNxeU16TA$gvDKzfxk9rmhQKcoTQunTB/j93gCua/kgiNiuVRf1/w', 'super_admin', 0, 1, '2026-11-24 15:22:08', '2026-11-24 14:37:44', '2026-11-24 15:22:08'),
 (2, 1, 'Admin Café Macondo', 'admin@cafemacondo.co', '$argon2id$v=19$m=65536,t=4,p=1$anZNSXZ4eHhPcUJMWi8wVQ$1cROCxfqhN41mq30jTm2QLQjuw0kvJc3BCwdhoH/E0k', 'admin_negocio', 0, 1, '2026-11-24 20:54:02', '2026-11-24 14:37:44', '2026-11-24 14:54:02'),
-(3, 2, 'Admin Pizzería Di Roma', 'admin@pizzeriadiroma.co', '$argon2id$v=19$m=65536,t=4,p=1$dEZORFcvV1lmS3N0a2RIVw$CWWI4TF8DW+nY3L4dbmJDyNfCAsWXbWwna0F8lLtPoA', 'admin_negocio', 0, 1, '2026-11-24 20:54:03', '2026-11-24 14:37:44', '2026-11-24 14:54:03'),
+(3, 2, 'Admin Pizzería Di Roma', 'admin@pizzeriadiroma.co', '$argon2id$v=19$m=65536,t=4,p=1$aU8vdFFKTFFxaHJTNkFwNw$qqFNb4tvUBKb9AYXVioom4tOwtS8UbCinnb8wUKYr2c', 'admin_negocio', 0, 1, '2026-11-24 15:06:06', '2026-11-24 14:37:44', '2026-11-24 15:07:05'),
 (4, 3, 'Admin Sabor Criollo', 'admin@saborcriollo.co', '$argon2id$v=19$m=65536,t=4,p=1$eVFyTnFlbmFqTUxPYzhuVw$99w9cQ7Q9uRbUw8KmAckQCMCZUnqSpUosjX2d6TiTfs', 'admin_negocio', 0, 1, '2026-11-24 20:54:03', '2026-11-24 14:37:44', '2026-11-24 14:54:03');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
