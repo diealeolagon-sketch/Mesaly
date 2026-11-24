@@ -102,6 +102,55 @@ class DashboardController extends Controller
         return $this->back();
     }
 
+    /**
+     * Procesa el pago de suscripción SaaS del restaurante a Mesaly (integración Wompi)
+     */
+    public function pagarSuscripcion(Request $request): Response
+    {
+        $tenantId = Auth::tenantId();
+        if (!$tenantId) {
+            return $this->redirect(app_url('/login'));
+        }
+
+        $restaurante = $this->restauranteModel->find($tenantId);
+        if (!$restaurante) {
+            return $this->redirect(app_url('/login'));
+        }
+
+        $periodos = max(1, min(12, (int)$request->post('periodos', 1)));
+        $metodoSeleccionado = trim((string)$request->post('metodo', 'Wompi - Tarjeta / PSE'));
+        $referencia = 'WOMPI-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+        $precioUnitario = (int)($restaurante['precio'] ?? 49000);
+        $montoTotal = $precioUnitario * $periodos;
+
+        try {
+            $resultado = SuscripcionService::registrarPago(
+                $tenantId,
+                [
+                    'monto' => $montoTotal,
+                    'fecha_pago' => date('Y-m-d'),
+                    'periodos' => $periodos,
+                    'metodo' => $metodoSeleccionado,
+                    'referencia' => $referencia,
+                    'nota' => "Pago online de suscripción SaaS procesado por el comercio vía Wompi ({$periodos} mes/es).",
+                ],
+                Auth::id() ?? 1
+            );
+
+            // Actualizar datos de sesión del tenant
+            $restauranteActualizado = $this->restauranteModel->find($tenantId);
+            TenantContext::setTenant($restauranteActualizado);
+
+            $diasRenovados = $periodos * 30;
+            $fechaNuevaFmt = date('d/m/Y', strtotime($resultado['nueva_fecha_vencimiento']));
+            Session::flash('success', "¡Pago procesado exitosamente por Wompi! Ref: {$referencia}. Tu suscripción Mesaly Pro ha sido renovada por {$diasRenovados} días (Nuevo vencimiento: {$fechaNuevaFmt}).");
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Ocurrió un error al procesar el pago: ' . $e->getMessage());
+        }
+
+        return $this->redirect(app_url('/admin'));
+    }
+
     public function suscripcionVencida(Request $request): Response
     {
         $tenant = TenantContext::getTenant();

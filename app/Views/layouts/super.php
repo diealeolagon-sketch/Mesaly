@@ -37,6 +37,10 @@
                     <?= icon('chart', 16) ?>
                     <span>Métricas Globales</span>
                 </a>
+                <a href="<?= e(app_url('/superadmin/logs')) ?>" class="nav-link-item <?= str_contains($currentUri, '/superadmin/logs') ? 'active' : '' ?>">
+                    <?= icon('settings', 16) ?>
+                    <span>Logs del Sistema</span>
+                </a>
             </nav>
 
             <div class="nav-user-actions flex items-center gap-3">

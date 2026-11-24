@@ -63,6 +63,7 @@ $router->post('/superadmin/dejar-ver-como', [NegocioController::class, 'dejarVer
 $router->get('/superadmin/pagos', [NegocioController::class, 'pagos'], $superMiddlewares);
 $router->get('/superadmin/negocios/{id}/pagos-json', [NegocioController::class, 'historialPagosJson'], $superMiddlewares);
 $router->get('/superadmin/metricas', [NegocioController::class, 'metricas'], $superMiddlewares);
+$router->get('/superadmin/logs', [NegocioController::class, 'logs'], $superMiddlewares);
 
 // -----------------------------------------------------------------------------
 // Admin de Negocio (/admin)
@@ -74,6 +75,7 @@ $adminPostMiddlewares = [new AuthMiddleware(), new TenantMiddleware(), new Suscr
 $router->get('/admin/suscripcion-vencida', [AdminDashboardController::class, 'suscripcionVencida'], $adminBaseMiddlewares);
 $router->get('/admin', [AdminDashboardController::class, 'index'], $adminMiddlewares);
 $router->post('/admin/toggle-recibiendo-pedidos', [AdminDashboardController::class, 'toggleRecibiendoPedidos'], $adminPostMiddlewares);
+$router->post('/admin/pagar-suscripcion', [AdminDashboardController::class, 'pagarSuscripcion'], $adminPostMiddlewares);
 
 // Pedidos en Vivo y Operación (Fase 3)
 $router->get('/admin/pedidos/poll-nuevos', [PedidoAdminController::class, 'pollNuevos'], $adminMiddlewares);
