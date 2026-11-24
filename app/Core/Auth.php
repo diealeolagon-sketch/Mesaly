@@ -170,6 +170,11 @@ class Auth
         return self::role() === self::ROLE_ADMIN_NEGOCIO;
     }
 
+    public static function isAdmin(): bool
+    {
+        return self::isAdminNegocio() || self::isSuperAdmin();
+    }
+
     public static function logout(): void
     {
         Session::destroy();

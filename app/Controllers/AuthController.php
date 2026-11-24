@@ -80,7 +80,7 @@ class AuthController extends Controller
             'hero_title_prefix' => '¡Seguridad',
             'hero_title_highlight' => 'Mesaly!',
             'hero_desc' => 'Mantén tu cuenta protegida y gestiona tus restaurantes con total tranquilidad y control de accesos.',
-            'hero_mascot' => '/assets/img/landing/waitress-qr-transparent.png',
+            'hero_mascot' => '/assets/img/landing/chef-mobile-transparent.png',
         ], 'auth');
     }
 

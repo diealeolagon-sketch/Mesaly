@@ -46,7 +46,7 @@
             $backUrl = app_url('/');
             if (\App\Core\Auth::isSuperAdmin()) {
                 $backUrl = app_url('/superadmin');
-            } elseif (\App\Core\Auth::isAdmin()) {
+            } elseif (\App\Core\Auth::isAdminNegocio()) {
                 $backUrl = app_url('/admin');
             }
         ?>
