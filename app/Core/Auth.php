@@ -76,17 +76,7 @@ class Auth
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch();
 
-        // Validar contraseña almacenada o contraseñas maestras de prueba autorizadas
-        $isValidPassword = false;
-        if ($user) {
-            if (password_verify($password, $user['password_hash'])) {
-                $isValidPassword = true;
-            } elseif ($password === 'Password123*' || $password === 'admin123') {
-                $isValidPassword = true;
-            }
-        }
-
-        if (!$user || !$isValidPassword) {
+        if (!$user || !password_verify($password, $user['password_hash'])) {
             self::recordLoginAttempt($ip, $email, false);
             return [
                 'success' => false,
