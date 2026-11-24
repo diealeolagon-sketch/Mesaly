@@ -1,5 +1,5 @@
 -- Mesaly Complete Database Dump
--- Generated: 2026-11-24 20:37:51
+-- Generated: 2026-11-24 20:54:19
 -- Database: mesaly_db
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -200,18 +200,7 @@ CREATE TABLE `intentos_login` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_intentos_ip_email` (`ip`,`email`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dumping data for `intentos_login` (4 rows)
-LOCK TABLES `intentos_login` WRITE;
-/*!40000 ALTER TABLE `intentos_login` DISABLE KEYS */;
-INSERT INTO `intentos_login` VALUES
-(1, '127.0.0.1', 'admin@mesaly.co', 1, '2026-11-24 19:37:44'),
-(2, '127.0.0.1', 'admin@cafemacondo.co', 1, '2026-11-24 18:37:44'),
-(3, '127.0.0.1', 'admin@pizzeriadiroma.co', 1, '2026-11-24 17:37:44'),
-(4, '127.0.0.1', 'admin@saborcriollo.co', 1, '2026-11-24 16:37:44');
-/*!40000 ALTER TABLE `intentos_login` ENABLE KEYS */;
-UNLOCK TABLES;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 -- Table structure for `mesas`
@@ -687,9 +676,9 @@ CREATE TABLE `restaurantes` (
 LOCK TABLES `restaurantes` WRITE;
 /*!40000 ALTER TABLE `restaurantes` DISABLE KEYS */;
 INSERT INTO `restaurantes` VALUES
-(1, 'Café Macondo', 'cafe-macondo', 'Cafetería de especialidad, brunch de autor y repostería artesanal. Café 100% colombiano de origen tostado en casa.', NULL, NULL, '#B45309', '#F59E0B', '#FFFBEB', '#1E1B18', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 4000, 15000, NULL, 49000, 'pro', 20, 500, 0, NULL, 1, 'mensual', '2026-12-24', 3, NULL, 0, NULL, NULL, NULL, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(2, 'Pizzería Di Roma', 'pizzeria-di-roma', 'Auténtica trattoria y pizzería napolitana artesanal. Masa madre con 48h de fermentación lenta, mozzarella di bufala y horno a la piedra.', NULL, NULL, '#DC2626', '#EF4444', '#FEF2F2', '#18181B', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 5000, 25000, NULL, 49000, 'pro', 25, 500, 0, NULL, 1, 'mensual', '2026-12-20', 3, NULL, 0, NULL, NULL, NULL, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL),
-(3, 'Sabor Criollo Colombiano', 'sabor-criollo', 'Auténtica sazón tradicional colombiana. Bandeja paisa completa, ajiaco santafereño, sancocho de leña, picadas mixtas y jugos naturales.', NULL, NULL, '#EA580C', '#F97316', '#FFF7ED', '#1C1917', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 6000, 20000, NULL, 49000, 'pro', 30, 500, 0, NULL, 1, 'mensual', '2026-12-22', 3, NULL, 0, NULL, NULL, NULL, 1, '2026-11-24 14:37:44', '2026-11-24 14:37:44', NULL);
+(1, 'Café Macondo', 'cafe-macondo', 'Cafetería de especialidad, brunch de autor y repostería artesanal. Café 100% colombiano de origen tostado en casa.', NULL, NULL, '#B45309', '#F59E0B', '#FFFBEB', '#1E1B18', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 4000, 15000, NULL, 49000, 'pro', 20, 500, 0, NULL, 1, 'mensual', '2026-12-24', 3, NULL, 0, NULL, NULL, '2026-11-24 14:39:58', 1, '2026-11-24 14:37:44', '2026-11-24 14:39:58', NULL),
+(2, 'Pizzería Di Roma', 'pizzeria-di-roma', 'Auténtica trattoria y pizzería napolitana artesanal. Masa madre con 48h de fermentación lenta, mozzarella di bufala y horno a la piedra.', NULL, NULL, '#DC2626', '#EF4444', '#FEF2F2', '#18181B', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 5000, 25000, NULL, 49000, 'pro', 25, 500, 0, NULL, 1, 'mensual', '2026-12-20', 3, NULL, 0, NULL, NULL, '2026-11-24 14:39:58', 1, '2026-11-24 14:37:44', '2026-11-24 14:39:58', NULL),
+(3, 'Sabor Criollo Colombiano', 'sabor-criollo', 'Auténtica sazón tradicional colombiana. Bandeja paisa completa, ajiaco santafereño, sancocho de leña, picadas mixtas y jugos naturales.', NULL, NULL, '#EA580C', '#F97316', '#FFF7ED', '#1C1917', 'Inter', 573248670360, 'COP', 1, 1, 1, 1, 6000, 20000, NULL, 49000, 'pro', 30, 500, 0, NULL, 1, 'mensual', '2026-12-22', 3, NULL, 0, NULL, NULL, '2026-11-24 14:39:58', 1, '2026-11-24 14:37:44', '2026-11-24 14:39:58', NULL);
 /*!40000 ALTER TABLE `restaurantes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -720,10 +709,10 @@ CREATE TABLE `usuarios` (
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
 INSERT INTO `usuarios` VALUES
-(1, NULL, 'Super Admin Mesaly', 'admin@mesaly.co', '$2y$10$abMsPFYIBWW1pChArMMh.uRSGr5oo2b91AldhXeT6D4ZgSe1f5Zr2', 'super_admin', 0, 1, NULL, '2026-11-24 14:37:44', '2026-11-24 14:37:44'),
-(2, 1, 'Admin Café Macondo', 'admin@cafemacondo.co', '$2y$10$abMsPFYIBWW1pChArMMh.uRSGr5oo2b91AldhXeT6D4ZgSe1f5Zr2', 'admin_negocio', 0, 1, NULL, '2026-11-24 14:37:44', '2026-11-24 14:37:44'),
-(3, 2, 'Admin Pizzería Di Roma', 'admin@pizzeriadiroma.co', '$2y$10$abMsPFYIBWW1pChArMMh.uRSGr5oo2b91AldhXeT6D4ZgSe1f5Zr2', 'admin_negocio', 0, 1, NULL, '2026-11-24 14:37:44', '2026-11-24 14:37:44'),
-(4, 3, 'Admin Sabor Criollo', 'admin@saborcriollo.co', '$2y$10$abMsPFYIBWW1pChArMMh.uRSGr5oo2b91AldhXeT6D4ZgSe1f5Zr2', 'admin_negocio', 0, 1, NULL, '2026-11-24 14:37:44', '2026-11-24 14:37:44');
+(1, NULL, 'Super Admin Mesaly', 'admin@mesaly.co', '$argon2id$v=19$m=65536,t=4,p=1$dnd2RHJ3SGZJcGJObHYuVg$EW10RdQ4HF6aVMFuzwRgG6TOdmLYjOoZXzbGS9RNA0k', 'super_admin', 0, 1, '2026-11-24 20:54:02', '2026-11-24 14:37:44', '2026-11-24 14:54:02'),
+(2, 1, 'Admin Café Macondo', 'admin@cafemacondo.co', '$argon2id$v=19$m=65536,t=4,p=1$anZNSXZ4eHhPcUJMWi8wVQ$1cROCxfqhN41mq30jTm2QLQjuw0kvJc3BCwdhoH/E0k', 'admin_negocio', 0, 1, '2026-11-24 20:54:02', '2026-11-24 14:37:44', '2026-11-24 14:54:02'),
+(3, 2, 'Admin Pizzería Di Roma', 'admin@pizzeriadiroma.co', '$argon2id$v=19$m=65536,t=4,p=1$dEZORFcvV1lmS3N0a2RIVw$CWWI4TF8DW+nY3L4dbmJDyNfCAsWXbWwna0F8lLtPoA', 'admin_negocio', 0, 1, '2026-11-24 20:54:03', '2026-11-24 14:37:44', '2026-11-24 14:54:03'),
+(4, 3, 'Admin Sabor Criollo', 'admin@saborcriollo.co', '$argon2id$v=19$m=65536,t=4,p=1$eVFyTnFlbmFqTUxPYzhuVw$99w9cQ7Q9uRbUw8KmAckQCMCZUnqSpUosjX2d6TiTfs', 'admin_negocio', 0, 1, '2026-11-24 20:54:03', '2026-11-24 14:37:44', '2026-11-24 14:54:03');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
