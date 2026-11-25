@@ -268,9 +268,9 @@
                                             data-nombre="<?= e($neg['nombre']) ?>" 
                                             data-precio="<?= (int)($neg['precio'] ?? 49000) ?>"
                                             data-ciclo="<?= e($neg['ciclo'] ?? 'mensual') ?>"
-                                            title="Registrar pago y renovar suscripción (+1 mes calendario)">
+                                            title="Registrar pago y renovar suscripción (+30 días)">
                                         <?= icon('cash', 13) ?>
-                                        <span>Renovar (+1 Mes)</span>
+                                        <span>Renovar (+30 Días)</span>
                                     </button>
 
                                     <!-- 2. Botón WhatsApp: Cobrar / Recordatorio -->
@@ -396,11 +396,11 @@
                     <div class="form-group">
                         <label for="pago_periodos" class="form-label">Cantidad de Períodos *</label>
                         <select id="pago_periodos" name="periodos" class="form-control" required>
-                            <option value="1" selected>1 período</option>
-                            <option value="2">2 períodos</option>
-                            <option value="3">3 períodos</option>
-                            <option value="6">6 períodos (semestral)</option>
-                            <option value="12">12 períodos (anual)</option>
+                            <option value="1" selected>1 período (30 días)</option>
+                            <option value="2">2 períodos (60 días)</option>
+                            <option value="3">3 períodos (90 días)</option>
+                            <option value="6">6 períodos (semestral - 180 días)</option>
+                            <option value="12">12 períodos (anual - 360 días)</option>
                         </select>
                     </div>
                 </div>
@@ -431,7 +431,7 @@
                 </button>
                 <button type="submit" class="btn btn-primary btn-submit-pago">
                     <?= icon('check', 16) ?>
-                    <span>Asentar Pago y Renovar (+1 Mes)</span>
+                    <span>Asentar Pago y Renovar (+30 Días)</span>
                 </button>
             </div>
         </form>

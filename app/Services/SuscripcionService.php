@@ -194,7 +194,8 @@ class SuscripcionService
         }
 
         $ciclo = ($restaurante['ciclo'] ?? 'mensual') === 'anual' ? 'anual' : 'mensual';
-        $intervalStr = $ciclo === 'anual' ? "+{$periodos} year" : "+{$periodos} month";
+        $diasPorPeriodo = $periodos * 30;
+        $intervalStr = $ciclo === 'anual' ? "+{$periodos} year" : "+{$diasPorPeriodo} days";
         $nuevaFechaVenc = $baseDate->modify($intervalStr)->format('Y-m-d');
 
         $pdo->beginTransaction();

@@ -49,7 +49,7 @@
         </a>
 
         <!-- Botón para pagar suscripción al dueño de Mesaly con Wompi -->
-        <button type="button" class="btn btn-secondary btn-sm fw-600 inline-flex items-center gap-2 btn-abrir-wompi" title="Pagar suscripción mensual a Mesaly">
+        <button type="button" class="btn btn-secondary btn-sm fw-600 inline-flex items-center gap-2 btn-abrir-wompi" title="Pagar suscripción (30 días) a Mesaly">
             <?= icon('cash', 14) ?>
             <span>Pagar a Mesaly</span>
         </button>
@@ -461,7 +461,7 @@
                     </div>
                     <div class="modal-wompi-price-block">
                         <span class="modal-wompi-price-amount"><?= format_cop((int)($tenant['precio'] ?? 49000)) ?></span>
-                        <span class="modal-wompi-price-cycle">/ 1 Mes Calendario</span>
+                        <span class="modal-wompi-price-cycle">/ 30 Días</span>
                     </div>
                 </div>
 
@@ -515,7 +515,7 @@
                         <p>Notifícanos por WhatsApp con tu soporte para renovar tu suscripción de inmediato.</p>
                     </div>
                     <?php 
-                        $msgWa = "Hola equipo Mesaly, acabo de realizar el pago de la suscripción mensual para el restaurante " . ($tenant['nombre'] ?? 'Mi Restaurante') . " por valor de " . format_cop((int)($tenant['precio'] ?? 49000)) . " a través de Wompi. Adjunto el comprobante para la renovación.";
+                        $msgWa = "Hola equipo Mesaly, acabo de realizar el pago de la suscripción (30 días) para el restaurante " . ($tenant['nombre'] ?? 'Mi Restaurante') . " por valor de " . format_cop((int)($tenant['precio'] ?? 49000)) . " a través de Wompi. Adjunto el comprobante para la renovación.";
                     ?>
                     <a href="<?= e(support_whatsapp_url($msgWa)) ?>" 
                        target="_blank" 
