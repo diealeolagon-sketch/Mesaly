@@ -323,46 +323,57 @@ $maxLote = $limiteNum !== null ? $limiteNum : 999;
 
 <!-- ═══ MODAL 1: NUEVA MESA INDIVIDUAL ═══ -->
 <div class="modal-backdrop modal-backdrop-modern" id="modalCrearMesa">
-    <div class="modal-dialog modal-dialog-sm card card-p-6">
-        <div class="card-header-bordered flex items-center justify-between mb-4 pb-3">
-            <div class="flex items-center gap-2">
-                <div class="modifier-icon-box">
-                    <?= icon('cutlery', 16) ?>
+    <div class="modal-dialog modal-dialog-modern modal-dialog-sm">
+        <div class="modal-header-modern">
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h3 class="modal-brand-title">Agregar Nueva Mesa</h3>
+                        <span class="modal-brand-subtitle">Gestión de Mesas y Salón</span>
+                    </div>
                 </div>
-                <h3 class="text-md fw-700 text-main m-0">Agregar Nueva Mesa</h3>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalCrear" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn-close-modal text-lg text-muted pointer" id="btnCerrarModalCrear">&times;</button>
         </div>
 
         <form method="POST" action="<?= e(app_url('/admin/mesas/crear')) ?>">
             <?= csrf_field() ?>
 
-            <?php if (!empty($limiteMesas) && $totalMesas >= $limiteMesas): ?>
-                <div class="alert alert-danger mb-4 text-xs">
-                    <?= icon('alert', 14) ?>
-                    <span>Has alcanzado el límite de <?= (int)$limiteMesas ?> mesas de tu Plan <?= e($planNombre ?? 'Básico') ?>. Para crear más mesas, contacta a tu asesor de Mesaly.</span>
+            <div class="modal-body-modern">
+                <?php if (!empty($limiteMesas) && $totalMesas >= $limiteMesas): ?>
+                    <div class="alert alert-danger mb-4 text-xs">
+                        <?= icon('alert', 14) ?>
+                        <span>Has alcanzado el límite de <?= (int)$limiteMesas ?> mesas de tu Plan <?= e($planNombre ?? 'Básico') ?>. Para crear más mesas, contacta a tu asesor de Mesaly.</span>
+                    </div>
+                <?php endif; ?>
+
+                <div class="form-group">
+                    <label for="crear_numero" class="form-label">Número de Mesa *</label>
+                    <input type="number" id="crear_numero" name="numero" class="form-control" min="1" max="<?= $maxLote ?>" value="<?= $totalMesas < ($limiteNum ?? 999) ? $siguienteNumero : '' ?>" placeholder="Ej: <?= $siguienteNumero ?>" required autofocus <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
+                    <span class="form-hint">
+                        <?php if (!empty($limiteMesas)): ?>
+                            Tope máximo de tu plan: Mesa <?= (int)$limiteMesas ?>.
+                        <?php else: ?>
+                            Número correlativo que identificará el código QR.
+                        <?php endif; ?>
+                    </span>
                 </div>
-            <?php endif; ?>
 
-            <div class="form-group">
-                <label for="crear_numero" class="form-label">Número de Mesa *</label>
-                <input type="number" id="crear_numero" name="numero" class="form-control" min="1" max="<?= $maxLote ?>" value="<?= $totalMesas < ($limiteNum ?? 999) ? $siguienteNumero : '' ?>" placeholder="Ej: <?= $siguienteNumero ?>" required autofocus <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
-                <span class="form-hint">
-                    <?php if (!empty($limiteMesas)): ?>
-                        Tope máximo de tu plan: Mesa <?= (int)$limiteMesas ?>.
-                    <?php else: ?>
-                        Número correlativo que identificará el código QR.
-                    <?php endif; ?>
-                </span>
+                <div class="form-group mb-0">
+                    <label for="crear_nombre" class="form-label">Nombre Opcional / Zona</label>
+                    <input type="text" id="crear_nombre" name="nombre" class="form-control" maxlength="50" placeholder="Ej: Terraza Exterior, Barra 2..." <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
+                    <span class="form-hint">Texto descriptivo para tu equipo (opcional).</span>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="crear_nombre" class="form-label">Nombre Opcional / Zona</label>
-                <input type="text" id="crear_nombre" name="nombre" class="form-control" maxlength="50" placeholder="Ej: Terraza Exterior, Barra 2..." <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
-                <span class="form-hint">Texto descriptivo para tu equipo (opcional).</span>
-            </div>
-
-            <div class="modal-footer-bordered pt-4 mt-5 flex justify-end gap-2">
+            <div class="modal-footer-modern">
                 <button type="button" class="btn btn-secondary" id="btnCancelarCrear">Cancelar</button>
                 <button type="submit" class="btn btn-primary fw-700" <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
                     <?= icon('check', 15) ?>
@@ -375,54 +386,65 @@ $maxLote = $limiteNum !== null ? $limiteNum : 999;
 
 <!-- ═══ MODAL 2: GENERACIÓN DE MESAS EN LOTE ═══ -->
 <div class="modal-backdrop modal-backdrop-modern" id="modalLoteMesas">
-    <div class="modal-dialog modal-dialog-md card card-p-6">
-        <div class="card-header-bordered flex items-center justify-between mb-4 pb-3">
-            <div class="flex items-center gap-2">
-                <div class="modifier-icon-box">
-                    <?= icon('zap', 16) ?>
+    <div class="modal-dialog modal-dialog-modern modal-dialog-md">
+        <div class="modal-header-modern">
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h3 class="modal-brand-title">Generar Mesas en Lote</h3>
+                        <span class="modal-brand-subtitle">Secuencia Rápida de Mesas</span>
+                    </div>
                 </div>
-                <h3 class="text-md fw-700 text-main m-0">Generar Mesas en Lote</h3>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalLote" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn-close-modal text-lg text-muted pointer" id="btnCerrarModalLote">&times;</button>
         </div>
 
         <form method="POST" action="<?= e(app_url('/admin/mesas/lote')) ?>">
             <?= csrf_field() ?>
 
-            <?php if (!empty($limiteMesas) && $totalMesas >= $limiteMesas): ?>
-                <div class="alert alert-danger mb-4 text-xs">
-                    <?= icon('alert', 14) ?>
-                    <span>Límite de <?= (int)$limiteMesas ?> mesas alcanzado en tu Plan <?= e($planNombre ?? 'Básico') ?>. No es posible generar más mesas.</span>
-                </div>
-            <?php else: ?>
-                <p class="text-xs text-muted mb-4 leading-relaxed">
-                    Crea rápidamente una secuencia consecutiva de mesas para tu local.
-                    <?php if (!empty($limiteMesas)): ?>
-                        <strong class="text-brand block mt-1">Tu plan admite hasta la mesa <?= (int)$limiteMesas ?> (te quedan <?= (int)($limiteMesas - $totalMesas) ?> mesas disponibles).</strong>
-                    <?php endif; ?>
-                </p>
-            <?php endif; ?>
-
-            <div class="config-grid-2 mb-4">
-                <div class="form-group m-0">
-                    <label for="lote_desde" class="form-label">Desde Mesa *</label>
-                    <input type="number" id="lote_desde" name="desde" class="form-control" min="1" max="<?= $maxLote ?>" value="<?= $defaultLoteDesde ?>" required <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
-                    <span class="form-hint">Mesa inicial de la secuencia.</span>
-                </div>
-                <div class="form-group m-0">
-                    <label for="lote_hasta" class="form-label">Hasta Mesa *</label>
-                    <input type="number" id="lote_hasta" name="hasta" class="form-control" min="1" max="<?= $maxLote ?>" value="<?= $defaultLoteHasta ?>" required <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
-                    <span class="form-hint">
+            <div class="modal-body-modern">
+                <?php if (!empty($limiteMesas) && $totalMesas >= $limiteMesas): ?>
+                    <div class="alert alert-danger mb-4 text-xs">
+                        <?= icon('alert', 14) ?>
+                        <span>Límite de <?= (int)$limiteMesas ?> mesas alcanzado en tu Plan <?= e($planNombre ?? 'Básico') ?>. No es posible generar más mesas.</span>
+                    </div>
+                <?php else: ?>
+                    <p class="text-xs text-muted mb-4 leading-relaxed">
+                        Crea rápidamente una secuencia consecutiva de mesas para tu local.
                         <?php if (!empty($limiteMesas)): ?>
-                            Tope máximo de tu plan: Mesa <?= (int)$limiteMesas ?>.
-                        <?php else: ?>
-                            Tope recomendado para este lote.
+                            <strong class="text-brand block mt-1">Tu plan admite hasta la mesa <?= (int)$limiteMesas ?> (te quedan <?= (int)($limiteMesas - $totalMesas) ?> mesas disponibles).</strong>
                         <?php endif; ?>
-                    </span>
+                    </p>
+                <?php endif; ?>
+
+                <div class="config-grid-2 mb-0">
+                    <div class="form-group m-0">
+                        <label for="lote_desde" class="form-label">Desde Mesa *</label>
+                        <input type="number" id="lote_desde" name="desde" class="form-control" min="1" max="<?= $maxLote ?>" value="<?= $defaultLoteDesde ?>" required <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
+                        <span class="form-hint">Mesa inicial de la secuencia.</span>
+                    </div>
+                    <div class="form-group m-0">
+                        <label for="lote_hasta" class="form-label">Hasta Mesa *</label>
+                        <input type="number" id="lote_hasta" name="hasta" class="form-control" min="1" max="<?= $maxLote ?>" value="<?= $defaultLoteHasta ?>" required <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
+                        <span class="form-hint">
+                            <?php if (!empty($limiteMesas)): ?>
+                                Tope máximo de tu plan: Mesa <?= (int)$limiteMesas ?>.
+                            <?php else: ?>
+                                Tope recomendado para este lote.
+                            <?php endif; ?>
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <div class="modal-footer-bordered pt-4 mt-5 flex justify-end gap-2">
+            <div class="modal-footer-modern">
                 <button type="button" class="btn btn-secondary" id="btnCancelarLote">Cancelar</button>
                 <button type="submit" class="btn btn-primary fw-700" <?= (!empty($limiteMesas) && $totalMesas >= $limiteMesas) ? 'disabled' : '' ?>>
                     <?= icon('zap', 15) ?>
@@ -435,31 +457,42 @@ $maxLote = $limiteNum !== null ? $limiteNum : 999;
 
 <!-- ═══ MODAL 3: EDITAR MESA ═══ -->
 <div class="modal-backdrop modal-backdrop-modern" id="modalEditarMesa">
-    <div class="modal-dialog modal-dialog-sm card card-p-6">
-        <div class="card-header-bordered flex items-center justify-between mb-4 pb-3">
-            <div class="flex items-center gap-2">
-                <div class="modifier-icon-box">
-                    <?= icon('edit', 16) ?>
+    <div class="modal-dialog modal-dialog-modern modal-dialog-sm">
+        <div class="modal-header-modern">
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h3 class="modal-brand-title">Editar Mesa</h3>
+                        <span class="modal-brand-subtitle">Actualizar Datos y Ubicación</span>
+                    </div>
                 </div>
-                <h3 class="text-md fw-700 text-main m-0">Editar Mesa</h3>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalEditar" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn-close-modal text-lg text-muted pointer" id="btnCerrarModalEditar">&times;</button>
         </div>
 
         <form method="POST" id="formEditarMesa" action="">
             <?= csrf_field() ?>
 
-            <div class="form-group">
-                <label for="editar_numero" class="form-label">Número de Mesa *</label>
-                <input type="number" id="editar_numero" name="numero" class="form-control" min="1" max="999" required>
+            <div class="modal-body-modern">
+                <div class="form-group">
+                    <label for="editar_numero" class="form-label">Número de Mesa *</label>
+                    <input type="number" id="editar_numero" name="numero" class="form-control" min="1" max="999" required>
+                </div>
+
+                <div class="form-group mb-0">
+                    <label for="editar_nombre" class="form-label">Nombre Opcional / Zona</label>
+                    <input type="text" id="editar_nombre" name="nombre" class="form-control" maxlength="50" placeholder="Ej: Terraza VIP...">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="editar_nombre" class="form-label">Nombre Opcional / Zona</label>
-                <input type="text" id="editar_nombre" name="nombre" class="form-control" maxlength="50" placeholder="Ej: Terraza VIP...">
-            </div>
-
-            <div class="modal-footer-bordered pt-4 mt-5 flex justify-end gap-2">
+            <div class="modal-footer-modern">
                 <button type="button" class="btn btn-secondary" id="btnCancelarEditar">Cancelar</button>
                 <button type="submit" class="btn btn-primary fw-700">
                     <?= icon('check', 15) ?>

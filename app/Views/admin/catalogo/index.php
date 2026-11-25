@@ -177,44 +177,56 @@
 </div>
 
 <!-- MODAL DE SECCIÓN -->
-<div id="modal_categoria" class="modal-backdrop">
-    <div class="modal-dialog modal-dialog-md">
-        <div class="mb-5">
-            <h3 id="cat_modal_title" class="modal-title mb-1">
-                Nueva Sección del Menú
-            </h3>
-            <p class="text-xs text-muted m-0">
-                Las secciones organizan los platos en pestañas para tus clientes (ej: Entradas, Carnes, Bebidas).
-            </p>
+<div id="modal_categoria" class="modal-backdrop modal-backdrop-modern">
+    <div class="modal-dialog modal-dialog-modern modal-dialog-md">
+        <div class="modal-header-modern">
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h3 id="cat_modal_title" class="modal-brand-title">Nueva Sección del Menú</h3>
+                        <span class="modal-brand-subtitle">Organización de Platos y Categorías</span>
+                    </div>
+                </div>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarCatModalTop" onclick="cerrarCatModal()" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <form method="POST" action="<?= e(app_url('/admin/catalogo/categoria/guardar')) ?>">
             <?= csrf_field() ?>
             <input type="hidden" id="cat_id" name="id" value="0">
 
-            <div class="form-group">
-                <label for="cat_nombre" class="form-label">Nombre de la Sección *</label>
-                <input type="text" id="cat_nombre" name="nombre" class="form-control" placeholder="Ej: Platos Fuertes, Bebidas, Postres" required autofocus>
-                <span class="form-hint">Aparecerá en la barra de navegación del menú.</span>
+            <div class="modal-body-modern">
+                <div class="form-group">
+                    <label for="cat_nombre" class="form-label">Nombre de la Sección *</label>
+                    <input type="text" id="cat_nombre" name="nombre" class="form-control" placeholder="Ej: Platos Fuertes, Bebidas, Postres" required autofocus>
+                    <span class="form-hint">Aparecerá en la barra de navegación del menú.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="cat_orden" class="form-label">Posición en el menú</label>
+                    <input type="number" id="cat_orden" name="orden" class="form-control input-w-sm" value="0" min="0">
+                    <span class="form-hint">0 = primera pestaña visible para los comensales.</span>
+                </div>
+
+                <div class="form-group mb-0">
+                    <label class="toggle-option-card m-0">
+                        <input type="checkbox" id="cat_activa" name="activa" value="1" checked class="form-checkbox">
+                        <div>
+                            <span class="toggle-option-title">Sección visible y activa</span>
+                            <span class="toggle-option-desc">Si se desactiva, se ocultará temporalmente en la carta digital.</span>
+                        </div>
+                    </label>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="cat_orden" class="form-label">Posición en el menú</label>
-                <input type="number" id="cat_orden" name="orden" class="form-control input-w-sm" value="0" min="0">
-                <span class="form-hint">0 = primera pestaña visible para los comensales.</span>
-            </div>
-
-            <div class="form-group">
-                <label class="toggle-option-card m-0">
-                    <input type="checkbox" id="cat_activa" name="activa" value="1" checked class="form-checkbox">
-                    <div>
-                        <span class="toggle-option-title">Sección visible y activa</span>
-                        <span class="toggle-option-desc">Si se desactiva, se ocultará temporalmente en la carta digital.</span>
-                    </div>
-                </label>
-            </div>
-
-            <div class="modal-footer modal-footer-bordered mt-6 pt-5">
+            <div class="modal-footer-modern">
                 <button type="button" class="btn btn-secondary" id="btnCancelarCatModal">Cancelar</button>
                 <button type="submit" class="btn btn-primary btn-save-action">Guardar Sección</button>
             </div>

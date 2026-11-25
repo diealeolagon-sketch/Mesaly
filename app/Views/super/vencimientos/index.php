@@ -364,18 +364,22 @@
 <div class="modal-backdrop modal-backdrop-modern" id="modal_pago">
     <div class="modal-dialog modal-dialog-modern">
         <div class="modal-header-modern">
-            <div class="flex items-center gap-3">
-                <div class="section-icon-box section-icon-success">
-                    <?= icon('cash', 20) ?>
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h2 class="modal-brand-title">Registrar Pago Manual</h2>
+                        <span id="pago_nombre_negocio" class="modal-brand-subtitle"></span>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-sm fw-700 text-main m-0">
-                        Registrar Pago Manual
-                    </h2>
-                    <span id="pago_nombre_negocio" class="text-xs text-muted fw-600"></span>
-                </div>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalPago" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm p-1 leading-none" id="btnCerrarModalPago">&times;</button>
         </div>
 
         <form method="POST" id="formRegistrarPago" action="">
@@ -444,18 +448,22 @@
 <div class="modal-backdrop modal-backdrop-modern" id="modal_extender">
     <div class="modal-dialog modal-dialog-modern modal-dialog-md">
         <div class="modal-header-modern">
-            <div class="flex items-center gap-3">
-                <div class="section-icon-box">
-                    <?= icon('plus', 20) ?>
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h2 class="modal-brand-title">Extender Días de Suscripción</h2>
+                        <span id="extender_nombre_negocio" class="modal-brand-subtitle"></span>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-sm fw-700 text-main m-0">
-                        Extender Días de Suscripción
-                    </h2>
-                    <span id="extender_nombre_negocio" class="text-xs text-muted fw-600"></span>
-                </div>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalExtender" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm p-1 leading-none" id="btnCerrarModalExtender">&times;</button>
         </div>
 
         <form method="POST" id="formExtenderDias" action="">
@@ -502,18 +510,22 @@
 <div class="modal-backdrop modal-backdrop-modern" id="modal_historial">
     <div class="modal-dialog modal-dialog-modern modal-dialog-lg">
         <div class="modal-header-modern">
-            <div class="flex items-center gap-3">
-                <div class="section-icon-box section-icon-blue">
-                    <?= icon('cash', 20) ?>
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h2 class="modal-brand-title">Historial de Pagos del Restaurante</h2>
+                        <span id="historial_nombre_negocio" class="modal-brand-subtitle"></span>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-sm fw-700 text-main m-0">
-                        Historial de Pagos del Restaurante
-                    </h2>
-                    <span id="historial_nombre_negocio" class="text-xs text-muted fw-600"></span>
-                </div>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalHistorial" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm p-1 leading-none" id="btnCerrarModalHistorial">&times;</button>
         </div>
 
         <div class="modal-body-modern p-0">

@@ -556,20 +556,22 @@
 <div class="modal-backdrop modal-backdrop-modern" id="modalAvisoWhatsApp">
     <div class="modal-dialog modal-aviso-wa-dialog">
         <div class="modal-aviso-wa-header">
-            <div class="modal-aviso-wa-brand">
-                <div class="modal-aviso-wa-icon">
-                    <?= icon('motorcycle', 18) ?>
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h3 class="modal-brand-title">¡Pedido en Camino!</h3>
+                        <span class="modal-brand-subtitle" id="avisoWaSubtitulo">Avisar al cliente por WhatsApp</span>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="modal-aviso-wa-title">
-                        ¡Pedido en Camino!
-                    </h3>
-                    <span class="modal-aviso-wa-sub" id="avisoWaSubtitulo">
-                        Avisar al cliente por WhatsApp
-                    </span>
-                </div>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalAvisoWa" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn-close-modal" id="btnCerrarModalAvisoWa" aria-label="Cerrar">&times;</button>
         </div>
 
         <p class="modal-aviso-wa-text">
@@ -603,6 +605,8 @@
         
         <div class="order-detail-header">
             <div class="order-detail-header-left">
+                <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                <span class="modal-brand-divider"></span>
                 <div class="order-detail-code-row">
                     <h3 class="order-detail-code" id="detCodigo">
                         #PED-0000
@@ -615,7 +619,12 @@
                     01/01/2026 12:00 PM
                 </span>
             </div>
-            <button type="button" class="btn-close-modal" id="btnCerrarModalDetalle" aria-label="Cerrar">&times;</button>
+            <button type="button" class="modal-btn-close-circle" id="btnCerrarModalDetalle" aria-label="Cerrar modal" title="Cerrar">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </div>
 
         <div id="detLoading" class="empty-state-box p-6 text-muted">
@@ -623,86 +632,87 @@
         </div>
 
         <div id="detContent" class="order-detail-content-wrap is-hidden">
-            
-            <!-- Banner de Mesa y Liberación (Solo para pedidos en salón) -->
-            <div id="detMesaCardWrap" class="p-3.5 rounded-xl border flex items-center justify-between flex-wrap gap-3 is-hidden" style="background: #FFFBF7; border-color: #FED7AA;">
-                <div class="flex items-center gap-3">
-                    <div style="background: rgba(232, 93, 4, 0.12); color: #E85D04; padding: 10px; border-radius: 10px; display: flex; align-items: center;">
-                        <?= icon('cutlery', 20) ?>
-                    </div>
-                    <div>
-                        <strong class="text-base text-main" id="detMesaNumeroTxt">Mesa 1</strong>
-                        <div class="mt-1">
-                            <span id="detMesaStatusTxt" class="order-mesa-occupancy-pill is-occupied">Comensales en mesa (Consumiendo)</span>
+            <div class="modal-body-modern order-detail-body">
+                <!-- Banner de Mesa y Liberación (Solo para pedidos en salón) -->
+                <div id="detMesaCardWrap" class="p-3.5 rounded-xl border flex items-center justify-between flex-wrap gap-3 is-hidden" style="background: #FFFBF7; border-color: #FED7AA;">
+                    <div class="flex items-center gap-3">
+                        <div style="background: rgba(232, 93, 4, 0.12); color: #E85D04; padding: 10px; border-radius: 10px; display: flex; align-items: center;">
+                            <?= icon('cutlery', 20) ?>
+                        </div>
+                        <div>
+                            <strong class="text-base text-main" id="detMesaNumeroTxt">Mesa 1</strong>
+                            <div class="mt-1">
+                                <span id="detMesaStatusTxt" class="order-mesa-occupancy-pill is-occupied">Comensales en mesa (Consumiendo)</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <button type="button" class="btn-liberar-mesa-modal" id="btnLiberarMesaModal" title="Marcar la mesa como desocupada para nuevos clientes">
-                    <?= icon('check', 14) ?>
-                    <span>Liberar Mesa Ahora</span>
-                </button>
-            </div>
-
-            <!-- Datos del Cliente y Entrega -->
-            <div class="order-detail-customer-box">
-                <div class="order-detail-field-col">
-                    <span class="order-detail-label">Cliente / Solicitante</span>
-                    <strong class="order-detail-val-strong" id="detClienteNombre">—</strong>
-                    <div id="detClienteTelWrap" class="order-detail-val-muted">—</div>
+                    <button type="button" class="btn-liberar-mesa-modal" id="btnLiberarMesaModal" title="Marcar la mesa como desocupada para nuevos clientes">
+                        <?= icon('check', 14) ?>
+                        <span>Liberar Mesa Ahora</span>
+                    </button>
                 </div>
 
-                <div class="order-detail-field-col">
-                    <span class="order-detail-label">Modalidad de Orden</span>
-                    <strong class="order-detail-val-strong" id="detModalidad">—</strong>
-                    <div id="detModalidadExtra" class="order-detail-val-muted">—</div>
+                <!-- Datos del Cliente y Entrega -->
+                <div class="order-detail-customer-box">
+                    <div class="order-detail-field-col">
+                        <span class="order-detail-label">Cliente / Solicitante</span>
+                        <strong class="order-detail-val-strong" id="detClienteNombre">—</strong>
+                        <div id="detClienteTelWrap" class="order-detail-val-muted">—</div>
+                    </div>
+
+                    <div class="order-detail-field-col">
+                        <span class="order-detail-label">Modalidad de Orden</span>
+                        <strong class="order-detail-val-strong" id="detModalidad">—</strong>
+                        <div id="detModalidadExtra" class="order-detail-val-muted">—</div>
+                    </div>
+
+                    <div class="order-detail-field-col full-col" id="detNotasWrap">
+                        <span class="order-detail-label">Instrucciones / Notas Especiales</span>
+                        <p class="order-detail-notes-box" id="detNotas">
+                            —
+                        </p>
+                    </div>
                 </div>
 
-                <div class="order-detail-field-col full-col" id="detNotasWrap">
-                    <span class="order-detail-label">Instrucciones / Notas Especiales</span>
-                    <p class="order-detail-notes-box" id="detNotas">
-                        —
-                    </p>
+                <!-- Tabla de Ítems del Pedido -->
+                <div>
+                    <h4 class="text-sm fw-700 text-main m-0 mb-2">
+                        Platos y Bebidas Ordenadas
+                    </h4>
+                    <div class="order-detail-table-card">
+                        <table class="order-detail-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-left">Cant · Plato / Especificación</th>
+                                    <th class="col-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detItemsTbody">
+                                <!-- Inyectado vía JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Tabla de Ítems del Pedido -->
-            <div>
-                <h4 class="text-sm fw-700 text-main m-0 mb-2">
-                    Platos y Bebidas Ordenadas
-                </h4>
-                <div class="order-detail-table-card">
-                    <table class="order-detail-table">
-                        <thead>
-                            <tr>
-                                <th class="col-left">Cant · Plato / Especificación</th>
-                                <th class="col-right">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detItemsTbody">
-                            <!-- Inyectado vía JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Resumen Financiero -->
-            <div class="order-detail-totals-box">
-                <div class="order-detail-total-row">
-                    <span>Subtotal:</span>
-                    <strong class="text-main" id="detSubtotal">$ 0</strong>
-                </div>
-                <div class="order-detail-total-row" id="detEnvioRow">
-                    <span>Costo de Envío:</span>
-                    <strong class="text-main" id="detEnvio">$ 0</strong>
-                </div>
-                <div class="order-detail-total-row grand-row">
-                    <span>Total a Cobrar:</span>
-                    <span class="text-success fw-700 text-lg" id="detTotal">$ 0</span>
+                <!-- Resumen Financiero -->
+                <div class="order-detail-totals-box">
+                    <div class="order-detail-total-row">
+                        <span>Subtotal:</span>
+                        <strong class="text-main" id="detSubtotal">$ 0</strong>
+                    </div>
+                    <div class="order-detail-total-row" id="detEnvioRow">
+                        <span>Costo de Envío:</span>
+                        <strong class="text-main" id="detEnvio">$ 0</strong>
+                    </div>
+                    <div class="order-detail-total-row grand-row">
+                        <span>Total a Cobrar:</span>
+                        <span class="text-success fw-700 text-lg" id="detTotal">$ 0</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Botones de Acción en el Modal -->
-            <div class="order-detail-actions-row flex items-center justify-between flex-wrap gap-2 pt-3 border-t">
+            <div class="order-detail-actions-row flex items-center justify-between flex-wrap gap-2">
                 <div class="flex items-center gap-2">
                     <button type="button" class="btn btn-secondary btn-sm flex items-center gap-1.5" id="btnImprimirComandaModal" title="Imprimir ticket para cocina o comanda de mesa">
                         <?= icon('printer', 14) ?>
