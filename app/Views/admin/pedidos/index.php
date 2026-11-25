@@ -603,28 +603,32 @@
 <div class="modal-backdrop modal-backdrop-modern" id="modalDetallePedido">
     <div class="modal-dialog order-modal-dialog">
         
-        <div class="order-detail-header">
-            <div class="order-detail-header-left">
-                <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
-                <span class="modal-brand-divider"></span>
-                <div class="order-detail-code-row">
-                    <h3 class="order-detail-code" id="detCodigo">
-                        #PED-0000
-                    </h3>
-                    <span id="detEstadoBadge" class="badge">
-                        Recibido
-                    </span>
+        <div class="order-detail-header modal-header-modern">
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <div class="modal-brand-divider"></div>
+                    <div class="modal-brand-titles">
+                        <div class="flex items-center gap-2">
+                            <h3 class="modal-brand-title font-mono" id="detCodigo" style="font-size: 16px; color: var(--color-brand, #E85D04);">
+                                #PED-0000
+                            </h3>
+                            <span id="detEstadoBadge" class="badge">
+                                Recibido
+                            </span>
+                        </div>
+                        <span class="modal-brand-subtitle" id="detFecha">
+                            01/01/2026 12:00 PM
+                        </span>
+                    </div>
                 </div>
-                <span class="order-detail-date" id="detFecha">
-                    01/01/2026 12:00 PM
-                </span>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalDetalle" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="modal-btn-close-circle" id="btnCerrarModalDetalle" aria-label="Cerrar modal" title="Cerrar">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
         </div>
 
         <div id="detLoading" class="empty-state-box p-6 text-muted">

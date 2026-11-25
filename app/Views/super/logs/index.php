@@ -226,8 +226,8 @@
                             </td>
                             <td class="text-right">
                                 <?php if (!empty($log['despues']) || !empty($log['antes'])): ?>
-                                    <button type="button" class="btn btn-secondary btn-xs" 
-                                            onclick='verDetalleLog(<?= json_encode($log, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)'>
+                                    <button type="button" class="btn btn-secondary btn-xs btn-ver-log" 
+                                            data-log="<?= htmlspecialchars(json_encode($log, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>">
                                         <?= icon('eye', 13) ?>
                                         <span>Ver Datos</span>
                                     </button>
@@ -292,7 +292,7 @@
 </div>
 
 <!-- MODAL DE DETALLE DE AUDITORÍA -->
-<div class="modal-backdrop modal-backdrop-modern is-hidden" id="modalDetalleLog" role="dialog" aria-modal="true" onclick="if(event.target===this) cerrarDetalleLog()">
+<div class="modal-backdrop modal-backdrop-modern is-hidden" id="modalDetalleLog" role="dialog" aria-modal="true">
     <div class="modal-dialog-modern max-w-600">
         <div class="modal-header-modern">
             <div class="modal-brand-header">
@@ -304,7 +304,7 @@
                         <span class="modal-brand-subtitle" id="modalLogSubtitulo"></span>
                     </div>
                 </div>
-                <button type="button" class="modal-btn-close-circle" onclick="cerrarDetalleLog()" aria-label="Cerrar modal" title="Cerrar">
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalLog" aria-label="Cerrar modal" title="Cerrar">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -323,7 +323,7 @@
             </div>
         </div>
         <div class="modal-footer-modern">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarDetalleLog()">Cerrar</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btnCerrarModalLogFooter">Cerrar</button>
         </div>
     </div>
 </div>
@@ -350,7 +350,7 @@ function switchLogsTab(tab) {
 
 function verDetalleLog(log) {
     document.getElementById('modalLogTitulo').textContent = 'Evento: ' + log.accion;
-    document.getElementById('modalLogSubtitulo').textContent = 'Entidad: ' + log.entidad + ' #' + (log.entidad_id || '') + ' | ' + log.created_at;
+    document.getElementById('modalLogSubtitulo').textContent = 'Entidad: ' + log.entidad + ' #' + (log.entidad_id || '') + ' | ' + (log.created_at || '');
 
     const antesWrap = document.getElementById('modalLogAntesWrap');
     const antesPre = document.getElementById('modalLogAntes');
@@ -383,7 +383,41 @@ function verDetalleLog(log) {
 
 function cerrarDetalleLog() {
     const modal = document.getElementById('modalDetalleLog');
-    modal.classList.add('is-hidden');
-    modal.classList.remove('is-open', 'is-active');
+    if (modal) {
+        modal.classList.add('is-hidden');
+        modal.classList.remove('is-open', 'is-active');
+    }
 }
+
+// Event Delegation compatible con CSP
+document.addEventListener('click', function(e) {
+    const btnVer = e.target.closest('.btn-ver-log');
+    if (btnVer) {
+        e.preventDefault();
+        try {
+            const raw = btnVer.getAttribute('data-log');
+            if (raw) {
+                const logData = JSON.parse(raw);
+                verDetalleLog(logData);
+            }
+        } catch(err) {
+            console.error('Error parseando datos del log:', err);
+        }
+        return;
+    }
+
+    const modal = document.getElementById('modalDetalleLog');
+    if (e.target === modal) {
+        cerrarDetalleLog();
+    }
+});
+
+document.getElementById('btnCerrarModalLog')?.addEventListener('click', cerrarDetalleLog);
+document.getElementById('btnCerrarModalLogFooter')?.addEventListener('click', cerrarDetalleLog);
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarDetalleLog();
+    }
+});
 </script>

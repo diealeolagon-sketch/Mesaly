@@ -150,25 +150,27 @@
             <?= csrf_field() ?>
             <input type="hidden" id="grupo_id" name="id" value="0">
 
-            <div class="modal-brand-header">
-                <div class="modal-brand-header-left">
-                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
-                    <div class="modal-brand-divider"></div>
-                    <div class="modal-brand-titles">
-                        <h3 id="grupo_modal_title" class="modal-brand-title">
-                            Nuevo Grupo de Modificadores
-                        </h3>
-                        <p class="modal-brand-subtitle">
-                            Configura el tipo de pregunta y reglas que verá el comensal.
-                        </p>
+            <div class="modal-header-modern">
+                <div class="modal-brand-header">
+                    <div class="modal-brand-header-left">
+                        <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                        <div class="modal-brand-divider"></div>
+                        <div class="modal-brand-titles">
+                            <h3 id="grupo_modal_title" class="modal-brand-title">
+                                Nuevo Grupo de Modificadores
+                            </h3>
+                            <p class="modal-brand-subtitle">
+                                Configura el tipo de pregunta y reglas que verá el comensal.
+                            </p>
+                        </div>
                     </div>
+                    <button type="button" class="modal-btn-close-circle" onclick="cerrarGrupoModal()" aria-label="Cerrar modal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
-                <button type="button" class="modal-btn-close-circle" onclick="cerrarGrupoModal()" aria-label="Cerrar modal">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
             </div>
 
             <div class="modal-body-modern">
