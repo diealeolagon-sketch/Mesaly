@@ -12,6 +12,6 @@
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_DEBUG" value="true"/>
-        <env name="DB_DATABASE" value="mesaly_db"/>
+        <env name="DB_DATABASE" value="mesaly"/>
     </php>
 </phpunit>

@@ -88,6 +88,17 @@ class PedidoAdminAndDashboardTest extends TestCase
         $this->pedidoModel->cambiarEstado(1, 1, 'estado_inexistente');
     }
 
+    public function testPedidoInexistenteNoSeReportaComoActualizado(): void
+    {
+        $pedidoIdInexistente = (int)\App\Core\Model::getPdo()
+            ->query('SELECT COALESCE(MAX(id), 0) + 1000 FROM `pedidos`')
+            ->fetchColumn();
+
+        $this->assertFalse(
+            $this->pedidoModel->cambiarEstado($pedidoIdInexistente, 1, 'listo')
+        );
+    }
+
     public function testCreacionDetalleTransicionEstadoYAislamientoTenant(): void
     {
         $tenantId = 1;
@@ -162,8 +173,12 @@ class PedidoAdminAndDashboardTest extends TestCase
         $detalleEntregado = $this->pedidoModel->obtenerDetalleCompleto($pedidoId, $tenantId);
         $this->assertSame('entregado', $detalleEntregado['estado']);
 
+        $okMismoEstado = $this->pedidoModel->cambiarEstado($pedidoId, $tenantId, 'entregado');
+        $this->assertTrue($okMismoEstado);
+
         // 7. Aislamiento en cambio de estado: restaurante ajeno no puede modificarlo
         $okAjeno = $this->pedidoModel->cambiarEstado($pedidoId, 999, 'rechazado');
+        $this->assertFalse($okAjeno);
         // El UPDATE afectará 0 filas porque WHERE restaurante_id = 999 no coincide
         $detallePostAjeno = $this->pedidoModel->obtenerDetalleCompleto($pedidoId, $tenantId);
         $this->assertSame('entregado', $detallePostAjeno['estado']);

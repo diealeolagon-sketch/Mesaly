@@ -78,7 +78,7 @@ APP_URL=http://localhost/Mesaly/public
 
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=mesaly_db
+DB_DATABASE=mesaly
 DB_USERNAME=root
 DB_PASSWORD=
 ```
@@ -87,10 +87,10 @@ DB_PASSWORD=
 Importa la estructura inicial y los datos base en tu gestor MySQL:
 ```bash
 # 1. Esquema de tablas
-mysql -u root -p mesaly_db < database/schema.sql
+mysql -u root mesaly < database/schema.sql
 
 # 2. Datos semilla iniciales (restaurantes de muestra, usuarios y catálogo)
-mysql -u root -p mesaly_db < database/seeds.sql
+mysql -u root mesaly < database/seeds.sql
 ```
 
 ### 4. Permisos de Almacenamiento

@@ -6,6 +6,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Auth;
 use App\Core\Controller;
+use App\Core\Logger;
 use App\Core\Model;
 use App\Core\Request;
 use App\Core\Response;
@@ -138,7 +139,15 @@ class PedidoAdminController extends Controller
         }
 
         try {
-            $this->pedidoModel->cambiarEstado($id, $tenantId, $nuevoEstado);
+            $actualizado = $this->pedidoModel->cambiarEstado($id, $tenantId, $nuevoEstado);
+
+            if (!$actualizado) {
+                if ($request->isAjax()) {
+                    return $this->json(['success' => false, 'error' => 'Pedido no encontrado'], 404);
+                }
+                Session::flash('error', 'Pedido no encontrado.');
+                return $this->back();
+            }
 
             $pedido = $this->pedidoModel->find($id, $tenantId);
             $avisoWhatsapp = null;
@@ -185,10 +194,21 @@ class PedidoAdminController extends Controller
 
             Session::flash('success', "Estado del pedido actualizado a: " . Pedido::ESTADOS[$nuevoEstado]['label']);
         } catch (\Throwable $e) {
+            Logger::error('Error al cambiar el estado de un pedido.', [
+                'pedido_id' => $id,
+                'restaurante_id' => $tenantId,
+                'estado_solicitado' => $nuevoEstado,
+                'exception' => get_class($e),
+                'error' => $e->getMessage(),
+            ]);
+
             if ($request->isAjax()) {
-                return $this->json(['success' => false, 'error' => $e->getMessage()], 500);
+                return $this->json([
+                    'success' => false,
+                    'error' => 'No fue posible actualizar el estado del pedido. Intenta nuevamente.',
+                ], 500);
             }
-            Session::flash('error', 'Error al cambiar estado: ' . $e->getMessage());
+            Session::flash('error', 'No fue posible actualizar el estado del pedido. Intenta nuevamente.');
         }
 
         return $this->back();

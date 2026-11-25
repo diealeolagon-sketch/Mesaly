@@ -424,11 +424,34 @@ class Pedido extends Model
              SET `estado` = :estado, `updated_at` = NOW() 
              WHERE `id` = :id AND `restaurante_id` = :rid"
         );
-        return $stmt->execute([
+        $ejecutado = $stmt->execute([
             'estado' => $nuevoEstado,
             'id' => $pedidoId,
             'rid' => $restauranteId,
         ]);
+
+        if (!$ejecutado) {
+            return false;
+        }
+
+        if ($stmt->rowCount() > 0) {
+            return true;
+        }
+
+        // Cero filas afectadas también puede significar que el estado ya era igual.
+        // La consulta mantiene el aislamiento: no revela pedidos de otro tenant.
+        $stmtExiste = $pdo->prepare(
+            "SELECT 1
+             FROM `{$this->table}`
+             WHERE `id` = :id AND `restaurante_id` = :rid
+             LIMIT 1"
+        );
+        $stmtExiste->execute([
+            'id' => $pedidoId,
+            'rid' => $restauranteId,
+        ]);
+
+        return $stmtExiste->fetchColumn() !== false;
     }
 
     /**

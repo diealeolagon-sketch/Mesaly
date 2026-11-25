@@ -10,8 +10,8 @@ $dotenv->safeLoad();
 $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
 $port = $_ENV['DB_PORT'] ?? '3306';
 $user = $_ENV['DB_USERNAME'] ?? 'root';
-$pass = $_ENV['DB_PASSWORD'] ?? 'root';
-$dbname = $_ENV['DB_DATABASE'] ?? 'mesaly_db';
+$pass = $_ENV['DB_PASSWORD'] ?? '';
+$dbname = $_ENV['DB_DATABASE'] ?? 'mesaly';
 
 try {
     $pdo = new PDO("mysql:host={$host};port={$port}", $user, $pass, [
