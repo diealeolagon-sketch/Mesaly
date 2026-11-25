@@ -24,9 +24,13 @@ Se reconstruyeron desde cero tres restaurantes de muestra con catálogos 100% au
 ### 3. Experiencia de Pedido sin Fricción para Comensales
 - **Checkout Ágil:** Se eliminó la exigencia de registrar métodos de pago al comensal en la toma de comanda móvil. Los pedidos se envían de forma fluida a la cocina y a WhatsApp sin bloqueos financieros innecesarios para el cliente final.
 
-### 4. Preparación de Interfaz para Pagos de Suscripción SaaS (Wompi)
-- **Nota Importante:** La integración con la pasarela transaccional en vivo de Wompi aún no está conectada.
-- **Alcance Implementado:** Se realizó la preparación a nivel de interfaz de usuario (UI/UX) ubicando el botón de acción *"Pagar a Mesaly (Wompi)"* en el panel administrativo del restaurante y maquetando el modal explicativo con el desglose del plan. Esta base de interfaz queda lista para la conexión directa de las llaves API de Wompi en la siguiente fase.
+### 4. Flujo de Cobro Seguro con Wompi y Renovación por Mes Calendario
+- **Enlace Oficial Wompi en Producción:** Se integró el link de pagos oficial del comercio (`https://checkout.wompi.co/l/VPOS_8rydsK`) en el botón *"Pagar Suscripción (Wompi)"* del panel del restaurante, permitiendo pagos con tarjeta, Nequi, Daviplata y PSE.
+- **Flujo Guiado en Dos Pasos:**
+  1. *Paso 1:* El restaurante hace clic en *"Ir a Pagar en Wompi (Link Oficial)"* y completa el pago en la pasarela oficial en una nueva pestaña.
+  2. *Paso 2:* Presiona *"Ya Pagué • Enviar Comprobante por WhatsApp"*, abriendo un chat directo con el soporte de Mesaly con un mensaje prellenado con el nombre del restaurante y la tarifa.
+- **Control de Acreditación Manual (Super Admin):** Para garantizar máxima seguridad financiera y evitar renovaciones sin pago verificado, el Super Administrador valida el ingreso en su cuenta bancaria/Wompi y ejecuta la renovación desde su panel con el botón *"Renovar (+1 Mes)"*.
+- **Cálculo por Mes Calendario Real:** La renovación no es un plazo rígido de 30 días, sino que se computa sumando **1 mes calendario exacto** (`+1 month`), respetando la duración específica de cada mes del año (28, 29, 30 o 31 días) y manteniendo fijo el día de corte del suscriptor.
 
 ### 5. Módulo de Logs y Auditoría del Sistema (Super Admin)
 - Se desarrolló la pantalla `/superadmin/logs` accesible para el Super Administrador, la cual incluye:

@@ -261,16 +261,16 @@
                             <td class="text-right">
                                 <div class="inline-flex items-center justify-end gap-1">
                                     
-                                    <!-- 1. Botón Primario: Registrar Pago -->
+                                    <!-- 1. Botón Primario: Renovar (+1 Mes) -->
                                     <button type="button" 
-                                            class="btn btn-primary btn-sm btn-modal-pago" 
+                                            class="btn btn-primary btn-sm btn-modal-pago fw-600 inline-flex items-center gap-1" 
                                             data-id="<?= (int)$neg['id'] ?>" 
                                             data-nombre="<?= e($neg['nombre']) ?>" 
                                             data-precio="<?= (int)($neg['precio'] ?? 49000) ?>"
                                             data-ciclo="<?= e($neg['ciclo'] ?? 'mensual') ?>"
-                                            title="Registrar pago manual de suscripción">
+                                            title="Registrar pago y renovar suscripción (+1 mes calendario)">
                                         <?= icon('cash', 13) ?>
-                                        <span>Pagar</span>
+                                        <span>Renovar (+1 Mes)</span>
                                     </button>
 
                                     <!-- 2. Botón WhatsApp: Cobrar / Recordatorio -->
@@ -409,19 +409,19 @@
                     <label for="pago_metodo" class="form-label">Método Utilizado por el Cliente *</label>
                     <select id="pago_metodo" name="metodo" class="form-control" required>
                         <?php foreach ($metodosPago as $k => $lbl): ?>
-                            <option value="<?= e($k) ?>" <?= $k === 'transferencia' ? 'selected' : '' ?>><?= e($lbl) ?></option>
+                            <option value="<?= e($k) ?>" <?= $k === 'wompi' ? 'selected' : '' ?>><?= e($lbl) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="pago_referencia" class="form-label">Comprobante o Referencia de Pago</label>
-                    <input type="text" id="pago_referencia" name="referencia" class="form-control" placeholder="Ej: Nequi M1234567, Transf. #98721">
+                    <input type="text" id="pago_referencia" name="referencia" class="form-control" placeholder="Ej: Wompi #12345, Nequi M1234567, Transf. #98721">
                 </div>
 
                 <div class="form-group">
                     <label for="pago_nota" class="form-label">Nota Interna (Opcional)</label>
-                    <input type="text" id="pago_nota" name="nota" class="form-control" placeholder="Ej: Pago adelantado del mes con descuento promocional">
+                    <input type="text" id="pago_nota" name="nota" class="form-control" placeholder="Ej: Pago recibido vía Wompi verificado por WhatsApp">
                 </div>
             </div>
 
@@ -431,7 +431,7 @@
                 </button>
                 <button type="submit" class="btn btn-primary btn-submit-pago">
                     <?= icon('check', 16) ?>
-                    <span>Asentar Pago y Renovar</span>
+                    <span>Asentar Pago y Renovar (+1 Mes)</span>
                 </button>
             </div>
         </form>

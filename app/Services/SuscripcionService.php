@@ -21,9 +21,10 @@ class SuscripcionService
     public const ESTADO_CANCELADO = 'CANCELADO';
 
     public const METODOS_PAGO = [
+        'wompi' => 'Wompi (Pasarela Oficial)',
+        'bancolombia' => 'Bancolombia / Transferencia',
         'nequi' => 'Nequi',
         'daviplata' => 'Daviplata',
-        'bancolombia' => 'Bancolombia / Transferencia',
         'efectivo' => 'Efectivo',
         'otro' => 'Otro Medio',
     ];

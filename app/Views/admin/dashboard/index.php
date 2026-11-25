@@ -49,7 +49,7 @@
         </a>
 
         <!-- Botón para pagar suscripción al dueño de Mesaly con Wompi -->
-        <button type="button" class="btn btn-secondary btn-sm fw-600 inline-flex items-center gap-2" onclick="abrirModalPagarMesaly()" title="Pagar suscripción mensual a Mesaly">
+        <button type="button" class="btn btn-secondary btn-sm fw-600 inline-flex items-center gap-2 btn-abrir-wompi" title="Pagar suscripción mensual a Mesaly">
             <?= icon('cash', 14) ?>
             <span>Pagar a Mesaly</span>
         </button>
@@ -76,7 +76,7 @@
         </div>
     </div>
     <div>
-        <button type="button" class="btn btn-primary btn-sm fw-600 inline-flex items-center gap-2" onclick="abrirModalPagarMesaly()">
+        <button type="button" class="btn btn-primary btn-sm fw-600 inline-flex items-center gap-2 btn-abrir-wompi">
             <?= icon('check', 14) ?>
             <span>Pagar Suscripción (Wompi)</span>
         </button>
@@ -431,17 +431,15 @@
 </div>
 
 <!-- MODAL PARA PAGAR SUSCRIPCIÓN A MESALY (INTEGRACIÓN WOMPI) -->
-<div class="modal is-hidden" id="modalPagarMesaly" role="dialog" aria-modal="true">
-    <div class="modal-backdrop" onclick="cerrarModalPagarMesaly()"></div>
+<div class="modal-backdrop modal-backdrop-modern" id="modalPagarMesaly" role="dialog" aria-modal="true">
     <div class="modal-dialog max-w-500">
-        <form method="POST" action="<?= e(app_url('/admin/pagar-suscripcion')) ?>" class="m-0">
-            <?= csrf_field() ?>
+        <div class="modal-content m-0">
             <div class="modal-header">
                 <div>
                     <h3 class="modal-title text-lg fw-700 m-0">Pagar Suscripción a Mesaly</h3>
                     <span class="text-xs text-muted">Pasarela Oficial Wompi Colombia (Bancolombia)</span>
                 </div>
-                <button type="button" class="btn-close" onclick="cerrarModalPagarMesaly()">&times;</button>
+                <button type="button" class="btn-close btn-cerrar-wompi">&times;</button>
             </div>
             <div class="modal-body p-5">
                 <div class="card p-3 mb-4 bg-subtle border flex items-center justify-between">
@@ -455,68 +453,90 @@
                     </div>
                 </div>
 
-                <div class="form-group mb-4">
-                    <label class="form-label text-sm fw-600 mb-1" for="periodosSuscripcion">Tiempo a Renovar</label>
-                    <select name="periodos" id="periodosSuscripcion" class="form-select" onchange="actualizarTotalWompi()">
-                        <option value="1">1 Mes (+30 días) — <?= format_cop((int)($tenant['precio'] ?? 49000)) ?></option>
-                        <option value="2">2 Meses (+60 días) — <?= format_cop((int)(($tenant['precio'] ?? 49000) * 2)) ?></option>
-                        <option value="3">3 Meses (+90 días) — <?= format_cop((int)(($tenant['precio'] ?? 49000) * 3)) ?></option>
-                        <option value="6">6 Meses (+180 días) — <?= format_cop((int)(($tenant['precio'] ?? 49000) * 6)) ?></option>
-                    </select>
-                </div>
-
-                <div class="form-group mb-4">
-                    <label class="form-label text-sm fw-600 mb-1" for="metodoWompi">Método de Pago Wompi</label>
-                    <select name="metodo" id="metodoWompi" class="form-select">
-                        <option value="Wompi - Tarjeta de Crédito / Débito (Visa, Mastercard, AMEX)">Tarjeta de Crédito / Débito (Visa, Mastercard, AMEX)</option>
-                        <option value="Wompi - PSE / Transferencia en Línea">PSE / Débito Bancario en Línea</option>
-                        <option value="Wompi - Nequi">Nequi (Pago directo QR / Push)</option>
-                        <option value="Wompi - Botón Bancolombia">Botón Bancolombia Transferencia</option>
-                    </select>
-                </div>
-
-                <div class="alert alert-info p-3 mb-4 text-xs">
-                    <?= icon('sparkles', 16) ?>
-                    <div>
-                        <strong>Procesamiento Inmediato:</strong> Al confirmar el pago, la fecha de vencimiento se extenderá automáticamente y se registrará en el historial de pagos del Super Admin.
+                <div class="p-3 mb-4 rounded border bg-white flex flex-col gap-2">
+                    <div class="flex items-center justify-between text-xs text-muted">
+                        <span>Ciclo de renovación:</span>
+                        <strong class="text-main">1 Mes Calendario</strong>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-muted">
+                        <span>Medios habilitados en Wompi:</span>
+                        <strong class="text-main">Tarjetas, Nequi, Daviplata, PSE</strong>
+                    </div>
+                    <div class="flex items-center justify-between text-sm fw-700 border-t pt-2 mt-1">
+                        <span class="text-muted">Total a Pagar:</span>
+                        <strong class="text-brand text-lg"><?= format_cop((int)($tenant['precio'] ?? 49000)) ?></strong>
                     </div>
                 </div>
 
-                <div class="p-3 bg-subtle rounded border flex items-center justify-between">
-                    <span class="text-sm fw-600 text-muted">Total a Pagar Wompi:</span>
-                    <strong class="text-xl text-brand" id="totalPagarDisplay"><?= format_cop((int)($tenant['precio'] ?? 49000)) ?></strong>
+                <!-- PASO 1: PAGAR EN WOMPI -->
+                <div class="mb-4">
+                    <label class="block text-xs fw-700 uppercase tracking-wider text-muted mb-2">Paso 1: Realizar Pago en la Pasarela</label>
+                    <a href="https://checkout.wompi.co/l/VPOS_8rydsK" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="btn btn-primary w-full py-3 fw-700 flex items-center justify-center gap-2 text-base shadow-sm"
+                       style="background: #EA580C; border-color: #EA580C; text-decoration: none;">
+                        <?= icon('cash', 18) ?>
+                        <span>Ir a Pagar en Wompi (Link Oficial) &rarr;</span>
+                    </a>
+                    <span class="block text-xs text-muted mt-1 text-center">
+                        Se abrirá la pasarela segura de Wompi en una nueva pestaña.
+                    </span>
+                </div>
+
+                <!-- PASO 2: NOTIFICAR Y ENVIAR COMPROBANTE -->
+                <div class="mb-4">
+                    <label class="block text-xs fw-700 uppercase tracking-wider text-muted mb-2">Paso 2: Confirmar y Notificar</label>
+                    <?php 
+                        $msgWa = "Hola equipo Mesaly, acabo de realizar el pago de la suscripción mensual para el restaurante " . ($tenant['nombre'] ?? 'Mi Restaurante') . " por valor de " . format_cop((int)($tenant['precio'] ?? 49000)) . " a través de Wompi. Adjunto el comprobante para la renovación.";
+                    ?>
+                    <a href="<?= e(support_whatsapp_url($msgWa)) ?>" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="btn btn-success w-full py-3 fw-700 flex items-center justify-center gap-2 text-sm shadow-sm"
+                       style="background: #25D366; border-color: #25D366; color: #FFFFFF; text-decoration: none;">
+                        <?= icon('whatsapp', 18) ?>
+                        <span>Ya Pagué &bull; Enviar Comprobante por WhatsApp</span>
+                    </a>
+                </div>
+
+                <div class="alert alert-info p-3 mb-0 text-xs">
+                    <?= icon('sparkles', 16) ?>
+                    <div>
+                        <strong>Acreditación Segura:</strong> Una vez recibido tu soporte por WhatsApp, el equipo de administración de Mesaly verificará la transacción y renovará de inmediato tu suscripción por <strong>1 mes calendario</strong>.
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer p-4 border-t flex items-center justify-between">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModalPagarMesaly()">Cancelar</button>
-                <button type="submit" class="btn btn-primary btn-sm fw-600 inline-flex items-center gap-2">
-                    <?= icon('check', 14) ?>
-                    <span>Confirmar y Pagar con Wompi</span>
-                </button>
+            <div class="modal-footer p-4 border-t flex items-center justify-end">
+                <button type="button" class="btn btn-secondary btn-sm btn-cerrar-wompi">Cerrar</button>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
 <script nonce="<?= e($cspNonce) ?>">
-const precioBaseMensual = <?= (int)($tenant['precio'] ?? 49000) ?>;
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('modalPagarMesaly');
+    if (!modal) return;
 
-function abrirModalPagarMesaly() {
-    document.getElementById('modalPagarMesaly').classList.remove('is-hidden');
-}
+    document.querySelectorAll('.btn-abrir-wompi').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            modal.classList.add('is-open', 'is-active');
+        });
+    });
 
-function cerrarModalPagarMesaly() {
-    document.getElementById('modalPagarMesaly').classList.add('is-hidden');
-}
+    document.querySelectorAll('.btn-cerrar-wompi').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            modal.classList.remove('is-open', 'is-active');
+        });
+    });
 
-function actualizarTotalWompi() {
-    const sel = document.getElementById('periodosSuscripcion');
-    const periodos = parseInt(sel.value, 10) || 1;
-    const total = periodos * precioBaseMensual;
-    document.getElementById('totalPagarDisplay').textContent = new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        maximumFractionDigits: 0
-    }).format(total);
-}
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            modal.classList.remove('is-open', 'is-active');
+        }
+    });
+});
 </script>
