@@ -160,8 +160,8 @@ if (!function_exists('support_whatsapp_number')) {
      */
     function support_whatsapp_number(): string
     {
-        $num = preg_replace('/\D/', '', (string)($_ENV['SUPPORT_WHATSAPP'] ?? '573228991339'));
-        return !empty($num) ? $num : '573228991339';
+        $num = preg_replace('/\D/', '', (string)($_ENV['SUPPORT_WHATSAPP'] ?? '573248670360'));
+        return !empty($num) ? $num : '573248670360';
     }
 }
 

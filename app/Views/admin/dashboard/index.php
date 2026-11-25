@@ -47,6 +47,39 @@
                 </span>
             <?php endif; ?>
         </a>
+
+        <!-- Botón para pagar suscripción al dueño de Mesaly con Wompi -->
+        <button type="button" class="btn btn-secondary btn-sm fw-600 inline-flex items-center gap-2" onclick="abrirModalPagarMesaly()" title="Pagar suscripción mensual a Mesaly">
+            <?= icon('cash', 14) ?>
+            <span>Pagar a Mesaly</span>
+        </button>
+    </div>
+</div>
+
+<!-- TARJETA DESTACADA DE SUSCRIPCIÓN SAAS Y BOTÓN WOMPI -->
+<div class="card p-4 mb-5 border-brand-light bg-subtle flex items-center justify-between flex-wrap gap-4">
+    <div class="flex items-center gap-3">
+        <div class="kpi-icon-badge kpi-icon-brand">
+            <?= icon('cash', 20) ?>
+        </div>
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="fw-700 text-main text-base">Suscripción SaaS Mesaly</span>
+                <span class="badge-pill <?= !empty($estadoSuscripcion['bloqueado']) ? 'danger' : (!empty($estadoSuscripcion['en_gracia']) ? 'warning' : 'success') ?>">
+                    <?= e($estadoSuscripcion['label'] ?? 'Al Día') ?>
+                </span>
+            </div>
+            <p class="text-xs text-muted m-0">
+                Tu plan actual vence el <strong><?= !empty($tenant['fecha_vencimiento']) ? date('d/m/Y', strtotime($tenant['fecha_vencimiento'])) : 'N/A' ?></strong> 
+                (<?= (int)($estadoSuscripcion['dias_restantes'] ?? 30) ?> días restantes). Tarifa: <strong><?= format_cop((int)($tenant['precio'] ?? 49000)) ?> COP / mes</strong>.
+            </p>
+        </div>
+    </div>
+    <div>
+        <button type="button" class="btn btn-primary btn-sm fw-600 inline-flex items-center gap-2" onclick="abrirModalPagarMesaly()">
+            <?= icon('check', 14) ?>
+            <span>Pagar Suscripción (Wompi)</span>
+        </button>
     </div>
 </div>
 
@@ -396,3 +429,94 @@
         </div>
     </div>
 </div>
+
+<!-- MODAL PARA PAGAR SUSCRIPCIÓN A MESALY (INTEGRACIÓN WOMPI) -->
+<div class="modal is-hidden" id="modalPagarMesaly" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" onclick="cerrarModalPagarMesaly()"></div>
+    <div class="modal-dialog max-w-500">
+        <form method="POST" action="<?= e(app_url('/admin/pagar-suscripcion')) ?>" class="m-0">
+            <?= csrf_field() ?>
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title text-lg fw-700 m-0">Pagar Suscripción a Mesaly</h3>
+                    <span class="text-xs text-muted">Pasarela Oficial Wompi Colombia (Bancolombia)</span>
+                </div>
+                <button type="button" class="btn-close" onclick="cerrarModalPagarMesaly()">&times;</button>
+            </div>
+            <div class="modal-body p-5">
+                <div class="card p-3 mb-4 bg-subtle border flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-muted block">Restaurante:</span>
+                        <strong class="text-sm text-main"><?= e($tenant['nombre']) ?></strong>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-muted block">Tarifa mensual:</span>
+                        <strong class="text-sm text-brand"><?= format_cop((int)($tenant['precio'] ?? 49000)) ?></strong>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="form-label text-sm fw-600 mb-1" for="periodosSuscripcion">Tiempo a Renovar</label>
+                    <select name="periodos" id="periodosSuscripcion" class="form-select" onchange="actualizarTotalWompi()">
+                        <option value="1">1 Mes (+30 días) — <?= format_cop((int)($tenant['precio'] ?? 49000)) ?></option>
+                        <option value="2">2 Meses (+60 días) — <?= format_cop((int)(($tenant['precio'] ?? 49000) * 2)) ?></option>
+                        <option value="3">3 Meses (+90 días) — <?= format_cop((int)(($tenant['precio'] ?? 49000) * 3)) ?></option>
+                        <option value="6">6 Meses (+180 días) — <?= format_cop((int)(($tenant['precio'] ?? 49000) * 6)) ?></option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="form-label text-sm fw-600 mb-1" for="metodoWompi">Método de Pago Wompi</label>
+                    <select name="metodo" id="metodoWompi" class="form-select">
+                        <option value="Wompi - Tarjeta de Crédito / Débito (Visa, Mastercard, AMEX)">Tarjeta de Crédito / Débito (Visa, Mastercard, AMEX)</option>
+                        <option value="Wompi - PSE / Transferencia en Línea">PSE / Débito Bancario en Línea</option>
+                        <option value="Wompi - Nequi">Nequi (Pago directo QR / Push)</option>
+                        <option value="Wompi - Botón Bancolombia">Botón Bancolombia Transferencia</option>
+                    </select>
+                </div>
+
+                <div class="alert alert-info p-3 mb-4 text-xs">
+                    <?= icon('sparkles', 16) ?>
+                    <div>
+                        <strong>Procesamiento Inmediato:</strong> Al confirmar el pago, la fecha de vencimiento se extenderá automáticamente y se registrará en el historial de pagos del Super Admin.
+                    </div>
+                </div>
+
+                <div class="p-3 bg-subtle rounded border flex items-center justify-between">
+                    <span class="text-sm fw-600 text-muted">Total a Pagar Wompi:</span>
+                    <strong class="text-xl text-brand" id="totalPagarDisplay"><?= format_cop((int)($tenant['precio'] ?? 49000)) ?></strong>
+                </div>
+            </div>
+            <div class="modal-footer p-4 border-t flex items-center justify-between">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModalPagarMesaly()">Cancelar</button>
+                <button type="submit" class="btn btn-primary btn-sm fw-600 inline-flex items-center gap-2">
+                    <?= icon('check', 14) ?>
+                    <span>Confirmar y Pagar con Wompi</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script nonce="<?= e($cspNonce) ?>">
+const precioBaseMensual = <?= (int)($tenant['precio'] ?? 49000) ?>;
+
+function abrirModalPagarMesaly() {
+    document.getElementById('modalPagarMesaly').classList.remove('is-hidden');
+}
+
+function cerrarModalPagarMesaly() {
+    document.getElementById('modalPagarMesaly').classList.add('is-hidden');
+}
+
+function actualizarTotalWompi() {
+    const sel = document.getElementById('periodosSuscripcion');
+    const periodos = parseInt(sel.value, 10) || 1;
+    const total = periodos * precioBaseMensual;
+    document.getElementById('totalPagarDisplay').textContent = new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        maximumFractionDigits: 0
+    }).format(total);
+}
+</script>

@@ -665,4 +665,101 @@ class NegocioController extends Controller
             'historicoMeses' => $historicoMeses,
         ], 'super');
     }
+
+    /**
+     * Pantalla de Logs y Auditoría del Sistema para Super Admin
+     */
+    public function logs(Request $request): Response
+    {
+        $pdo = Model::getPdo();
+        $q = trim((string)$request->query('q', ''));
+        $restauranteId = $request->query('restaurante_id') !== null && $request->query('restaurante_id') !== '' ? (int)$request->query('restaurante_id') : null;
+        $accion = trim((string)$request->query('accion', ''));
+        $desde = trim((string)$request->query('desde', ''));
+        $hasta = trim((string)$request->query('hasta', ''));
+
+        // Lista de restaurantes para el selector de filtro
+        $restaurantes = $pdo->query("SELECT id, nombre, slug FROM `restaurantes` WHERE `deleted_at` IS NULL ORDER BY nombre ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+        // Construir query de auditoría con filtros
+        $where = ["1=1"];
+        $params = [];
+
+        if ($q !== '') {
+            $where[] = "(a.accion LIKE :q OR a.entidad LIKE :q OR u.nombre LIKE :q OR u.email LIKE :q OR a.ip LIKE :q OR r.nombre LIKE :q)";
+            $params['q'] = "%{$q}%";
+        }
+
+        if ($restauranteId !== null && $restauranteId > 0) {
+            $where[] = "a.restaurante_id = :rid";
+            $params['rid'] = $restauranteId;
+        }
+
+        if ($accion !== '') {
+            $where[] = "a.accion = :accion";
+            $params['accion'] = $accion;
+        }
+
+        if ($desde !== '') {
+            $where[] = "a.created_at >= :desde";
+            $params['desde'] = $desde . ' 00:00:00';
+        }
+
+        if ($hasta !== '') {
+            $where[] = "a.created_at <= :hasta";
+            $params['hasta'] = $hasta . ' 23:59:59';
+        }
+
+        $whereSql = implode(" AND ", $where);
+
+        $sql = "SELECT a.*, 
+                       u.nombre as usuario_nombre, u.email as usuario_email, u.rol as usuario_rol,
+                       r.nombre as restaurante_nombre, r.slug as restaurante_slug
+                FROM `auditoria` a
+                LEFT JOIN `usuarios` u ON a.usuario_id = u.id
+                LEFT JOIN `restaurantes` r ON a.restaurante_id = r.id
+                WHERE {$whereSql}
+                ORDER BY a.created_at DESC
+                LIMIT 200";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Intentos de login recientes
+        $loginLogs = $pdo->query("SELECT * FROM `intentos_login` ORDER BY created_at DESC LIMIT 30")->fetchAll(PDO::FETCH_ASSOC);
+
+        // Métricas de resumen para la cabecera
+        $hoyStr = date('Y-m-d');
+        $totalLogs = (int)$pdo->query("SELECT COUNT(*) FROM `auditoria`")->fetchColumn();
+        $logsHoy = (int)$pdo->query("SELECT COUNT(*) FROM `auditoria` WHERE DATE(created_at) = '{$hoyStr}'")->fetchColumn();
+        $loginsHoyExitosos = (int)$pdo->query("SELECT COUNT(*) FROM `intentos_login` WHERE DATE(created_at) = '{$hoyStr}' AND exitoso = 1")->fetchColumn();
+        $loginsHoyFallidos = (int)$pdo->query("SELECT COUNT(*) FROM `intentos_login` WHERE DATE(created_at) = '{$hoyStr}' AND exitoso = 0")->fetchColumn();
+        $totalPagos = (int)$pdo->query("SELECT COUNT(*) FROM `pagos_suscripcion` WHERE anulado = 0")->fetchColumn();
+
+        // Tipos de acciones únicas para filtro
+        $accionesUnicas = $pdo->query("SELECT DISTINCT accion FROM `auditoria` ORDER BY accion ASC")->fetchAll(PDO::FETCH_COLUMN);
+
+        return $this->render('super/logs/index', [
+            'title' => 'Logs del Sistema & Auditoría — Super Admin',
+            'logs' => $logs,
+            'loginLogs' => $loginLogs,
+            'restaurantes' => $restaurantes,
+            'accionesUnicas' => $accionesUnicas,
+            'filtros' => [
+                'q' => $q,
+                'restaurante_id' => $restauranteId,
+                'accion' => $accion,
+                'desde' => $desde,
+                'hasta' => $hasta,
+            ],
+            'stats' => [
+                'total_logs' => $totalLogs,
+                'logs_hoy' => $logsHoy,
+                'logins_exitosos' => $loginsHoyExitosos,
+                'logins_fallidos' => $loginsHoyFallidos,
+                'total_pagos' => $totalPagos,
+            ],
+        ], 'super');
+    }
 }

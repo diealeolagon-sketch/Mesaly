@@ -6,6 +6,46 @@ Diseñada con un enfoque **mobile-first** para comensales y un panel de administ
 
 ---
 
+## Registro de Cambios y Mejoras Recientes
+
+A continuación se detallan las mejoras, correcciones y nuevas capacidades implementadas en el sistema:
+
+### 1. Aislamiento Multi-Tenant Estricto y Corrección en Reportes
+- **Aislamiento Total de Productos:** Se corrigió la consulta y filtrado de pedidos en reportes para garantizar que ningún producto de un restaurante aparezca en el resumen o estadísticas de otro (cero contaminación cruzada entre tenants).
+- **Consistencia en Métricas Top 5:** Los rankings de productos más vendidos ahora reflejan de manera fidedigna los platos propios del establecimiento consultado.
+
+### 2. Reconstrucción y Semillado de Locales Gastronómicos
+Se reconstruyeron desde cero tres restaurantes de muestra con catálogos 100% auténticos, grupos de modificadores, mesas y órdenes históricas:
+- **Café Macondo (`/cafe-macondo`):** Especialidad en café de origen, repostería artesanal, desayunos y sándwiches gourmet (10 platos).
+- **Pizzería Di Roma (`/pizzeria-di-roma`):** Pizzería artesanal al horno de piedra con pastas, calzones y postres italianos (10 platos).
+- **Sabor Criollo Colombiano (`/sabor-criollo`):** Cocina típica tradicional colombiana con Bandeja Paisa, Ajiaco Santafereño, Cazuela de Mariscos, Sancocho y entradas autóctonas (12 platos).
+- **Fotografía Gastronómica Real:** Cada restaurante cuenta con logotipo corporativo, banner panorámico e imágenes individuales en alta resolución para cada uno de sus 32 productos en `public/uploads/`.
+
+### 3. Experiencia de Pedido sin Fricción para Comensales
+- **Checkout Ágil:** Se eliminó la exigencia de registrar métodos de pago al comensal en la toma de comanda móvil. Los pedidos se envían de forma fluida a la cocina y a WhatsApp sin bloqueos financieros innecesarios para el cliente final.
+
+### 4. Preparación de Interfaz para Pagos de Suscripción SaaS (Wompi)
+- **Nota Importante:** La integración con la pasarela transaccional en vivo de Wompi aún no está conectada.
+- **Alcance Implementado:** Se realizó la preparación a nivel de interfaz de usuario (UI/UX) ubicando el botón de acción *"Pagar a Mesaly (Wompi)"* en el panel administrativo del restaurante y maquetando el modal explicativo con el desglose del plan. Esta base de interfaz queda lista para la conexión directa de las llaves API de Wompi en la siguiente fase.
+
+### 5. Módulo de Logs y Auditoría del Sistema (Super Admin)
+- Se desarrolló la pantalla `/superadmin/logs` accesible para el Super Administrador, la cual incluye:
+  - Tarjetas de métricas (KPIs): Total de eventos registrados, accesos exitosos, intentos bloqueados e incidentes críticos.
+  - Buscador en tiempo real y filtros dinámicos por severidad (info, warning, danger).
+  - Tabla de eventos de auditoría y tabla detallada de intentos de inicio de sesión con visualización de parámetros JSON formateados.
+
+### 6. Rediseño y Corrección de "Actualizar Contraseña" (`/cambiar-password`)
+- **Resolución de Error 500:** Se solucionó la excepción por método no definido (`Auth::isAdmin()`) añadiendo la compatibilidad en `App\Core\Auth` y ajustando la referencia a `Auth::isAdminNegocio()`.
+- **Identidad Visual Oficial de Mesaly:** Se integró la vista con el layout de login (`layouts/auth.php`), incorporando el fondo naranja con ondas de marca, el destello característico, el logotipo corporativo y campos con iconos interactivos de visualización de contraseña.
+- **Personaje 3D y Escala en PC:** Se reemplazó el personaje previo por el Chef 3D con teléfono inteligente (`chef-mobile-transparent.png`) y se amplió el contenedor en escritorio (`max-width: 440px`, `max-height: 520px`) para otorgarle presencia y balance visual en el panel lateral.
+
+### 7. Credenciales y Acceso Administrativo
+- **Super Admin:** `admin@mesaly.co` / `SuperAdmin123`
+- Acceso al panel de control global: `http://localhost/Mesaly/public/superadmin`
+- Actualización de contraseña: `http://localhost/Mesaly/public/cambiar-password`
+
+---
+
 ## Características Principales
 
 ### 1. Menú Digital Interactivo y Comensales
@@ -28,12 +68,13 @@ Diseñada con un enfoque **mobile-first** para comensales y un panel de administ
 ### 4. Reportes y Analítica Financiera
 - Dashboard con métricas clave: Ventas totales, ticket promedio, número de pedidos y ocupación.
 - Gráficos interactivos de ventas por fecha y horas de mayor consumo.
-- Ranking de los productos y categorías más vendidos.
+- Ranking de los productos y categorías más vendidos por restaurante.
 - Desglose por canales de venta (Mesa vs Domicilio) y métodos de pago (Efectivo, Transferencia, Tarjeta).
 
 ### 5. SuperAdmin y Multitenant
 - Gestión centralizada de múltiples restaurantes y marcas.
 - Control de planes de suscripción, fechas de corte y estados de cuenta.
+- Registro centralizado de logs y auditoría de eventos de seguridad.
 - Restricción automática de acceso y catálogos ante vencimiento de plan.
 
 ---
@@ -80,17 +121,13 @@ DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=mesaly
 DB_USERNAME=root
-DB_PASSWORD=
+DB_PASSWORD=root
 ```
 
 ### 3. Base de Datos
-Importa la estructura inicial y los datos base en tu gestor MySQL:
+Importa la estructura y datos completos más recientes desde `database/mesaly_db_completa.sql`:
 ```bash
-# 1. Esquema de tablas
-mysql -u root mesaly < database/schema.sql
-
-# 2. Datos semilla iniciales (restaurantes de muestra, usuarios y catálogo)
-mysql -u root mesaly < database/seeds.sql
+mysql -u root -p mesaly_db < database/mesaly_db_completa.sql
 ```
 
 ### 4. Permisos de Almacenamiento
@@ -121,17 +158,17 @@ Mesaly/
 │   ├── Middleware/        # Filtros de autenticación y tenant
 │   ├── Models/            # Modelos de datos con PDO
 │   ├── Services/          # Lógica de negocio (Horarios, WhatsApp, etc.)
-│   └── Views/             # Vistas PHP (layouts, admin, comensal, landing)
+│   └── Views/             # Vistas PHP (layouts, admin, comensal, landing, super)
 ├── config/                # Configuraciones de la app y rutas
-├── database/              # Esquema SQL, seeds y migraciones
+├── database/              # Esquema SQL, seeds y respaldo mesaly_db_completa.sql
 ├── docs/                  # Documentación técnica y especificaciones
 ├── public/                # DocumentRoot (index.php, CSS, JS, fuentes, imágenes)
 │   ├── assets/            # Estilos, scripts y assets de marca
-│   └── uploads/           # Imágenes cargadas por los comercios
+│   └── uploads/           # Imágenes gastronómicas organizadas por restaurante
 ├── storage/               # Logs y archivos de caché temporal
 ├── .env.example           # Plantilla de configuración de entorno
 ├── .gitignore             # Reglas de exclusión de Git
-└── README.md              # Documentación principal
+└── README.md              # Documentación principal y changelog
 ```
 
 ---

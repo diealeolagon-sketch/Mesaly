@@ -113,7 +113,7 @@
                     </a>
                 <?php endif; ?>
 
-                <a href="<?= e(support_whatsapp_url('Hola soporte Mesaly, necesito asistencia con mi restaurante: ' . ($tenant['nombre'] ?? ''))) ?>" target="_blank" rel="noopener" class="sidebar-footer-link" title="Contactar a Soporte Mesaly por WhatsApp (+57 322 899 1339)">
+                <a href="<?= e(support_whatsapp_url('Hola soporte Mesaly, necesito asistencia con mi restaurante: ' . ($tenant['nombre'] ?? ''))) ?>" target="_blank" rel="noopener" class="sidebar-footer-link" title="Contactar a Soporte Mesaly por WhatsApp (+57 324 867 0360)">
                     <?= icon('whatsapp', 16) ?>
                     <span>Soporte Mesaly</span>
                     <?= icon('external-link', 14, 'sidebar-footer-ext') ?>

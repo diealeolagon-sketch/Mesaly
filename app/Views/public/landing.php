@@ -956,7 +956,7 @@
                         </li>
                     </ul>
 
-                    <a href="https://wa.me/573228991339?text=Hola,%20deseo%20activar%20el%20Plan%20B%C3%A1sico%20de%20Mesaly" target="_blank" rel="noopener" class="btn-landing-outline" style="width: 100%;">
+                    <a href="https://wa.me/573248670360?text=Hola,%20deseo%20activar%20el%20Plan%20B%C3%A1sico%20de%20Mesaly" target="_blank" rel="noopener" class="btn-landing-outline" style="width: 100%;">
                         <span>Elegir Plan Básico</span>
                     </a>
                 </div>
@@ -1020,7 +1020,7 @@
                         </li>
                     </ul>
 
-                    <a href="https://wa.me/573228991339?text=Hola,%20deseo%20activar%20el%20Plan%20Pro%20de%20Mesaly" target="_blank" rel="noopener" class="btn-landing-primary" style="width: 100%;">
+                    <a href="https://wa.me/573248670360?text=Hola,%20deseo%20activar%20el%20Plan%20Pro%20de%20Mesaly" target="_blank" rel="noopener" class="btn-landing-primary" style="width: 100%;">
                         <span>Elegir Plan Pro</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -1087,7 +1087,7 @@
                         </li>
                     </ul>
 
-                    <a href="https://wa.me/573228991339?text=Hola,%20deseo%20activar%20el%20Plan%20Gran%20Sal%C3%B3n%20de%20Mesaly" target="_blank" rel="noopener" class="btn-landing-outline" style="width: 100%;">
+                    <a href="https://wa.me/573248670360?text=Hola,%20deseo%20activar%20el%20Plan%20Gran%20Sal%C3%B3n%20de%20Mesaly" target="_blank" rel="noopener" class="btn-landing-outline" style="width: 100%;">
                         <span>Elegir Plan Gran Salón</span>
                     </a>
                 </div>
@@ -1200,7 +1200,7 @@
                         </svg>
                         <span>Probar Menú Demo en Vivo</span>
                     </a>
-                    <a href="https://wa.me/573228991339?text=Hola,%20quiero%20conocer%20m%C3%A1s%20detalles%20de%20Mesaly%20para%20mi%20restaurante" target="_blank" rel="noopener" class="btn-landing-white-outline">
+                    <a href="https://wa.me/573248670360?text=Hola,%20quiero%20conocer%20m%C3%A1s%20detalles%20de%20Mesaly%20para%20mi%20restaurante" target="_blank" rel="noopener" class="btn-landing-white-outline">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                         </svg>
@@ -1263,7 +1263,7 @@
         </svg>
         <span>Ver Menú Demo</span>
     </a>
-    <a href="https://wa.me/573228991339?text=Hola,%20deseo%20m%C3%A1s%20informaci%C3%B3n%20sobre%20Mesaly" target="_blank" rel="noopener" class="mobile-bar-btn-ghost">
+    <a href="https://wa.me/573248670360?text=Hola,%20deseo%20m%C3%A1s%20informaci%C3%B3n%20sobre%20Mesaly" target="_blank" rel="noopener" class="mobile-bar-btn-ghost">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
         </svg>

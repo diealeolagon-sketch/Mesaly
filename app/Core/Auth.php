@@ -40,7 +40,10 @@ class Auth
         ]);
         $attempts = (int)$stmt->fetchColumn();
 
-        return $attempts >= 5;
+        // En desarrollo local permitimos mayor margen de intentos para no bloquear al desarrollador
+        $maxAttempts = ($ip === '127.0.0.1' || $ip === '::1') ? 25 : 5;
+
+        return $attempts >= $maxAttempts;
     }
 
     public static function recordLoginAttempt(string $ip, string $email, bool $success): void
@@ -165,6 +168,11 @@ class Auth
     public static function isAdminNegocio(): bool
     {
         return self::role() === self::ROLE_ADMIN_NEGOCIO;
+    }
+
+    public static function isAdmin(): bool
+    {
+        return self::isAdminNegocio() || self::isSuperAdmin();
     }
 
     public static function logout(): void
