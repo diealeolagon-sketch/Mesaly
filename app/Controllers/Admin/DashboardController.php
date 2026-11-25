@@ -156,10 +156,18 @@ class DashboardController extends Controller
         $tenant = TenantContext::getTenant();
         $estado = SuscripcionService::estadoDe($tenant);
 
+        // Si ya no está bloqueado (ya renovó o está al día), enviar directamente al dashboard
+        if (empty($estado['bloqueado'])) {
+            return $this->redirect(app_url('/admin'));
+        }
+
         return $this->render('admin/suscripcion_vencida', [
             'title' => 'Suscripción Suspendida — ' . ($tenant['nombre'] ?? 'Mesaly'),
             'tenant' => $tenant,
             'estado' => $estado,
+            'hero_title_prefix' => 'Atención',
+            'hero_title_highlight' => 'Mesaly',
+            'hero_desc' => 'Tu suscripción se encuentra pausada. Realiza el pago en segundos con Wompi o notifícanos por WhatsApp para reactivar tu carta digital.',
         ], 'auth');
     }
 }
