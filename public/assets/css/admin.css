@@ -2500,6 +2500,186 @@ body.admin-body {
     margin: 0 !important;
 }
 
+/* Botón Liberar Mesa en Modal */
+.btn-liberar-mesa-modal {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #10B981 !important;
+    color: #FFFFFF !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 7px 14px !important;
+    border-radius: 8px !important;
+    border: 1px solid #059669 !important;
+    box-shadow: 0 1px 2px rgba(16, 185, 129, 0.25) !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease-in-out !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    line-height: 1.3 !important;
+}
+.btn-liberar-mesa-modal:hover {
+    background: #059669 !important;
+    border-color: #047857 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.35) !important;
+}
+.btn-liberar-mesa-modal:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2) !important;
+}
+.btn-liberar-mesa-modal svg {
+    stroke-width: 2.4;
+    flex-shrink: 0;
+}
+
+/* Selects y Dropdowns Modernos de Filtros */
+.form-select,
+.reportes-select-control,
+.select-filter-compact {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 32px 0 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1E293B;
+    background-color: #FFFFFF;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    outline: none;
+    font-family: inherit;
+}
+
+.form-select:hover,
+.reportes-select-control:hover,
+.select-filter-compact:hover {
+    border-color: #94A3B8;
+    background-color: #F8FAFC;
+}
+
+.form-select:focus,
+.reportes-select-control:focus,
+.select-filter-compact:focus {
+    border-color: var(--color-brand, #E85D04);
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.15);
+}
+
+.form-select-sm {
+    height: 34px !important;
+    padding: 0 28px 0 10px !important;
+    font-size: 12.5px !important;
+    border-radius: 6px !important;
+    background-position: right 8px center !important;
+}
+
+/* Inputs de Filtros y Fechas */
+.form-input {
+    display: inline-block;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1E293B;
+    background-color: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.15s ease-in-out;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+}
+
+.form-input:hover {
+    border-color: #94A3B8;
+}
+
+.form-input:focus {
+    border-color: var(--color-brand, #E85D04);
+    box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.15);
+}
+
+.form-input-sm {
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 12.5px !important;
+    border-radius: 6px !important;
+}
+
+input[type="date"].form-input-sm {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* Barra de Controles de Reportes */
+.reportes-controls-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.reportes-controls-inline .date-range-picker-wrapper {
+    height: 36px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    background: #FFFFFF;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: border-color 0.15s ease;
+}
+.reportes-controls-inline .date-range-picker-wrapper:hover {
+    border-color: #94A3B8;
+}
+
+.reportes-controls-inline .reportes-select-control {
+    height: 36px;
+    font-size: 13px;
+}
+
+.reportes-controls-inline #btnSubmitFiltros {
+    height: 36px !important;
+    padding: 0 16px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    background: #0F172A !important;
+    color: #FFFFFF !important;
+    border: 1px solid #0F172A !important;
+    transition: all 0.15s ease-in-out !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12) !important;
+    cursor: pointer !important;
+}
+
+.reportes-controls-inline #btnSubmitFiltros:hover {
+    background: #1E293B !important;
+    border-color: #1E293B !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.2) !important;
+}
+.reportes-controls-inline #btnSubmitFiltros:active {
+    transform: translateY(0);
+}
+
 @keyframes modalSlideUp {
     from { opacity: 0; transform: translateY(16px) scale(0.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }

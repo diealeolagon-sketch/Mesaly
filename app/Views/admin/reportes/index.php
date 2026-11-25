@@ -111,7 +111,8 @@
                 </select>
 
                 <button type="submit" class="btn btn-secondary btn-sm fw-600" id="btnSubmitFiltros">
-                    Aplicar
+                    <?= icon('search', 13) ?>
+                    <span>Aplicar</span>
                 </button>
             </div>
         </div>
