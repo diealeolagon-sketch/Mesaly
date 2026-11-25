@@ -432,87 +432,341 @@
 
 <!-- MODAL PARA PAGAR SUSCRIPCIÓN A MESALY (INTEGRACIÓN WOMPI) -->
 <div class="modal-backdrop modal-backdrop-modern" id="modalPagarMesaly" role="dialog" aria-modal="true">
-    <div class="modal-dialog max-w-500">
+    <div class="modal-dialog modal-wompi-dialog">
         <div class="modal-content m-0">
-            <div class="modal-header">
-                <div>
-                    <h3 class="modal-title text-lg fw-700 m-0">Pagar Suscripción a Mesaly</h3>
-                    <span class="text-xs text-muted">Pasarela Oficial Wompi Colombia (Bancolombia)</span>
+            <!-- CABECERA DE MARCA MESALY + WOMPI -->
+            <div class="modal-wompi-header">
+                <div class="modal-wompi-brand-group">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-wompi-mesaly-logo">
+                    <span class="modal-wompi-divider"></span>
+                    <img src="<?= e(asset_url('/assets/img/payments/wompi.svg')) ?>" alt="Wompi" class="modal-wompi-wompi-logo">
                 </div>
-                <button type="button" class="btn-close btn-cerrar-wompi">&times;</button>
+                <button type="button" class="modal-wompi-close-btn btn-cerrar-wompi" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <div class="modal-body p-5">
-                <div class="card p-3 mb-4 bg-subtle border flex items-center justify-between">
-                    <div>
-                        <span class="text-xs text-muted block">Restaurante:</span>
-                        <strong class="text-sm text-main"><?= e($tenant['nombre']) ?></strong>
+
+            <div class="modal-body modal-wompi-body">
+                <!-- TARJETA PRINCIPAL DE PLAN Y TARIFA -->
+                <div class="modal-wompi-plan-box">
+                    <div class="modal-wompi-plan-info">
+                        <span class="modal-wompi-plan-badge">Suscripción SaaS Activa</span>
+                        <h4 class="modal-wompi-restaurant-name">
+                            <?= icon('store', 16) ?>
+                            <span><?= e($tenant['nombre']) ?></span>
+                        </h4>
                     </div>
-                    <div class="text-right">
-                        <span class="text-xs text-muted block">Tarifa mensual:</span>
-                        <strong class="text-sm text-brand"><?= format_cop((int)($tenant['precio'] ?? 49000)) ?></strong>
+                    <div class="modal-wompi-price-block">
+                        <span class="modal-wompi-price-amount"><?= format_cop((int)($tenant['precio'] ?? 49000)) ?></span>
+                        <span class="modal-wompi-price-cycle">/ 1 Mes Calendario</span>
                     </div>
                 </div>
 
-                <div class="p-3 mb-4 rounded border bg-white flex flex-col gap-2">
-                    <div class="flex items-center justify-between text-xs text-muted">
-                        <span>Ciclo de renovación:</span>
-                        <strong class="text-main">1 Mes Calendario</strong>
-                    </div>
-                    <div class="flex items-center justify-between text-xs text-muted">
-                        <span>Medios habilitados en Wompi:</span>
-                        <strong class="text-main">Tarjetas, Nequi, Daviplata, PSE</strong>
-                    </div>
-                    <div class="flex items-center justify-between text-sm fw-700 border-t pt-2 mt-1">
-                        <span class="text-muted">Total a Pagar:</span>
-                        <strong class="text-brand text-lg"><?= format_cop((int)($tenant['precio'] ?? 49000)) ?></strong>
+                <!-- TIRA DE LOGOTIPOS OFICIALES DE MEDIOS DE PAGO -->
+                <div class="modal-wompi-section">
+                    <span class="modal-wompi-section-title">Medios de Pago Habilitados en Wompi</span>
+                    <div class="modal-wompi-logos-grid">
+                        <div class="payment-logo-card" title="Visa">
+                            <img src="<?= e(asset_url('/assets/img/payments/visa.svg')) ?>" alt="Visa" class="payment-logo-img">
+                        </div>
+                        <div class="payment-logo-card" title="Mastercard">
+                            <img src="<?= e(asset_url('/assets/img/payments/mastercard.svg')) ?>" alt="Mastercard" class="payment-logo-img">
+                        </div>
+                        <div class="payment-logo-card" title="PSE">
+                            <img src="<?= e(asset_url('/assets/img/payments/pse.svg')) ?>" alt="PSE" class="payment-logo-img">
+                        </div>
+                        <div class="payment-logo-card" title="Nequi">
+                            <img src="<?= e(asset_url('/assets/img/payments/nequi.svg')) ?>" alt="Nequi" class="payment-logo-img">
+                        </div>
+                        <div class="payment-logo-card" title="Bancolombia">
+                            <img src="<?= e(asset_url('/assets/img/payments/bancolombia.svg')) ?>" alt="Bancolombia" class="payment-logo-img">
+                        </div>
+                        <div class="payment-logo-card" title="Daviplata">
+                            <img src="<?= e(asset_url('/assets/img/payments/daviplata.svg')) ?>" alt="Daviplata" class="payment-logo-img">
+                        </div>
                     </div>
                 </div>
 
-                <!-- PASO 1: PAGAR EN WOMPI -->
-                <div class="mb-4">
-                    <label class="block text-xs fw-700 uppercase tracking-wider text-muted mb-2">Paso 1: Realizar Pago en la Pasarela</label>
+                <!-- BOTÓN PRINCIPAL DE PAGO WOMPI -->
+                <div class="modal-wompi-section">
                     <a href="https://checkout.wompi.co/l/VPOS_8rydsK" 
                        target="_blank" 
                        rel="noopener noreferrer" 
-                       class="btn btn-primary w-full py-3 fw-700 flex items-center justify-center gap-2 text-base shadow-sm"
-                       style="background: #EA580C; border-color: #EA580C; text-decoration: none;">
-                        <?= icon('cash', 18) ?>
-                        <span>Ir a Pagar en Wompi (Link Oficial) &rarr;</span>
+                       class="btn-wompi-primary-pay">
+                        <span>Pagar con Wompi (Link Oficial)</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
                     </a>
-                    <span class="block text-xs text-muted mt-1 text-center">
-                        Se abrirá la pasarela segura de Wompi en una nueva pestaña.
+                    <span class="modal-wompi-security-note">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>Se abrirá el checkout seguro de Wompi Bancolombia en una pestaña nueva.</span>
                     </span>
                 </div>
 
-                <!-- PASO 2: NOTIFICAR Y ENVIAR COMPROBANTE -->
-                <div class="mb-4">
-                    <label class="block text-xs fw-700 uppercase tracking-wider text-muted mb-2">Paso 2: Confirmar y Notificar</label>
+                <!-- SECCIÓN DE NOTIFICACIÓN WHATSAPP -->
+                <div class="modal-wompi-wa-card">
+                    <div class="modal-wompi-wa-text">
+                        <strong>¿Ya completaste tu pago?</strong>
+                        <p>Notifícanos por WhatsApp con tu soporte para renovar tu suscripción de inmediato.</p>
+                    </div>
                     <?php 
                         $msgWa = "Hola equipo Mesaly, acabo de realizar el pago de la suscripción mensual para el restaurante " . ($tenant['nombre'] ?? 'Mi Restaurante') . " por valor de " . format_cop((int)($tenant['precio'] ?? 49000)) . " a través de Wompi. Adjunto el comprobante para la renovación.";
                     ?>
                     <a href="<?= e(support_whatsapp_url($msgWa)) ?>" 
                        target="_blank" 
                        rel="noopener noreferrer" 
-                       class="btn btn-success w-full py-3 fw-700 flex items-center justify-center gap-2 text-sm shadow-sm"
-                       style="background: #25D366; border-color: #25D366; color: #FFFFFF; text-decoration: none;">
-                        <?= icon('whatsapp', 18) ?>
-                        <span>Ya Pagué &bull; Enviar Comprobante por WhatsApp</span>
+                       class="btn-wompi-wa-link">
+                        <?= icon('whatsapp', 16) ?>
+                        <span>Enviar Comprobante</span>
                     </a>
                 </div>
-
-                <div class="alert alert-info p-3 mb-0 text-xs">
-                    <?= icon('sparkles', 16) ?>
-                    <div>
-                        <strong>Acreditación Segura:</strong> Una vez recibido tu soporte por WhatsApp, el equipo de administración de Mesaly verificará la transacción y renovará de inmediato tu suscripción por <strong>1 mes calendario</strong>.
-                    </div>
-                </div>
             </div>
-            <div class="modal-footer p-4 border-t flex items-center justify-end">
-                <button type="button" class="btn btn-secondary btn-sm btn-cerrar-wompi">Cerrar</button>
+
+            <div class="modal-wompi-footer">
+                <span class="modal-wompi-footer-ssl">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <span>Cifrado SSL 256-bit Wompi Bancolombia</span>
+                </span>
+                <button type="button" class="btn btn-secondary btn-sm btn-cerrar-wompi modal-wompi-btn-close-footer">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
+
+<style nonce="<?= e($cspNonce) ?>">
+.modal-wompi-dialog {
+    max-width: 520px !important;
+    border-radius: 24px !important;
+    box-shadow: 0 30px 70px -15px rgba(15, 23, 42, 0.45) !important;
+    border: 1px solid #E2E8F0 !important;
+    overflow: hidden !important;
+    background: #FFFFFF !important;
+    padding: 0 !important;
+}
+.modal-wompi-header {
+    background: #FFFFFF;
+    border-bottom: 1px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+}
+.modal-wompi-brand-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.modal-wompi-mesaly-logo {
+    height: 26px;
+    width: auto;
+    object-fit: contain;
+}
+.modal-wompi-divider {
+    width: 1px;
+    height: 22px;
+    background: #CBD5E1;
+}
+.modal-wompi-wompi-logo {
+    height: 22px;
+    width: auto;
+    object-fit: contain;
+}
+.modal-wompi-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #E2E8F0;
+    background: #F8FAFC;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.modal-wompi-close-btn:hover {
+    background: #E2E8F0;
+    color: #0F172A;
+}
+.modal-wompi-body {
+    padding: 22px 24px !important;
+}
+.modal-wompi-plan-box {
+    background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+    border: 1px solid #FED7AA;
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.modal-wompi-plan-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #C2410C;
+    display: block;
+    margin-bottom: 4px;
+}
+.modal-wompi-restaurant-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1E293B;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.modal-wompi-price-block {
+    text-align: right;
+}
+.modal-wompi-price-amount {
+    font-size: 22px;
+    font-weight: 800;
+    color: #EA580C;
+    display: block;
+    line-height: 1.1;
+}
+.modal-wompi-price-cycle {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #9A3412;
+    display: block;
+    margin-top: 2px;
+}
+.modal-wompi-section {
+    margin-bottom: 20px;
+}
+.modal-wompi-section-title {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 10px;
+}
+.modal-wompi-logos-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+.payment-logo-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 6px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.payment-logo-card:hover {
+    transform: translateY(-2px);
+    border-color: #CBD5E1;
+}
+.payment-logo-img {
+    max-height: 24px;
+    max-width: 90%;
+    object-fit: contain;
+}
+.btn-wompi-primary-pay {
+    background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
+    color: #FFFFFF !important;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none !important;
+    box-shadow: 0 6px 20px rgba(234, 88, 12, 0.32);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-wompi-primary-pay:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(234, 88, 12, 0.42);
+}
+.modal-wompi-security-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: #64748B;
+    margin-top: 8px;
+    text-align: center;
+}
+.modal-wompi-wa-card {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.modal-wompi-wa-text strong {
+    font-size: 12.5px;
+    color: #166534;
+    display: block;
+    margin-bottom: 2px;
+}
+.modal-wompi-wa-text p {
+    font-size: 11.5px;
+    color: #15803D;
+    margin: 0;
+    line-height: 1.3;
+}
+.btn-wompi-wa-link {
+    background: #25D366;
+    color: #FFFFFF !important;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none !important;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.25);
+    transition: background 0.15s ease;
+}
+.btn-wompi-wa-link:hover {
+    background: #1EBE5D;
+}
+.modal-wompi-footer {
+    background: #F8FAFC;
+    border-top: 1px solid #F1F5F9;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.modal-wompi-footer-ssl {
+    font-size: 11.5px;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.modal-wompi-btn-close-footer {
+    border-radius: 8px;
+    font-weight: 600;
+}
+</style>
 
 <script nonce="<?= e($cspNonce) ?>">
 document.addEventListener('DOMContentLoaded', function () {
