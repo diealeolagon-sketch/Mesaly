@@ -61,8 +61,20 @@ final class FactusConfig
 
     public function assertCredentialsConfigured(): void
     {
-        if ($this->clientId === '' || $this->clientSecret === '' || $this->username === '' || $this->password === '') {
-            throw new FactusConfigurationException('Las credenciales de Factus Sandbox no están configuradas.');
+        $credentials = [
+            'FACTUS_USERNAME' => $this->username,
+            'FACTUS_PASSWORD' => $this->password,
+            'FACTUS_CLIENT_ID' => $this->clientId,
+            'FACTUS_CLIENT_SECRET' => $this->clientSecret,
+        ];
+        $missing = [];
+        foreach ($credentials as $name => $value) {
+            if (trim($value) === '' || str_starts_with(strtoupper(trim($value)), 'REEMPLAZAR_')) {
+                $missing[] = $name;
+            }
+        }
+        if ($missing !== []) {
+            throw new FactusConfigurationException('Completa estas variables en .env: ' . implode(', ', $missing) . '.');
         }
     }
 }

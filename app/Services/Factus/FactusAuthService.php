@@ -50,6 +50,11 @@ final class FactusAuthService
         $this->tokenStore->clear();
     }
 
+    public function authenticateWithCredentials(): FactusToken
+    {
+        return $this->withExclusiveLock(fn (): FactusToken => $this->authenticate());
+    }
+
     private function authenticate(): FactusToken
     {
         $this->config->assertCredentialsConfigured();
@@ -79,8 +84,13 @@ final class FactusAuthService
     {
         $accessToken = $response['access_token'] ?? null;
         $expiresIn = $response['expires_in'] ?? null;
-        if (!is_string($accessToken) || $accessToken === '' || !is_numeric($expiresIn) || (int)$expiresIn < 1) {
-            throw new FactusInvalidResponseException('Factus no devolvió un token de acceso válido.');
+        if (is_string($expiresIn) && ctype_digit($expiresIn)) {
+            $expiresIn = (int)$expiresIn;
+        }
+        $now = $this->clock->now();
+        if (!is_string($accessToken) || trim($accessToken) === '' || !is_int($expiresIn)
+            || $expiresIn < 1 || $expiresIn > PHP_INT_MAX - $now) {
+            throw new FactusInvalidResponseException('Factus no devolvió un token de acceso con vigencia válida.');
         }
 
         $refreshToken = is_string($response['refresh_token'] ?? null)
@@ -90,7 +100,8 @@ final class FactusAuthService
             $accessToken,
             $refreshToken,
             is_string($response['token_type'] ?? null) ? $response['token_type'] : 'Bearer',
-            $this->clock->now() + (int)$expiresIn,
+            $now + $expiresIn,
+            $expiresIn,
         );
         $this->tokenStore->save($token);
         return $token;

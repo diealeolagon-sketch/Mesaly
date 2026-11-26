@@ -704,6 +704,11 @@
             <!-- Botones de Acción en el Modal -->
             <div class="order-detail-actions-row flex items-center justify-between flex-wrap gap-2 pt-3 border-t">
                 <div class="flex items-center gap-2">
+                    <?php if (\App\Core\Auth::isAdminNegocio()): ?>
+                        <a href="#" id="detBtnFactura" class="btn btn-secondary btn-sm is-hidden">
+                            <?= icon('receipt', 14) ?> Generar factura electrónica
+                        </a>
+                    <?php endif; ?>
                     <button type="button" class="btn btn-secondary btn-sm flex items-center gap-1.5" id="btnImprimirComandaModal" title="Imprimir ticket para cocina o comanda de mesa">
                         <?= icon('printer', 14) ?>
                         <span>Imprimir Comanda</span>
@@ -831,6 +836,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const p = data.pedido;
                 content.classList.remove('is-hidden');
+                const billingLink = document.getElementById('detBtnFactura');
+                if (billingLink) {
+                    billingLink.classList.toggle('is-hidden', p.estado !== 'entregado');
+                    billingLink.href = baseUrl + '/admin/facturacion/pedidos/' + Number(p.id);
+                }
 
                 document.getElementById('detCodigo').innerText = '#' + p.codigo;
                 const badge = document.getElementById('detEstadoBadge');

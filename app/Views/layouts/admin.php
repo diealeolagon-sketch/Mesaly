@@ -66,7 +66,7 @@
                             <?= icon('dashboard', 18) ?>
                             <span>Resumen</span>
                         </a>
-                        <a href="<?= e(app_url('/admin/pedidos')) ?>" class="sidebar-nav-link <?= str_contains($currentUri, '/pedidos') ? 'active' : '' ?>">
+                        <a href="<?= e(app_url('/admin/pedidos')) ?>" class="sidebar-nav-link <?= str_contains($currentUri, '/admin/pedidos') ? 'active' : '' ?>">
                             <?= icon('cart', 18) ?>
                             <span>Pedidos en Vivo</span>
                         </a>
@@ -88,6 +88,12 @@
                             <?= icon('chart', 18) ?>
                             <span>Reportes &amp; Cierre</span>
                         </a>
+                        <?php if (\App\Core\Auth::isAdminNegocio()): ?>
+                            <a href="<?= e(app_url('/admin/facturacion')) ?>" class="sidebar-nav-link <?= str_contains($currentUri, '/admin/facturacion') ? 'active' : '' ?>">
+                                <?= icon('receipt', 18) ?>
+                                <span>Facturación electrónica</span>
+                            </a>
+                        <?php endif; ?>
                         <a href="<?= e(app_url('/admin/catalogo')) ?>" class="sidebar-nav-link <?= str_contains($currentUri, '/catalogo') ? 'active' : '' ?>">
                             <?= icon('catalog', 18) ?>
                             <span>Catálogo de Menú</span>
@@ -96,7 +102,7 @@
                             <?= icon('modifiers', 18) ?>
                             <span>Modificadores</span>
                         </a>
-                        <a href="<?= e(app_url('/admin/configuracion')) ?>" class="sidebar-nav-link <?= str_contains($currentUri, '/configuracion') ? 'active' : '' ?>">
+                        <a href="<?= e(app_url('/admin/configuracion')) ?>" class="sidebar-nav-link <?= str_contains($currentUri, '/admin/configuracion') ? 'active' : '' ?>">
                             <?= icon('settings', 18) ?>
                             <span>Configuración</span>
                         </a>

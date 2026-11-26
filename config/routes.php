@@ -10,6 +10,7 @@ use App\Controllers\Admin\CatalogoController;
 use App\Controllers\Admin\ConfigController;
 use App\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Controllers\Admin\DisponibilidadController;
+use App\Controllers\Admin\FacturacionController;
 use App\Controllers\Admin\MesaController;
 use App\Controllers\Admin\ModificadorController;
 use App\Controllers\Admin\PedidoAdminController;
@@ -71,6 +72,18 @@ $router->get('/superadmin/logs', [NegocioController::class, 'logs'], $superMiddl
 $adminBaseMiddlewares = [new AuthMiddleware(), new TenantMiddleware()];
 $adminMiddlewares = [new AuthMiddleware(), new TenantMiddleware(), new SuscripcionMiddleware()];
 $adminPostMiddlewares = [new AuthMiddleware(), new TenantMiddleware(), new SuscripcionMiddleware(), new CsrfMiddleware()];
+$billingMiddlewares = [...$adminMiddlewares, new RolMiddleware(Auth::ROLE_ADMIN_NEGOCIO)];
+$billingPostMiddlewares = [...$billingMiddlewares, new CsrfMiddleware()];
+
+$router->get('/admin/facturacion', [FacturacionController::class, 'index'], $billingMiddlewares);
+$router->get('/admin/facturacion/configuracion', [FacturacionController::class, 'settings'], $billingMiddlewares);
+$router->post('/admin/facturacion/configuracion', [FacturacionController::class, 'save'], $billingPostMiddlewares);
+$router->get('/admin/facturacion/pedidos/{id}', [FacturacionController::class, 'show'], $billingMiddlewares);
+$router->post('/admin/facturacion/pedidos/{id}/revisar', [FacturacionController::class, 'review'], $billingPostMiddlewares);
+$router->post('/admin/facturacion/pedidos/{id}/emitir', [FacturacionController::class, 'issue'], $billingPostMiddlewares);
+$router->post('/admin/facturacion/pedidos/{id}/estado', [FacturacionController::class, 'reconcile'], $billingPostMiddlewares);
+$router->post('/admin/facturacion/pedidos/{id}/reintentar', [FacturacionController::class, 'retry'], $billingPostMiddlewares);
+$router->get('/admin/facturacion/pedidos/{id}/documentos/{formato}', [FacturacionController::class, 'document'], $billingMiddlewares);
 
 $router->get('/admin/suscripcion-vencida', [AdminDashboardController::class, 'suscripcionVencida'], $adminBaseMiddlewares);
 $router->get('/admin', [AdminDashboardController::class, 'index'], $adminMiddlewares);

@@ -11,6 +11,7 @@ final class FactusToken
         public readonly string $refreshToken,
         public readonly string $tokenType,
         public readonly int $expiresAt,
+        public readonly ?int $expiresIn = null,
     ) {
     }
 

@@ -74,7 +74,7 @@ final class CurlHttpTransport implements HttpTransportInterface
             if ($errno === CURLE_OPERATION_TIMEDOUT) {
                 throw new FactusTimeoutException('Factus no respondió dentro del tiempo permitido.');
             }
-            throw new FactusConnectionException('No fue posible conectar con Factus.');
+            throw new FactusConnectionException('No fue posible conectar con Factus.', null, ['curl_errno' => $errno]);
         }
 
         return new HttpResponse($statusCode, $responseHeaders, $responseBody);
