@@ -144,55 +144,73 @@
 <?php endif; ?>
 
 <!-- MODAL GRUPO -->
-<div id="modal_grupo" class="modal-backdrop">
-    <div class="modal-dialog modal-dialog-lg">
-        <h3 id="grupo_modal_title" class="modal-title">
-            Nuevo Grupo de Modificadores
-        </h3>
-        <p class="text-xs text-muted modal-subtitle">
-            Configura el tipo de pregunta y reglas que verá el comensal.
-        </p>
-
+<div id="modal_grupo" class="modal-backdrop modal-backdrop-modern">
+    <div class="modal-dialog-modern modal-dialog-lg">
         <form method="POST" action="<?= e(app_url('/admin/modificadores/grupo/guardar')) ?>">
             <?= csrf_field() ?>
             <input type="hidden" id="grupo_id" name="id" value="0">
 
-            <div class="form-group">
-                <label for="grupo_nombre" class="form-label">Nombre del Grupo *</label>
-                <input type="text" id="grupo_nombre" name="nombre" class="form-control" placeholder="Ej: Término de la carne, Tipo de salsa, Adicionales" required>
-                <span class="form-hint">Este título aparecerá en el menú interactivo para el cliente.</span>
-            </div>
-
-            <div class="form-group">
-                <label for="grupo_tipo" class="form-label">Tipo de Selección *</label>
-                <select id="grupo_tipo" name="tipo" class="form-control" required>
-                    <option value="unica">Selección Única (El cliente escoge exactamente una opción)</option>
-                    <option value="multiple">Selección Múltiple (El cliente puede marcar varias adiciones)</option>
-                </select>
-            </div>
-
-            <div class="form-group toggle-card-box">
-                <label class="toggle-card-label">
-                    <input type="checkbox" id="grupo_obligatorio" name="obligatorio" value="1" class="form-checkbox">
-                    <div>
-                        <span class="toggle-card-title">Respuesta obligatoria</span>
-                        <span class="form-hint mt-1">El cliente no podrá agregar el plato al pedido sin elegir una opción.</span>
+            <div class="modal-header-modern">
+                <div class="modal-brand-header">
+                    <div class="modal-brand-header-left">
+                        <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                        <div class="modal-brand-divider"></div>
+                        <div class="modal-brand-titles">
+                            <h3 id="grupo_modal_title" class="modal-brand-title">
+                                Nuevo Grupo de Modificadores
+                            </h3>
+                            <p class="modal-brand-subtitle">
+                                Configura el tipo de pregunta y reglas que verá el comensal.
+                            </p>
+                        </div>
                     </div>
-                </label>
-            </div>
-
-            <div id="box_multi_limites" class="multi-limits-grid">
-                <div class="form-group m-0">
-                    <label for="grupo_min" class="form-label">Mínimo de opciones</label>
-                    <input type="number" id="grupo_min" name="min_selecciones" class="form-control" value="0" min="0">
-                </div>
-                <div class="form-group m-0">
-                    <label for="grupo_max" class="form-label">Máximo de opciones</label>
-                    <input type="number" id="grupo_max" name="max_selecciones" class="form-control" value="3" min="1">
+                    <button type="button" class="modal-btn-close-circle" onclick="cerrarGrupoModal()" aria-label="Cerrar modal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <div class="modal-footer modal-footer-bordered mt-6 pt-5">
+            <div class="modal-body-modern">
+                <div class="form-group">
+                    <label for="grupo_nombre" class="form-label">Nombre del Grupo *</label>
+                    <input type="text" id="grupo_nombre" name="nombre" class="form-control" placeholder="Ej: Término de la carne, Tipo de salsa, Adicionales" required>
+                    <span class="form-hint">Este título aparecerá en el menú interactivo para el cliente.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="grupo_tipo" class="form-label">Tipo de Selección *</label>
+                    <select id="grupo_tipo" name="tipo" class="form-control" required>
+                        <option value="unica">Selección Única (El cliente escoge exactamente una opción)</option>
+                        <option value="multiple">Selección Múltiple (El cliente puede marcar varias adiciones)</option>
+                    </select>
+                </div>
+
+                <div class="form-group toggle-card-box">
+                    <label class="toggle-card-label">
+                        <input type="checkbox" id="grupo_obligatorio" name="obligatorio" value="1" class="form-checkbox">
+                        <div>
+                            <span class="toggle-card-title">Respuesta obligatoria</span>
+                            <span class="form-hint mt-1">El cliente no podrá agregar el plato al pedido sin elegir una opción.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="box_multi_limites" class="multi-limits-grid">
+                    <div class="form-group m-0">
+                        <label for="grupo_min" class="form-label">Mínimo de opciones</label>
+                        <input type="number" id="grupo_min" name="min_selecciones" class="form-control" value="0" min="0">
+                    </div>
+                    <div class="form-group m-0">
+                        <label for="grupo_max" class="form-label">Máximo de opciones</label>
+                        <input type="number" id="grupo_max" name="max_selecciones" class="form-control" value="3" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer-modern">
                 <button type="button" class="btn btn-secondary" id="btnCancelarGrupoModal">Cancelar</button>
                 <button type="submit" class="btn btn-primary btn-save-action">Guardar Grupo</button>
             </div>

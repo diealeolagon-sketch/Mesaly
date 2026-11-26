@@ -261,16 +261,16 @@
                             <td class="text-right">
                                 <div class="inline-flex items-center justify-end gap-1">
                                     
-                                    <!-- 1. Botón Primario: Registrar Pago -->
+                                    <!-- 1. Botón Primario: Renovar (+1 Mes) -->
                                     <button type="button" 
-                                            class="btn btn-primary btn-sm btn-modal-pago" 
+                                            class="btn btn-primary btn-sm btn-modal-pago fw-600 inline-flex items-center gap-1" 
                                             data-id="<?= (int)$neg['id'] ?>" 
                                             data-nombre="<?= e($neg['nombre']) ?>" 
                                             data-precio="<?= (int)($neg['precio'] ?? 49000) ?>"
                                             data-ciclo="<?= e($neg['ciclo'] ?? 'mensual') ?>"
-                                            title="Registrar pago manual de suscripción">
+                                            title="Registrar pago y renovar suscripción (+30 días)">
                                         <?= icon('cash', 13) ?>
-                                        <span>Pagar</span>
+                                        <span>Renovar (+30 Días)</span>
                                     </button>
 
                                     <!-- 2. Botón WhatsApp: Cobrar / Recordatorio -->
@@ -364,18 +364,22 @@
 <div class="modal-backdrop modal-backdrop-modern" id="modal_pago">
     <div class="modal-dialog modal-dialog-modern">
         <div class="modal-header-modern">
-            <div class="flex items-center gap-3">
-                <div class="section-icon-box section-icon-success">
-                    <?= icon('cash', 20) ?>
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h2 class="modal-brand-title">Registrar Pago Manual</h2>
+                        <span id="pago_nombre_negocio" class="modal-brand-subtitle"></span>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-sm fw-700 text-main m-0">
-                        Registrar Pago Manual
-                    </h2>
-                    <span id="pago_nombre_negocio" class="text-xs text-muted fw-600"></span>
-                </div>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalPago" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm p-1 leading-none" id="btnCerrarModalPago">&times;</button>
         </div>
 
         <form method="POST" id="formRegistrarPago" action="">
@@ -396,11 +400,11 @@
                     <div class="form-group">
                         <label for="pago_periodos" class="form-label">Cantidad de Períodos *</label>
                         <select id="pago_periodos" name="periodos" class="form-control" required>
-                            <option value="1" selected>1 período</option>
-                            <option value="2">2 períodos</option>
-                            <option value="3">3 períodos</option>
-                            <option value="6">6 períodos (semestral)</option>
-                            <option value="12">12 períodos (anual)</option>
+                            <option value="1" selected>1 período (30 días)</option>
+                            <option value="2">2 períodos (60 días)</option>
+                            <option value="3">3 períodos (90 días)</option>
+                            <option value="6">6 períodos (semestral - 180 días)</option>
+                            <option value="12">12 períodos (anual - 360 días)</option>
                         </select>
                     </div>
                 </div>
@@ -409,19 +413,19 @@
                     <label for="pago_metodo" class="form-label">Método Utilizado por el Cliente *</label>
                     <select id="pago_metodo" name="metodo" class="form-control" required>
                         <?php foreach ($metodosPago as $k => $lbl): ?>
-                            <option value="<?= e($k) ?>" <?= $k === 'transferencia' ? 'selected' : '' ?>><?= e($lbl) ?></option>
+                            <option value="<?= e($k) ?>" <?= $k === 'wompi' ? 'selected' : '' ?>><?= e($lbl) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="pago_referencia" class="form-label">Comprobante o Referencia de Pago</label>
-                    <input type="text" id="pago_referencia" name="referencia" class="form-control" placeholder="Ej: Nequi M1234567, Transf. #98721">
+                    <input type="text" id="pago_referencia" name="referencia" class="form-control" placeholder="Ej: Wompi #12345, Nequi M1234567, Transf. #98721">
                 </div>
 
                 <div class="form-group">
                     <label for="pago_nota" class="form-label">Nota Interna (Opcional)</label>
-                    <input type="text" id="pago_nota" name="nota" class="form-control" placeholder="Ej: Pago adelantado del mes con descuento promocional">
+                    <input type="text" id="pago_nota" name="nota" class="form-control" placeholder="Ej: Pago recibido vía Wompi verificado por WhatsApp">
                 </div>
             </div>
 
@@ -431,7 +435,7 @@
                 </button>
                 <button type="submit" class="btn btn-primary btn-submit-pago">
                     <?= icon('check', 16) ?>
-                    <span>Asentar Pago y Renovar</span>
+                    <span>Asentar Pago y Renovar (+30 Días)</span>
                 </button>
             </div>
         </form>
@@ -444,18 +448,22 @@
 <div class="modal-backdrop modal-backdrop-modern" id="modal_extender">
     <div class="modal-dialog modal-dialog-modern modal-dialog-md">
         <div class="modal-header-modern">
-            <div class="flex items-center gap-3">
-                <div class="section-icon-box">
-                    <?= icon('plus', 20) ?>
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h2 class="modal-brand-title">Extender Días de Suscripción</h2>
+                        <span id="extender_nombre_negocio" class="modal-brand-subtitle"></span>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-sm fw-700 text-main m-0">
-                        Extender Días de Suscripción
-                    </h2>
-                    <span id="extender_nombre_negocio" class="text-xs text-muted fw-600"></span>
-                </div>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalExtender" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm p-1 leading-none" id="btnCerrarModalExtender">&times;</button>
         </div>
 
         <form method="POST" id="formExtenderDias" action="">
@@ -502,18 +510,22 @@
 <div class="modal-backdrop modal-backdrop-modern" id="modal_historial">
     <div class="modal-dialog modal-dialog-modern modal-dialog-lg">
         <div class="modal-header-modern">
-            <div class="flex items-center gap-3">
-                <div class="section-icon-box section-icon-blue">
-                    <?= icon('cash', 20) ?>
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h2 class="modal-brand-title">Historial de Pagos del Restaurante</h2>
+                        <span id="historial_nombre_negocio" class="modal-brand-subtitle"></span>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-sm fw-700 text-main m-0">
-                        Historial de Pagos del Restaurante
-                    </h2>
-                    <span id="historial_nombre_negocio" class="text-xs text-muted fw-600"></span>
-                </div>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalHistorial" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm p-1 leading-none" id="btnCerrarModalHistorial">&times;</button>
         </div>
 
         <div class="modal-body-modern p-0">

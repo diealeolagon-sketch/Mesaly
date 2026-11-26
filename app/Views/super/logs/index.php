@@ -226,8 +226,8 @@
                             </td>
                             <td class="text-right">
                                 <?php if (!empty($log['despues']) || !empty($log['antes'])): ?>
-                                    <button type="button" class="btn btn-secondary btn-xs" 
-                                            onclick='verDetalleLog(<?= json_encode($log, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)'>
+                                    <button type="button" class="btn btn-secondary btn-xs btn-ver-log" 
+                                            data-log="<?= htmlspecialchars(json_encode($log, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>">
                                         <?= icon('eye', 13) ?>
                                         <span>Ver Datos</span>
                                     </button>
@@ -292,17 +292,27 @@
 </div>
 
 <!-- MODAL DE DETALLE DE AUDITORÍA -->
-<div class="modal is-hidden" id="modalDetalleLog" role="dialog" aria-modal="true">
-    <div class="modal-backdrop" onclick="cerrarDetalleLog()"></div>
-    <div class="modal-dialog max-w-600">
-        <div class="modal-header">
-            <div>
-                <h3 class="modal-title text-lg fw-700 m-0" id="modalLogTitulo">Detalle de Auditoría</h3>
-                <span class="text-xs text-muted" id="modalLogSubtitulo"></span>
+<div class="modal-backdrop modal-backdrop-modern is-hidden" id="modalDetalleLog" role="dialog" aria-modal="true">
+    <div class="modal-dialog-modern max-w-600">
+        <div class="modal-header-modern">
+            <div class="modal-brand-header">
+                <div class="modal-brand-header-left">
+                    <img src="<?= e(asset_url('/assets/img/logo-horizontal.svg')) ?>" alt="Mesaly" class="modal-brand-mesaly-logo">
+                    <span class="modal-brand-divider"></span>
+                    <div class="modal-brand-titles">
+                        <h3 class="modal-brand-title" id="modalLogTitulo">Detalle de Auditoría</h3>
+                        <span class="modal-brand-subtitle" id="modalLogSubtitulo"></span>
+                    </div>
+                </div>
+                <button type="button" class="modal-btn-close-circle" id="btnCerrarModalLog" aria-label="Cerrar modal" title="Cerrar">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <button type="button" class="btn-close" onclick="cerrarDetalleLog()">&times;</button>
         </div>
-        <div class="modal-body p-4">
+        <div class="modal-body-modern">
             <div id="modalLogAntesWrap" class="mb-3 is-hidden">
                 <label class="text-xs fw-600 text-muted block mb-1">Estado Anterior (Antes):</label>
                 <pre id="modalLogAntes" class="code-block text-xs p-3 bg-subtle border rounded overflow-x-auto"></pre>
@@ -312,8 +322,8 @@
                 <pre id="modalLogDespues" class="code-block text-xs p-3 bg-subtle border rounded overflow-x-auto"></pre>
             </div>
         </div>
-        <div class="modal-footer p-3 border-t flex justify-end">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarDetalleLog()">Cerrar</button>
+        <div class="modal-footer-modern">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnCerrarModalLogFooter">Cerrar</button>
         </div>
     </div>
 </div>
@@ -340,7 +350,7 @@ function switchLogsTab(tab) {
 
 function verDetalleLog(log) {
     document.getElementById('modalLogTitulo').textContent = 'Evento: ' + log.accion;
-    document.getElementById('modalLogSubtitulo').textContent = 'Entidad: ' + log.entidad + ' #' + (log.entidad_id || '') + ' | ' + log.created_at;
+    document.getElementById('modalLogSubtitulo').textContent = 'Entidad: ' + log.entidad + ' #' + (log.entidad_id || '') + ' | ' + (log.created_at || '');
 
     const antesWrap = document.getElementById('modalLogAntesWrap');
     const antesPre = document.getElementById('modalLogAntes');
@@ -366,10 +376,48 @@ function verDetalleLog(log) {
         despuesPre.textContent = '(Sin datos adicionales)';
     }
 
-    document.getElementById('modalDetalleLog').classList.remove('is-hidden');
+    const modal = document.getElementById('modalDetalleLog');
+    modal.classList.remove('is-hidden');
+    modal.classList.add('is-open', 'is-active');
 }
 
 function cerrarDetalleLog() {
-    document.getElementById('modalDetalleLog').classList.add('is-hidden');
+    const modal = document.getElementById('modalDetalleLog');
+    if (modal) {
+        modal.classList.add('is-hidden');
+        modal.classList.remove('is-open', 'is-active');
+    }
 }
+
+// Event Delegation compatible con CSP
+document.addEventListener('click', function(e) {
+    const btnVer = e.target.closest('.btn-ver-log');
+    if (btnVer) {
+        e.preventDefault();
+        try {
+            const raw = btnVer.getAttribute('data-log');
+            if (raw) {
+                const logData = JSON.parse(raw);
+                verDetalleLog(logData);
+            }
+        } catch(err) {
+            console.error('Error parseando datos del log:', err);
+        }
+        return;
+    }
+
+    const modal = document.getElementById('modalDetalleLog');
+    if (e.target === modal) {
+        cerrarDetalleLog();
+    }
+});
+
+document.getElementById('btnCerrarModalLog')?.addEventListener('click', cerrarDetalleLog);
+document.getElementById('btnCerrarModalLogFooter')?.addEventListener('click', cerrarDetalleLog);
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarDetalleLog();
+    }
+});
 </script>
