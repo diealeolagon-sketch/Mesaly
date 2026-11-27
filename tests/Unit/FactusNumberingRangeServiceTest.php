@@ -10,6 +10,7 @@ use App\Services\Factus\FactusAuthService;
 use App\Services\Factus\FactusClientInterface;
 use App\Services\Factus\FactusConfig;
 use App\Services\Factus\FactusInvalidResponseException;
+use App\Services\Factus\FactusInvoiceService;
 use App\Services\Factus\FactusNumberingRangeService;
 use App\Services\Factus\FactusServerException;
 use App\Services\Factus\FactusToken;
@@ -58,6 +59,40 @@ final class FactusNumberingRangeServiceTest extends TestCase
         self::assertSame([], $this->service($client)->listInvoiceRanges());
     }
 
+    public function testValidatesTheRealSandboxEnvelopeAndMatchesTheExactPrefix(): void
+    {
+        $range = [
+            'id' => 389, 'document' => 'Factura de Venta', 'prefix' => 'SETP',
+            'from' => 990000000, 'to' => 995000000, 'current' => 990043312,
+            'resolution_number' => '18760000001', 'start_date' => '2019-01-19', 'end_date' => '2030-01-19',
+            'is_expired' => false, 'is_active' => true, 'is_external' => false, 'deleted_at' => null,
+        ];
+        $client = $this->createMock(FactusClientInterface::class);
+        $client->expects(self::exactly(3))->method('requestJson')
+            ->with('GET', '/v2/numbering-ranges?filter%5Bdocument%5D=21&page=1')
+            ->willReturn(['status' => 'OK', 'message' => 'Solicitud exitosa', 'data' => [
+                'data' => [
+                    $range,
+                    array_replace($range, ['id' => '410', 'prefix' => 'ALT', 'is_active' => '1', 'is_expired' => '0']),
+                    array_replace($range, ['id' => 411, 'is_active' => false]),
+                    array_replace($range, ['id' => 412, 'is_expired' => true]),
+                    array_replace($range, ['id' => 413, 'document' => 'Documento Soporte']),
+                    array_replace($range, ['id' => 414, 'end_date' => '2019-01-20']),
+                ],
+                'pagination' => ['total' => 6, 'per_page' => 10, 'current_page' => 1, 'last_page' => 1],
+            ]]);
+
+        $authenticated = $this->authenticatedClient($client);
+        $available = (new FactusNumberingRangeService($authenticated))->listAvailableInvoiceRanges();
+        self::assertSame([389, 410], array_column($available, 'id'));
+        $invoiceService = new FactusInvoiceService($authenticated);
+        $selected = $invoiceService->availableRange(389, 'SETP');
+        self::assertSame('18760000001', $selected['resolution_number']);
+        self::assertSame('2030-01-19', $selected['end_date']);
+        $this->expectException(\DomainException::class);
+        $invoiceService->availableRange(389, 'STEP');
+    }
+
     #[DataProvider('invalidResponses')]
     public function testRejectsInvalidResponses(array $response): void
     {
@@ -88,12 +123,17 @@ final class FactusNumberingRangeServiceTest extends TestCase
 
     private function service(FactusClientInterface $client): FactusNumberingRangeService
     {
+        return new FactusNumberingRangeService($this->authenticatedClient($client));
+    }
+
+    private function authenticatedClient(FactusClientInterface $client): AuthenticatedFactusClient
+    {
         $clock = $this->createStub(ClockInterface::class);
         $clock->method('now')->willReturn(1_800_000_000);
         $store = $this->createStub(TokenStoreInterface::class);
         $store->method('load')->willReturn(new FactusToken('test-access-token', '', 'Bearer', 1_800_003_600));
         $config = new FactusConfig('sandbox', 'https://api-sandbox.factus.com.co', '', '', '', '', '');
         $auth = new FactusAuthService($config, $client, $store, $clock, '');
-        return new FactusNumberingRangeService(new AuthenticatedFactusClient($client, $auth));
+        return new AuthenticatedFactusClient($client, $auth);
     }
 }

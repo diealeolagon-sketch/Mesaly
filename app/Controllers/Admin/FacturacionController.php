@@ -16,9 +16,11 @@ use App\Models\Pedido;
 use App\Services\Factus\FactusBillingAccount;
 use App\Services\Factus\FactusException;
 use App\Services\Factus\FactusInvoiceService;
+use App\Services\Factus\FactusNumberingRangeService;
 use App\Services\Factus\InvoiceDraft;
 use Closure;
 use DomainException;
+use PDOException;
 use Throwable;
 
 final class FacturacionController extends Controller
@@ -61,6 +63,24 @@ final class FacturacionController extends Controller
         ]));
     }
 
+    public function ranges(Request $request): Response
+    {
+        return $this->handle(function (int $tenant) use ($request): Response {
+            $settings = $this->invoices->settings($tenant) ?? ['ambiente' => 'sandbox'];
+            [$credentials, $global] = $this->submittedAccount($request->post(), $tenant);
+            if ($credentials !== [] || $global) {
+                $settings['credenciales'] = $global ? null : FactusBillingAccount::encrypt($tenant, $credentials);
+            }
+            [, $client] = ($this->connect)($tenant, $settings);
+            $fields = array_flip(['id', 'prefix', 'resolution_number', 'start_date', 'end_date']);
+            $ranges = array_map(
+                static fn (array $range): array => array_intersect_key($range, $fields),
+                (new FactusNumberingRangeService($client))->listAvailableInvoiceRanges(),
+            );
+            return (new Response())->json(['ranges' => $ranges])->header('Cache-Control', 'no-store');
+        }, json: true);
+    }
+
     public function save(Request $request): Response
     {
         return $this->handle(function (int $tenant) use ($request): Response {
@@ -95,21 +115,7 @@ final class FacturacionController extends Controller
                     $taxes[$code] = InvoiceDraft::tax($tax);
                 }
             }
-            $credentials = [];
-            foreach (FactusBillingAccount::CREDENTIALS as $key) {
-                $value = $input[$key] ?? '';
-                if (!is_string($value) || strlen($value) > 2048 || preg_match('/[\x00-\x1F\x7F]/', $value)) {
-                    throw new DomainException('Hay una credencial inválida.');
-                }
-                if (trim($value) !== '') {
-                    $credentials[$key] = $value;
-                }
-            }
-            $global = ($input['global'] ?? null) === '1';
-            if (($global && (!FactusBillingAccount::globalAllowed($tenant) || $credentials !== []))
-                || ($credentials !== [] && count($credentials) !== 4)) {
-                throw new DomainException('Selecciona una fuente de credenciales válida o completa las cuatro credenciales.');
-            }
+            [$credentials, $global] = $this->submittedAccount($input, $tenant);
             $cipher = $credentials === [] ? null : FactusBillingAccount::encrypt($tenant, $credentials);
             if ($enabled && $cipher === null && empty($current['credenciales']) && !FactusBillingAccount::globalAllowed($tenant)) {
                 throw new DomainException('Configura las cuatro credenciales Sandbox del restaurante.');
@@ -121,6 +127,26 @@ final class FacturacionController extends Controller
             Session::flash('success', 'Configuración de facturación guardada.');
             return $this->redirect(app_url(self::BASE . '/configuracion'));
         }, self::BASE . '/configuracion');
+    }
+
+    private function submittedAccount(array $input, int $tenant): array
+    {
+        $credentials = [];
+        foreach (FactusBillingAccount::CREDENTIALS as $key) {
+            $value = $input[$key] ?? '';
+            if (!is_string($value) || strlen($value) > 2048 || preg_match('/[\x00-\x1F\x7F]/', $value)) {
+                throw new DomainException('Hay una credencial inválida.');
+            }
+            if (trim($value) !== '') {
+                $credentials[$key] = $value;
+            }
+        }
+        $global = ($input['global'] ?? null) === '1';
+        if (($global && (!FactusBillingAccount::globalAllowed($tenant) || $credentials !== []))
+            || ($credentials !== [] && count($credentials) !== count(FactusBillingAccount::CREDENTIALS))) {
+            throw new DomainException('Selecciona una fuente de credenciales válida o completa las cuatro credenciales.');
+        }
+        return [$credentials, $global];
     }
 
     public function show(Request $request, array $params): Response
@@ -290,7 +316,8 @@ final class FacturacionController extends Controller
                     // La referencia persistida permite conciliar cuando Factus vuelva a responder.
                 }
             }
-        } catch (Throwable) {
+        } catch (Throwable $error) {
+            $this->logInternalError($tenant, $error);
             $result = ['estado' => 'incierta', 'error' => 'No se confirmó la emisión. Consulta el estado por referencia.'];
         }
         $this->invoices->record($tenant, $invoice, $user, $version, $result);
@@ -351,7 +378,7 @@ final class FacturacionController extends Controller
         ], 'admin')->header('Cache-Control', 'private, no-store');
     }
 
-    private function handle(callable $action, ?string $redirect = null): Response
+    private function handle(callable $action, ?string $redirect = null, bool $json = false): Response
     {
         $tenant = Auth::tenantId();
         if (!$tenant || Auth::role() !== Auth::ROLE_ADMIN_NEGOCIO || !Auth::id()) {
@@ -361,17 +388,39 @@ final class FacturacionController extends Controller
             return $action($tenant);
         } catch (DomainException $error) {
             $message = $error->getMessage();
+            $status = 422;
         } catch (FactusException $error) {
             $message = $error->httpStatus === 429 ? 'Factus limitó las solicitudes. Intenta más tarde.'
                 : 'Factus Sandbox no pudo completar la consulta. Revisa la conexión y la cuenta configurada.';
+            $status = $error->httpStatus === 429 ? 429 : 502;
         } catch (Throwable $error) {
-            Logger::error('Error local de facturación electrónica.', ['restaurante_id' => $tenant, 'tipo' => get_class($error)]);
-            $message = 'No se pudo completar la operación. Verifica que la migración de facturación esté aplicada.';
+            $this->logInternalError($tenant, $error);
+            $message = 'No se pudo completar la operación de facturación. Si el problema persiste, contacta a soporte.';
+            $status = 503;
+        }
+        if ($json) {
+            return (new Response())->json(['message' => $message], $status)->header('Cache-Control', 'no-store');
         }
         if ($redirect === null) {
             return $this->view('error', compact('message'))->setStatusCode(503);
         }
         Session::flash('error', $message);
         return $this->redirect(app_url($redirect));
+    }
+
+    private function logInternalError(int $tenant, Throwable $error): void
+    {
+        $context = [
+            'restaurante_id' => $tenant,
+            'tipo' => $error::class,
+            'archivo' => basename($error->getFile()),
+            'linea' => $error->getLine(),
+        ];
+        if ($error instanceof PDOException) {
+            $context['sqlstate'] = $error->errorInfo[0] ?? null;
+            $context['codigo_motor'] = $error->errorInfo[1] ?? null;
+        }
+        // Los mensajes y argumentos de excepciones pueden contener datos fiscales o credenciales.
+        Logger::error('Error local de facturación electrónica.', $context);
     }
 }

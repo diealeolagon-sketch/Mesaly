@@ -49,7 +49,7 @@ final class FacturacionPersistenceTest extends TestCase
             mesa_id BIGINT NULL, subtotal INT, costo_envio INT, metodo_pago VARCHAR(20)
         ) ENGINE=InnoDB");
         $pdo->exec("INSERT INTO pedidos VALUES
-            (10, 1, 'TEST-10', 10, 'Persona de prueba', 'entregado', 1000, NOW(), NULL, 1000, 0, 'efectivo'),
+            (10, 1, 'TEST-10', 10, 'Persona de prueba', 'entregado', 1000, NOW(), 1, 1000, 0, 'efectivo'),
             (11, 2, 'TEST-11', 11, 'Persona de prueba', 'entregado', 1000, NOW(), NULL, 1000, 0, 'efectivo'),
             (12, 1, 'TEST-12', 12, 'Persona de prueba', 'entregado', 1000, NOW(), NULL, 1000, 0, 'efectivo')");
         $pdo->exec('CREATE TEMPORARY TABLE mesas (id BIGINT PRIMARY KEY, numero INT, nombre VARCHAR(100))');
@@ -69,6 +69,9 @@ final class FacturacionPersistenceTest extends TestCase
                 'impuestos' => [22 => ['code' => 'excluded', 'rate' => '0']], 'credenciales' => null,
             ], false);
             self::assertSame('SETP', $model->settings(1)['prefijo']);
+            $pending = ['q' => '', 'estado' => 'sin_factura', 'desde' => '', 'hasta' => ''];
+            self::assertSame([12, 10], array_column($model->listing(1, $pending, 1)['rows'], 'id'));
+            self::assertSame([11], array_column($model->listing(2, $pending, 1)['rows'], 'id'));
             $id = $model->reserve(1, 10, 1, str_repeat('a', 64), 'MESALY-SB-test', $snapshot);
             self::assertIsInt($id);
             self::assertNull($model->reserve(1, 10, 1, str_repeat('a', 64), 'MESALY-SB-another', $snapshot));
@@ -86,6 +89,7 @@ final class FacturacionPersistenceTest extends TestCase
             self::assertCount(4, $model->events(1, $id));
             $list = $model->listing(1, ['q' => 'SETP1', 'estado' => 'validada', 'desde' => '', 'hasta' => ''], 1);
             self::assertSame([10], array_column($list['rows'], 'id'));
+            self::assertSame([12], array_column($model->listing(1, $pending, 1)['rows'], 'id'));
 
             Session::set('user', ['id' => 1, 'rol' => 'admin_negocio', 'restaurante_id' => 1, 'nombre' => 'Pruebas']);
             TenantContext::setTenant(['id' => 1, 'slug' => 'pruebas', 'nombre' => 'Pruebas']);
@@ -93,8 +97,24 @@ final class FacturacionPersistenceTest extends TestCase
             self::assertSame(200, $response->getStatusCode());
             self::assertStringContainsString('Factus Sandbox', $response->getContent());
             self::assertStringContainsString('SETP1', $response->getContent());
+            self::assertStringContainsString('Generar factura electrónica', $response->getContent());
             self::assertStringNotContainsString('TEST-11', $response->getContent());
             $controller = new FacturacionController($model, fn (): array => $this->simulatedConnection());
+            $settings = $controller->settings(new Request('GET', '/admin/facturacion/configuracion'));
+            self::assertStringContainsString('Verificar conexión y consultar rangos', $settings->getContent());
+            $rangeRequest = new Request('POST', '/admin/facturacion/configuracion/rangos');
+            self::assertSame(403, (new CsrfMiddleware())->handle($rangeRequest)?->getStatusCode());
+            $ranges = $controller->ranges($rangeRequest);
+            self::assertSame(200, $ranges->getStatusCode());
+            self::assertSame('no-store', $ranges->getHeader('Cache-Control'));
+            self::assertSame(['ranges' => [[
+                'id' => 389, 'prefix' => 'SETP', 'resolution_number' => '18760000001',
+                'start_date' => '2000-01-01', 'end_date' => '2099-01-01',
+            ]]], json_decode($ranges->getContent(), true, 16, JSON_THROW_ON_ERROR));
+            self::assertSame(422, $controller->ranges(new Request(
+                'POST', '/admin/facturacion/configuracion/rangos', ['username' => 'parcial'],
+            ))->getStatusCode());
+            self::assertNull($model->settings(1)['credenciales']);
             $form = $controller->show(new Request('GET', '/admin/facturacion/pedidos/12'), ['id' => 12]);
             self::assertSame(200, $form->getStatusCode());
             self::assertStringContainsString('Producto de prueba', $form->getContent());
@@ -137,8 +157,12 @@ final class FacturacionPersistenceTest extends TestCase
         $client->method('requestJson')->willReturnCallback(
             static function (string $method, string $path, array $body): array {
                 if ($path === '/v2/numbering-ranges?filter%5Bdocument%5D=21&page=1') {
-                    return ['data' => [['id' => 389, 'prefix' => 'SETP', 'is_active' => true,
-                        'is_expired' => false, 'start_date' => '2000-01-01', 'end_date' => '2099-01-01']]];
+                    return ['status' => 'OK', 'data' => [
+                        'data' => [['id' => 389, 'document' => 'Factura de Venta', 'prefix' => 'SETP', 'is_active' => true,
+                            'resolution_number' => '18760000001', 'is_expired' => false,
+                            'start_date' => '2000-01-01', 'end_date' => '2099-01-01']],
+                        'pagination' => ['current_page' => 1, 'last_page' => 1],
+                    ]];
                 }
                 if ($path === '/v2/bills/SETP2/download-pdf') {
                     return ['data' => ['pdf_base_64_encoded' => base64_encode('%PDF-1.7 Factus de prueba')]];

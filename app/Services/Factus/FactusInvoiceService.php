@@ -17,12 +17,8 @@ final class FactusInvoiceService
 
     public function availableRange(int $id, string $prefix): array
     {
-        $today = date('Y-m-d');
-        foreach ((new FactusNumberingRangeService($this->client))->listInvoiceRanges() as $range) {
-            if ((string)$range['id'] === (string)$id && $range['prefix'] === $prefix && $range['is_available']
-                && is_string($range['start_date']) && InvoiceDraft::validDate($range['start_date'])
-                && is_string($range['end_date']) && InvoiceDraft::validDate($range['end_date'])
-                && $range['start_date'] <= $today && $range['end_date'] >= $today) {
+        foreach ((new FactusNumberingRangeService($this->client))->listAvailableInvoiceRanges() as $range) {
+            if ($range['id'] === $id && $range['prefix'] === $prefix) {
                 return $range;
             }
         }

@@ -88,7 +88,9 @@ final class FacturaElectronica extends Model
         if ($filters['q'] !== '') {
             $like = '%' . strtr($filters['q'], ['!' => '!!', '%' => '!%', '_' => '!_']) . '%';
             $where .= " AND (p.codigo LIKE ? ESCAPE '!' OR CAST(p.consecutivo AS CHAR) LIKE ? ESCAPE '!'
-                OR f.numero LIKE ? ESCAPE '!' OR COALESCE(f.comprador, p.cliente_nombre) LIKE ? ESCAPE '!')";
+                OR f.numero LIKE ? ESCAPE '!'
+                OR CONVERT(COALESCE(f.comprador, p.cliente_nombre) USING utf8mb4)
+                    COLLATE utf8mb4_unicode_ci LIKE ? ESCAPE '!')";
             array_push($params, $like, $like, $like, $like);
         }
         foreach (['desde' => '>=', 'hasta' => '<='] as $field => $operator) {

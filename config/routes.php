@@ -78,6 +78,7 @@ $billingPostMiddlewares = [...$billingMiddlewares, new CsrfMiddleware()];
 $router->get('/admin/facturacion', [FacturacionController::class, 'index'], $billingMiddlewares);
 $router->get('/admin/facturacion/configuracion', [FacturacionController::class, 'settings'], $billingMiddlewares);
 $router->post('/admin/facturacion/configuracion', [FacturacionController::class, 'save'], $billingPostMiddlewares);
+$router->post('/admin/facturacion/configuracion/rangos', [FacturacionController::class, 'ranges'], $billingPostMiddlewares);
 $router->get('/admin/facturacion/pedidos/{id}', [FacturacionController::class, 'show'], $billingMiddlewares);
 $router->post('/admin/facturacion/pedidos/{id}/revisar', [FacturacionController::class, 'review'], $billingPostMiddlewares);
 $router->post('/admin/facturacion/pedidos/{id}/emitir', [FacturacionController::class, 'issue'], $billingPostMiddlewares);

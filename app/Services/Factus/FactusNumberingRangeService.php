@@ -40,10 +40,28 @@ final class FactusNumberingRangeService
         return $ranges;
     }
 
+    public function listAvailableInvoiceRanges(): array
+    {
+        $today = date('Y-m-d');
+        return array_values(array_filter($this->listInvoiceRanges(), static function (array $range) use ($today): bool {
+            $document = $range['document_name'] ?? $range['document'];
+            return is_string($document) && in_array(mb_strtolower(trim($document)), [
+                'factura de venta', 'factura electrónica de venta',
+            ], true) && $range['is_available']
+                && is_string($range['prefix']) && ctype_alnum($range['prefix']) && strlen($range['prefix']) <= 16
+                && is_string($range['start_date']) && InvoiceDraft::validDate($range['start_date'])
+                && is_string($range['end_date']) && InvoiceDraft::validDate($range['end_date'])
+                && $range['start_date'] <= $today && $range['end_date'] >= $today;
+        }));
+    }
+
     private function normalizeRange(mixed $row): array
     {
         $id = is_array($row) ? ($row['id'] ?? null) : null;
-        if (!(is_int($id) && $id > 0) && !(is_string($id) && trim($id) !== '')) {
+        $numericId = is_int($id) || (is_string($id) && ctype_digit($id))
+            ? filter_var(ltrim((string)$id, '0'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
+            : false;
+        if ($numericId === false) {
             throw new FactusInvalidResponseException('Factus devolvió un rango sin ID válido.');
         }
 
@@ -55,6 +73,7 @@ final class FactusNumberingRangeService
             }
             $range[$field] = $value;
         }
+        $range['id'] = $numericId;
         $range['is_active'] = $this->flag($row['is_active'] ?? null);
         $range['is_expired'] = $this->flag($row['is_expired'] ?? null);
         $range['is_external'] = $this->flag($row['is_external'] ?? null);
